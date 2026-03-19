@@ -31,7 +31,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("posts")
-        .select("*, categories!posts_category_id_fkey(name, emoji)")
+        .select("*, categories!posts_category_id_fkey(name, emoji, slug)")
         .eq("id", postId)
         .maybeSingle();
       if (!data) return null;
