@@ -146,7 +146,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
       {/* Post article */}
       <article className="border border-border bg-card">
-        <div className="p-6 pb-4">
+        <div className="p-4 md:p-6 pb-4">
           {/* Category + pin badge */}
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[.65rem] font-heading tracking-wider uppercase text-gold/70 bg-gold/5 px-2 py-1">
