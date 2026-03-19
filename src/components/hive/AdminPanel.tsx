@@ -487,9 +487,9 @@ const AdminPanel = () => {
                                 cnpj: profile.cnpj || "",
                               });
                             }}
-                            className="text-muted-foreground hover:text-foreground text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading"
+                            className="text-muted-foreground hover:text-foreground text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading"
                           >
-                            <Pencil size={10} />
+                            <Pencil size={13} />
                             Editar
                           </Button>
                           <Button
