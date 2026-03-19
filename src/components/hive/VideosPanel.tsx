@@ -21,6 +21,7 @@ const VideosPanel = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ title: "", description: "", video_url: "", thumbnail_url: "", category: "geral" });
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [theaterVideo, setTheaterVideo] = useState<any | null>(null);
 
   const { data: videos, isLoading } = useQuery({
     queryKey: ["videos"],
