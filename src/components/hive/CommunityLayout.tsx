@@ -123,9 +123,7 @@ const CommunityLayout = () => {
     <span className="relative">
       <Bell size={14} />
       {(unreadCount ?? 0) > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 bg-gold text-background text-[.5rem] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
-          {unreadCount! > 9 ? "9+" : unreadCount}
-        </span>
+        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
       )}
     </span>
   );
