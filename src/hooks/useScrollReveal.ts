@@ -6,11 +6,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const useScrollReveal = () => {
   useEffect(() => {
-    // GSAP ScrollTrigger for .reveal elements
+    // ── Reveal elements ──
     const els = document.querySelectorAll(".reveal");
 
     els.forEach((el) => {
-      // Determine delay from reveal-delay-N class
       let delay = 0;
       el.classList.forEach((cls) => {
         const match = cls.match(/^reveal-delay-(\d+)$/);
@@ -19,13 +18,68 @@ export const useScrollReveal = () => {
 
       gsap.fromTo(
         el,
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 50, filter: "blur(3px)" },
         {
           opacity: 1,
           y: 0,
-          duration: 0.9,
+          filter: "blur(0px)",
+          duration: 1,
           delay,
-          ease: "power2.out",
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            once: true,
+          },
+        }
+      );
+    });
+
+    // ── Section eyebrow — horizontal drift ──
+    document.querySelectorAll(".section-eyebrow").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { x: -15 },
+        {
+          x: 15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2,
+          },
+        }
+      );
+    });
+
+    // ── Section titles — subtle lift ──
+    document.querySelectorAll(".section-title").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { y: 15 },
+        {
+          y: -15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 2,
+          },
+        }
+      );
+    });
+
+    // ── Horizontal dividers / borders — scale in ──
+    document.querySelectorAll(".divider").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { scaleX: 0, transformOrigin: "left center" },
+        {
+          scaleX: 1,
+          duration: 1.2,
+          ease: "power2.inOut",
           scrollTrigger: {
             trigger: el,
             start: "top 92%",
@@ -35,33 +89,108 @@ export const useScrollReveal = () => {
       );
     });
 
-    // Smooth parallax for section eyebrows
-    document.querySelectorAll(".section-eyebrow").forEach((el) => {
-      gsap.to(el, {
-        x: 20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: el,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
+    // ── Proof bar — fade in on scroll ──
+    const proofBar = document.querySelector(".proof-bar-wrapper");
+    if (proofBar) {
+      gsap.fromTo(
+        proofBar,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: proofBar,
+            start: "top 95%",
+            once: true,
+          },
+        }
+      );
+    }
+
+    // ── Vertical items — staggered slide from left ──
+    const verticalItems = document.querySelectorAll(".vertical-item-gsap");
+    if (verticalItems.length) {
+      gsap.fromTo(
+        verticalItems,
+        { opacity: 0, x: -40 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.9,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: verticalItems[0],
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
+    }
+
+    // ── Stats counters — scale pop ──
+    document.querySelectorAll(".stat-value-gsap").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { scale: 0.6, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 0.7,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+            once: true,
+          },
+        }
+      );
     });
 
-    // Parallax on section titles
-    document.querySelectorAll(".section-title").forEach((el) => {
-      gsap.to(el, {
-        y: -20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: el,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        },
-      });
-    });
+    // ── Hive visual — rotate in ──
+    const hiveVisual = document.querySelector(".hive-visual-gsap");
+    if (hiveVisual) {
+      gsap.fromTo(
+        hiveVisual,
+        { opacity: 0, scale: 0.8, rotate: -8 },
+        {
+          opacity: 1,
+          scale: 1,
+          rotate: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: hiveVisual,
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
+    }
+
+    // ── CTA section — dramatic entrance ──
+    const ctaSection = document.getElementById("cta-section");
+    if (ctaSection) {
+      gsap.fromTo(
+        ctaSection.children,
+        { opacity: 0, y: 60, filter: "blur(4px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1,
+          stagger: 0.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ctaSection,
+            start: "top 80%",
+            once: true,
+          },
+        }
+      );
+    }
 
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
