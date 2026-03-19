@@ -91,10 +91,10 @@ const HiveSection = () => {
   }, []);
 
   return (
-    <section id="hive" className="border-t border-border px-7 py-20 md:px-14 md:py-[140px] grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-      <div className="reveal relative aspect-square max-w-[280px] md:max-w-[480px]">
-        <div className="absolute -inset-4 border border-gold-border rounded-full" style={{ animation: "spin-slow 20s linear infinite" }} />
-        <div className="absolute -inset-10 border border-dashed border-gold-dim rounded-full" style={{ animation: "spin-slow 35s linear infinite reverse" }} />
+    <section id="hive" className="border-t border-border px-6 py-[72px] md:px-[60px] md:py-[130px] grid grid-cols-1 md:grid-cols-2 gap-[60px] md:gap-[100px] items-center">
+      <div className="reveal relative aspect-square max-w-[280px] md:max-w-[460px]">
+        <div className="absolute -inset-4 border border-gold-border rounded-full" style={{ animation: "spin-slow 22s linear infinite" }} />
+        <div className="absolute -inset-11 border border-dashed border-[rgba(200,169,110,0.12)] rounded-full" style={{ animation: "spin-slow 40s linear infinite reverse" }} />
         <div className="w-full h-full rounded-full overflow-hidden">
           <canvas ref={canvasRef} className="w-full h-full block" />
         </div>
