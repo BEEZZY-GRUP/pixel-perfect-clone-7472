@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 
+const CONFESSIONARIO_SLUG = "confessionario";
+
 interface Props {
   postId: string;
   onBack: () => void;
@@ -29,7 +31,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("posts")
-        .select("*, categories!posts_category_id_fkey(name, emoji)")
+        .select("*, categories!posts_category_id_fkey(name, emoji, slug)")
         .eq("id", postId)
         .maybeSingle();
       if (!data) return null;
@@ -132,7 +134,8 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   }
 
   const createdAt = new Date(post.created_at);
-
+  const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
+  const hideAuthor = isConfessionario && !isAdmin;
   return (
     <div>
       {/* Back button */}
@@ -163,21 +166,21 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
           {/* Author info */}
           <div className="flex items-center gap-3 mb-5">
             <button
-              onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-              className={!post.is_anonymous ? "cursor-pointer" : "cursor-default"}
+              onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+              className={!hideAuthor && !post.is_anonymous ? "cursor-pointer" : "cursor-default"}
             >
               <UserAvatar
-                avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
-                name={post.is_anonymous ? "A" : post.profile?.company_name}
+                avatarUrl={hideAuthor ? null : (post.is_anonymous ? null : post.profile?.avatar_url)}
+                name={hideAuthor ? "A" : (post.is_anonymous ? "A" : post.profile?.company_name)}
                 size="lg"
               />
             </button>
             <div>
               <button
-                onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-                className={`text-foreground font-medium text-sm ${!post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+                className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
               >
-                {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
               </button>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
                 <Clock size={10} />
@@ -250,18 +253,18 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
                 className="flex gap-3 p-4 border border-border border-t-0 first:border-t bg-card hover:bg-secondary/30 transition-colors"
               >
                 <UserAvatar
-                  avatarUrl={c.profile?.avatar_url}
-                  name={c.profile?.company_name}
+                  avatarUrl={isConfessionario && !isAdmin ? null : c.profile?.avatar_url}
+                  name={isConfessionario && !isAdmin ? "A" : c.profile?.company_name}
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
                       <button
-                        onClick={() => navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
-                        className="text-foreground text-[.8rem] font-medium truncate hover:text-gold transition-colors"
+                        onClick={() => !(isConfessionario && !isAdmin) && navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
+                        className={`text-foreground text-[.8rem] font-medium truncate ${!(isConfessionario && !isAdmin) ? "hover:text-gold transition-colors" : ""}`}
                       >
-                        {c.profile?.company_name || "Membro"}
+                        {isConfessionario && !isAdmin ? "Anônimo" : (c.profile?.company_name || "Membro")}
                       </button>
                       <time
                         className="text-muted-foreground text-[.6rem] shrink-0"
