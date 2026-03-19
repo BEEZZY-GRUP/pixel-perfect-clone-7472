@@ -421,10 +421,10 @@ const AdminPanel = () => {
                           { label: "Bio", value: profile.bio || "—" },
                         ].map((d) => (
                           <div key={d.label}>
-                            <p className="text-[.55rem] text-muted-foreground uppercase tracking-wider font-heading mb-0.5">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-heading mb-1">
                               {d.label}
                             </p>
-                            <p className="text-foreground text-sm truncate">{d.value}</p>
+                            <p className="text-foreground text-base truncate">{d.value}</p>
                           </div>
                         ))}
                       </div>
