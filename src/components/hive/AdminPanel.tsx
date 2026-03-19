@@ -246,23 +246,23 @@ const AdminPanel = () => {
       {activeTab === "membros" && (
         <div className="space-y-4">
           {/* Filters & sort bar */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-[220px]">
               <Search
-                size={14}
+                size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar membro..."
-                className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
+                className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-base h-10"
               />
             </div>
 
             {/* Filter buttons */}
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {(
                 [
                   { key: "all", label: "Todos" },
@@ -277,7 +277,7 @@ const AdminPanel = () => {
                   size="sm"
                   variant="ghost"
                   onClick={() => setFilterBy(f.key)}
-                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading ${
+                  className={`text-xs h-9 px-3 uppercase tracking-wider font-heading ${
                     filterBy === f.key
                       ? "bg-gold/15 text-gold border border-gold/30"
                       : "text-muted-foreground"
@@ -289,7 +289,7 @@ const AdminPanel = () => {
             </div>
 
             {/* Sort */}
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1.5 items-center">
               {(
                 [
                   { key: "date", label: "Data" },
@@ -309,7 +309,7 @@ const AdminPanel = () => {
                       setSortAsc(false);
                     }
                   }}
-                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading gap-1 ${
+                  className={`text-xs h-9 px-3 uppercase tracking-wider font-heading gap-1.5 ${
                     sortBy === s.key
                       ? "bg-gold/15 text-gold border border-gold/30"
                       : "text-muted-foreground"
@@ -317,14 +317,14 @@ const AdminPanel = () => {
                 >
                   {s.label}
                   {sortBy === s.key &&
-                    (sortAsc ? <SortAsc size={10} /> : <SortDesc size={10} />)}
+                    (sortAsc ? <SortAsc size={12} /> : <SortDesc size={12} />)}
                 </Button>
               ))}
             </div>
           </div>
 
           {/* Results count */}
-          <p className="text-muted-foreground text-[.6rem] uppercase tracking-wider font-heading">
+          <p className="text-muted-foreground text-xs uppercase tracking-wider font-heading">
             {filtered?.length ?? 0} resultado{(filtered?.length ?? 0) !== 1 ? "s" : ""}
           </p>
 
