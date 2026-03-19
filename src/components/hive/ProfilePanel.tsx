@@ -56,13 +56,12 @@ const ProfilePanel = () => {
   });
 
   const updateProfile = useMutation({
-    mutationFn: async (vals: { company_name: string; bio: string; cnpj: string }) => {
+    mutationFn: async (vals: { company_name: string; bio: string }) => {
       const { error } = await supabase
         .from("profiles")
         .update({
           company_name: vals.company_name,
           bio: vals.bio || null,
-          cnpj: vals.cnpj || null,
         })
         .eq("user_id", user!.id);
       if (error) throw error;
