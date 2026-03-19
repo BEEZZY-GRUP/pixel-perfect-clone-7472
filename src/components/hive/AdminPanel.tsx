@@ -459,9 +459,9 @@ const AdminPanel = () => {
                                 })
                               }
                               disabled={updateProfile.isPending}
-                              className="bg-gold text-background hover:bg-gold-light text-[.6rem] tracking-wider uppercase font-heading h-7"
+                              className="bg-gold text-background hover:bg-gold-light text-xs tracking-wider uppercase font-heading h-9"
                             >
-                              <Save size={12} className="mr-1" />
+                              <Save size={14} className="mr-1.5" />
                               Salvar
                             </Button>
                             <Button
