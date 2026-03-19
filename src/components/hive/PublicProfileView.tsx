@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import UserAvatar from "./UserAvatar";
+import BadgesPanel from "./BadgesPanel";
 import { ArrowLeft, FileText, MessageSquare, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -38,17 +39,6 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
     },
   });
 
-  const { data: badges } = useQuery({
-    queryKey: ["public_user_badges", userId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("user_badges")
-        .select("*, badges(*)")
-        .eq("user_id", userId)
-        .order("earned_at", { ascending: false });
-      return data ?? [];
-    },
-  });
 
   if (isLoading) {
     return (
@@ -129,20 +119,8 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
         </div>
       </div>
 
-      {/* Badges */}
-      {badges && badges.length > 0 && (
-        <div className="border border-border bg-card p-6">
-          <h3 className="text-foreground font-heading text-sm tracking-wide mb-4">Badges</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {badges.map((ub: any) => (
-              <div key={ub.id} className="border border-border p-3 text-center">
-                <span className="text-2xl">{ub.badges?.emoji}</span>
-                <p className="text-foreground text-xs font-medium mt-1">{ub.badges?.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Badges with click-to-see-date */}
+      <BadgesPanel userId={userId} />
     </div>
   );
 };
