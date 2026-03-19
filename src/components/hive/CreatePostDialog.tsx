@@ -22,9 +22,12 @@ interface Props {
   categories: Category[];
   defaultCategorySlug: string | null;
   isAdmin?: boolean;
+  isModerator?: boolean;
 }
 
-const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug, isAdmin }: Props) => {
+const AVISOS_SLUG = "avisos";
+
+const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug, isAdmin, isModerator }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
