@@ -236,21 +236,29 @@ const CommunityLayout = () => {
                       onSelect={handleCategorySelect}
                     />
 
-                    <div className="flex items-center justify-between mb-4">
-                      <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                        {activeCategory === "todas"
-                          ? "📋 Todas as Publicações"
-                          : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                            (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
-                      </h1>
-                      <Button
-                        onClick={() => setShowCreate(true)}
-                        className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
-                      >
-                        <Plus size={14} />
-                        Publicar
-                      </Button>
-                    </div>
+                    {(() => {
+                      const isAvisos = activeCategory === "avisos";
+                      const canPostHere = !isAvisos || isAdmin || isModerator;
+                      return (
+                        <div className="flex items-center justify-between mb-4">
+                          <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
+                            {activeCategory === "todas"
+                              ? "📋 Todas as Publicações"
+                              : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                                (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
+                          </h1>
+                          {canPostHere && (
+                            <Button
+                              onClick={() => setShowCreate(true)}
+                              className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
+                            >
+                              <Plus size={14} />
+                              Publicar
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {(() => {
                       if (activeCategory === "todas") return null;
@@ -296,6 +304,7 @@ const CommunityLayout = () => {
         categories={categories ?? []}
         defaultCategorySlug={activeCategory}
         isAdmin={isAdmin}
+        isModerator={isModerator}
       />
     </div>
   );
