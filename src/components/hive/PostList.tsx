@@ -18,6 +18,8 @@ interface Props {
   isAdmin?: boolean;
 }
 
+const CONFESSIONARIO_SLUG = "confessionario";
+
 const ITEMS_PER_PAGE = 8;
 
 const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
