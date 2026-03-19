@@ -79,8 +79,92 @@ const CommunityLayout = () => {
       return data ?? [];
     },
   });
+  // Prefetch all community content during loading
+  const { isLoading: postsLoading } = useQuery({
+    queryKey: ["posts", null],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("*, categories!posts_category_id_fkey(name, emoji, slug), comments(count)")
+        .order("pinned", { ascending: false })
+        .order("created_at", { ascending: false });
+      if (!data?.length) return [];
+      const userIds = [...new Set(data.map((p) => p.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, company_name, avatar_url")
+        .in("user_id", userIds);
+      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+      return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
+    },
+  });
 
-  const isDataLoading = profileLoading || categoriesLoading;
+  const { isLoading: statsLoading } = useQuery({
+    queryKey: ["community_stats"],
+    queryFn: async () => {
+      const [postsRes, commentsRes, profilesRes, badgesRes] = await Promise.all([
+        supabase.from("posts").select("id", { count: "exact", head: true }),
+        supabase.from("comments").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("user_badges").select("id", { count: "exact", head: true }),
+      ]);
+      return { posts: postsRes.count ?? 0, comments: commentsRes.count ?? 0, members: profilesRes.count ?? 0, badgesEarned: badgesRes.count ?? 0 };
+    },
+    staleTime: 60_000,
+  });
+
+  const { isLoading: topMembersLoading } = useQuery({
+    queryKey: ["top_3_members"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  const { isLoading: recentPostsLoading } = useQuery({
+    queryKey: ["recent_posts_sidebar"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, created_at, categories!posts_category_id_fkey(emoji, name)")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+    staleTime: 30_000,
+  });
+
+  const { isLoading: badgesLoading } = useQuery({
+    queryKey: ["all_badges"],
+    queryFn: async () => {
+      const { data } = await supabase.from("badges").select("*").order("name");
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  const { isLoading: missionsLoading } = useQuery({
+    queryKey: ["missions"],
+    queryFn: async () => {
+      const { data } = await supabase.from("missions").select("*").eq("active", true).order("created_at");
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  const { isLoading: postCountsLoading } = useQuery({
+    queryKey: ["category_post_counts"],
+    queryFn: async () => {
+      const { data } = await supabase.from("posts").select("category_id");
+      if (!data) return {};
+      const counts: Record<string, number> = {};
+      data.forEach((p) => { counts[p.category_id] = (counts[p.category_id] || 0) + 1; });
+      return counts;
+    },
+  });
+
+  const isDataLoading = profileLoading || categoriesLoading || postsLoading || statsLoading || topMembersLoading || recentPostsLoading || badgesLoading || missionsLoading || postCountsLoading;
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unread_notifications", user?.id],
