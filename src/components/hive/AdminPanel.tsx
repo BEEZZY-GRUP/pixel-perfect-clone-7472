@@ -43,6 +43,7 @@ const AdminPanel = () => {
   const [sortAsc, setSortAsc] = useState(false);
   const [filterBy, setFilterBy] = useState<MemberFilter>("all");
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const { data: profiles } = useQuery({
     queryKey: ["all_profiles"],
