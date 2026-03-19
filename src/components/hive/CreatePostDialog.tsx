@@ -39,12 +39,14 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
 
   const createPost = useMutation({
     mutationFn: async () => {
+      const selectedCat = categories.find((c) => c.id === categoryId);
+      const forceAnon = selectedCat?.slug === "confessionario";
       const { error } = await supabase.from("posts").insert({
         user_id: user!.id,
         category_id: categoryId,
         title: title.trim(),
         content: content.trim(),
-        is_anonymous: isAnonymous,
+        is_anonymous: forceAnon ? true : isAnonymous,
       });
       if (error) throw error;
     },
