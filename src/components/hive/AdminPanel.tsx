@@ -26,7 +26,7 @@ import CompanyManagement from "./CompanyManagement";
 
 type AdminTab = "empresas" | "membros";
 type MemberSort = "name" | "level" | "xp" | "date";
-type MemberFilter = "all" | "admin" | "user" | "no-company";
+type MemberFilter = "all" | "admin" | "moderator" | "user" | "no-company";
 
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
@@ -97,19 +97,19 @@ const AdminPanel = () => {
     onError: () => toast.error("Erro ao atualizar perfil."),
   });
 
-  const toggleAdmin = useMutation({
-    mutationFn: async ({ userId, makeAdmin }: { userId: string; makeAdmin: boolean }) => {
-      if (makeAdmin) {
+  const toggleRole = useMutation({
+    mutationFn: async ({ userId, role, add }: { userId: string; role: "admin" | "moderator"; add: boolean }) => {
+      if (add) {
         const { error } = await supabase
           .from("user_roles")
-          .insert({ user_id: userId, role: "admin" });
+          .insert({ user_id: userId, role });
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("user_roles")
           .delete()
           .eq("user_id", userId)
-          .eq("role", "admin");
+          .eq("role", role);
         if (error) throw error;
       }
     },
@@ -132,6 +132,15 @@ const AdminPanel = () => {
   const isUserAdmin = (userId: string) =>
     roles?.some((r) => r.user_id === userId && r.role === "admin");
 
+  const isUserModerator = (userId: string) =>
+    roles?.some((r) => r.user_id === userId && r.role === "moderator");
+
+  const getUserRole = (userId: string) => {
+    if (isUserAdmin(userId)) return "admin";
+    if (isUserModerator(userId)) return "moderator";
+    return "user";
+  };
+
   const getCompanyName = (companyId: string | null) => {
     if (!companyId) return null;
     return companies?.find((c) => c.id === companyId)?.name ?? null;
@@ -146,7 +155,8 @@ const AdminPanel = () => {
       if (!matchName && !matchCnpj) return false;
     }
     if (filterBy === "admin") return isUserAdmin(p.user_id);
-    if (filterBy === "user") return !isUserAdmin(p.user_id);
+    if (filterBy === "moderator") return isUserModerator(p.user_id);
+    if (filterBy === "user") return !isUserAdmin(p.user_id) && !isUserModerator(p.user_id);
     if (filterBy === "no-company") return !p.company_id;
     return true;
   });
@@ -257,6 +267,7 @@ const AdminPanel = () => {
                 [
                   { key: "all", label: "Todos" },
                   { key: "admin", label: "Admins" },
+                  { key: "moderator", label: "Moderadores" },
                   { key: "user", label: "Usuários" },
                   { key: "no-company", label: "Sem Empresa" },
                 ] as { key: MemberFilter; label: string }[]
@@ -321,6 +332,8 @@ const AdminPanel = () => {
           <div className="space-y-2">
             {filtered?.map((profile: any) => {
               const admin = isUserAdmin(profile.user_id);
+              const moderator = isUserModerator(profile.user_id);
+              const role = getUserRole(profile.user_id);
               const isEditing = editingProfile === profile.user_id;
               const isExpanded = expandedMember === profile.user_id;
               const linkedCompany = getCompanyName(profile.company_id);
@@ -356,6 +369,11 @@ const AdminPanel = () => {
                           {admin && (
                             <span className="text-[.55rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
                               Admin
+                            </span>
+                          )}
+                          {moderator && !admin && (
+                            <span className="text-[.55rem] bg-blue-500/10 text-blue-400 px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                              Moderador
                             </span>
                           )}
                         </div>
@@ -399,7 +417,7 @@ const AdminPanel = () => {
                           },
                           { label: "Nível", value: `${profile.level}` },
                           { label: "XP Total", value: `${profile.xp}` },
-                          { label: "Papel", value: admin ? "Administrador" : "Usuário" },
+                          { label: "Papel", value: admin ? "Administrador" : moderator ? "Moderador" : "Usuário" },
                           { label: "Bio", value: profile.bio || "—" },
                         ].map((d) => (
                           <div key={d.label}>
@@ -457,7 +475,7 @@ const AdminPanel = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex gap-2 border-t border-border pt-3">
+                        <div className="flex flex-wrap gap-2 border-t border-border pt-3">
                           <Button
                             size="sm"
                             variant="ghost"
@@ -479,12 +497,13 @@ const AdminPanel = () => {
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleAdmin.mutate({
+                              toggleRole.mutate({
                                 userId: profile.user_id,
-                                makeAdmin: !admin,
+                                role: "admin",
+                                add: !admin,
                               });
                             }}
-                            disabled={toggleAdmin.isPending}
+                            disabled={toggleRole.isPending}
                             className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
                               admin
                                 ? "text-destructive hover:text-destructive"
@@ -493,6 +512,27 @@ const AdminPanel = () => {
                           >
                             {admin ? <ShieldOff size={10} /> : <Shield size={10} />}
                             {admin ? "Remover admin" : "Tornar admin"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleRole.mutate({
+                                userId: profile.user_id,
+                                role: "moderator",
+                                add: !moderator,
+                              });
+                            }}
+                            disabled={toggleRole.isPending}
+                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                              moderator
+                                ? "text-destructive hover:text-destructive"
+                                : "text-blue-400 hover:text-blue-400"
+                            }`}
+                          >
+                            {moderator ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {moderator ? "Remover moderador" : "Tornar moderador"}
                           </Button>
                         </div>
                       )}
