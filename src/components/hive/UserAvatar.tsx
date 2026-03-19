@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -13,7 +14,7 @@ const sizeMap = {
   lg: "w-12 h-12 text-sm",
 };
 
-const UserAvatar = ({ avatarUrl, name, size = "md", className }: Props) => {
+const UserAvatar = forwardRef<HTMLElement, Props>(({ avatarUrl, name, size = "md", className }, ref) => {
   const initials = (name || "?")
     .split(" ")
     .map((w) => w[0])
@@ -46,6 +47,8 @@ const UserAvatar = ({ avatarUrl, name, size = "md", className }: Props) => {
       {initials}
     </div>
   );
-};
+});
+
+UserAvatar.displayName = "UserAvatar";
 
 export default UserAvatar;

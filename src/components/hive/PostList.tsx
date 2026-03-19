@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
@@ -57,7 +57,8 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
   });
 
   // Reset page when category changes
-  const prevCategoryId = categoryId;
+  useEffect(() => { setPage(1); }, [categorySlug]);
+
 
   if (isLoading) {
     return (

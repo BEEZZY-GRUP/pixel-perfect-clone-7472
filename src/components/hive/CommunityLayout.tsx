@@ -4,6 +4,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import PublicProfileView from "./PublicProfileView";
 import CategorySidebar from "./CategorySidebar";
 import PostList from "./PostList";
 import CreatePostDialog from "./CreatePostDialog";
@@ -271,6 +272,9 @@ const CommunityLayout = () => {
                 {activeView === "ranking" && <RankingPanel />}
                 {activeView === "missions" && <MissionsPanel />}
                 {activeView === "profile" && !isProfileView && <ProfilePanel />}
+                {isProfileView && params.userId && (
+                  <PublicProfileView userId={params.userId} onBack={() => navigate(-1)} />
+                )}
                 {activeView === "admin" && <AdminPanel />}
               </div>
 

@@ -522,6 +522,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      insert_notification: {
+        Args: {
+          _actor_id?: string
+          _body?: string
+          _link?: string
+          _title: string
+          _type: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
