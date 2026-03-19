@@ -105,19 +105,21 @@
 /* ─── CUSTOM CURSOR ─────────────────────────────── */
 #cursor-dot {
   width: 5px; height: 5px;
-  background: hsl(var(--gold));
+  background: hsl(var(--foreground));
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9999;
   transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
 }
 #cursor-ring {
   width: 32px; height: 32px;
-  border: 1px solid hsl(var(--gold-border));
+  border: 1px solid hsl(var(--foreground) / 0.4);
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9998;
   transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
   transition: width .35s cubic-bezier(.25,.46,.45,.94),
               height .35s cubic-bezier(.25,.46,.45,.94),
               border-color .3s;
@@ -125,7 +127,7 @@
 body:has(a:hover) #cursor-ring,
 body:has(button:hover) #cursor-ring {
   width: 52px; height: 52px;
-  border-color: hsl(var(--gold));
+  border-color: hsl(var(--foreground) / 0.7);
 }
 
 /* ─── REVEAL — GSAP handles all animation ────────── */
