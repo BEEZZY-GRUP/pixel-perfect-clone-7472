@@ -100,24 +100,20 @@ const HiveSection = () => {
         </div>
       </div>
       <div>
-        <div className="reveal text-[.65rem] tracking-[.25em] uppercase text-gold mb-[72px] flex items-center gap-3.5">
-          <span className="block w-6 h-px bg-gold" />
-          The Hive
-        </div>
-        <h2 className="reveal font-heading text-[clamp(2.2rem,5vw,5rem)] font-light leading-[1.08] tracking-tight mb-7">
-          Um ecossistema
-          <br />
+        <div className="section-eyebrow reveal">The Hive</div>
+        <h2 className="section-title reveal mt-4 mb-7">
+          Um ecossistema<br />
           <em className="font-display italic font-light text-gold-light">vivo e real.</em>
         </h2>
-        <p className="reveal reveal-delay-1 text-sm leading-[1.9] text-muted-foreground max-w-[440px] mt-7">
+        <p className="reveal reveal-delay-1 text-[.875rem] leading-[1.9] text-muted-foreground max-w-[420px] mt-6">
           The Hive é mais do que uma comunidade. É um ecossistema onde empresários, criativos e inovadores se conectam, colaboram e crescem juntos.
         </p>
-        <p className="reveal reveal-delay-2 text-sm leading-[1.9] text-muted-foreground max-w-[440px] mt-7">
+        <p className="reveal reveal-delay-2 text-[.875rem] leading-[1.9] text-muted-foreground max-w-[420px] mt-6">
           Queremos que você, empresário(a), faça parte de algo maior — onde cada conexão é uma oportunidade e cada encontro pode mudar o rumo do seu negócio.
         </p>
         <a
           href="#"
-          className="reveal reveal-delay-3 inline-flex items-center gap-2.5 text-xs tracking-[.15em] uppercase text-gold no-underline mt-12 pb-2 border-b border-gold-border hover:border-gold hover:text-gold-light transition-colors"
+          className="reveal reveal-delay-3 inline-flex items-center gap-[10px] font-heading text-[.72rem] tracking-[.15em] uppercase text-gold no-underline mt-12 pb-2 border-b border-gold-border hover:border-gold hover:gap-4 transition-all font-semibold"
         >
           Entrar para o ecossistema
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
