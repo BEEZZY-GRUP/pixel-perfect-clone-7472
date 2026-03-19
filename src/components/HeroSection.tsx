@@ -37,7 +37,6 @@ const HeroSection = () => {
       #define PI 3.14159265359
       #define OCTAVES 6
 
-      // Improved hash
       vec3 hash33(vec3 p) {
         p = fract(p * vec3(443.897, 441.423, 437.195));
         p += dot(p, p.yzx + 19.19);
@@ -45,7 +44,6 @@ const HeroSection = () => {
       }
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
 
-      // Simplex-like noise
       float noise(vec2 p) {
         vec2 i = floor(p);
         vec2 f = fract(p);
@@ -57,7 +55,6 @@ const HeroSection = () => {
         );
       }
 
-      // Fractal Brownian Motion — smoke layers
       float fbm(vec2 p) {
         float v = 0.0;
         float a = 0.5;
@@ -70,29 +67,22 @@ const HeroSection = () => {
         return v;
       }
 
-      // Warped domain smoke
       float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
-        // Ultra-subtle mouse trail — whisper-thin cloud separation
         vec2 delta = uv - mouse;
         float dist = length(delta);
         float influence = smoothstep(0.25, 0.0, dist);
         vec2 pushDir = normalize(delta + 0.0001);
-        
-        // Barely-there UV nudge
         vec2 displaced = uv + pushDir * influence * 0.012;
         displaced += mvel * smoothstep(0.2, 0.0, dist) * 0.06;
 
-        // Base warp layers
         float d1 = fbm(displaced * 2.0 + vec2(t * 0.5, t * 0.3));
         float d2 = fbm(displaced * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
         float d3 = fbm(displaced * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
 
-        // Faint brightness trail where mouse passes
         float trail = influence * 0.015;
         return d3 + trail;
       }
 
-      // Film grain
       float grain(vec2 uv, float t) {
         return (hash(uv * uResolution * 0.5 + fract(t * 43.0)) * 2.0 - 1.0) * 0.035;
       }
@@ -105,32 +95,21 @@ const HeroSection = () => {
 
         float smoke = smokeField(uv, t, mouse, mvel);
 
-        // Color mapping — volumetric depth
         float base = smoothstep(0.25, 0.75, smoke);
-
-        // Layer separation for depth
         float layer1 = smoothstep(0.35, 0.55, fbm(uv * 1.8 + t * 0.2)) * 0.4;
         float layer2 = smoothstep(0.4, 0.65, fbm(uv * 3.0 - t * 0.15)) * 0.25;
-
-        // Volumetric light from top-left
         float lightDir = dot(normalize(uv - vec2(0.2, 0.8)), vec2(0.7, -0.7));
         float volumeLight = smoothstep(-0.2, 0.6, lightDir) * base * 0.15;
 
-        // Combine luminance
         float lum = mix(0.03, 0.14, base);
         lum += layer1;
         lum -= layer2;
         lum += volumeLight;
 
-        // Subtle golden tint in bright areas
         vec3 col = vec3(lum);
         col += vec3(0.04, 0.025, 0.005) * smoothstep(0.12, 0.25, lum);
-
-        // Edge darkening (vignette)
         float vig = 1.0 - smoothstep(0.3, 0.85, length(uv - 0.5) * 1.2);
         col *= mix(0.6, 1.0, vig);
-
-        // Grain
         col += grain(uv, uTime);
         col = clamp(col, 0.0, 1.0);
 
@@ -163,7 +142,6 @@ const HeroSection = () => {
     const animate = () => {
       raf = requestAnimationFrame(animate);
       uniforms.uTime.value = (performance.now() - startTime) * 0.001;
-      // Dampen velocity
       uniforms.uMouseVel.value.multiplyScalar(0.88);
       renderer.render(scene, camera);
     };
@@ -213,18 +191,18 @@ const HeroSection = () => {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-screen flex flex-col justify-end px-6 pb-14 md:px-[60px] md:pb-20 overflow-hidden"
+      className="relative min-h-screen flex flex-col justify-end px-6 pb-10 pt-28 md:px-[60px] md:pb-20 md:pt-32 overflow-hidden"
     >
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-55" />
       <div className="hero-noise" />
       <div className="absolute bottom-0 left-0 right-0 h-[60%] z-[1] bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
       <div className="relative z-[2] max-w-[820px]">
-        <div className="hero-badge font-heading text-[.68rem] tracking-[.22em] uppercase text-gold mb-8 flex items-center gap-[10px] font-medium">
+        <div className="hero-badge font-heading text-[.68rem] tracking-[.22em] uppercase text-gold mb-6 md:mb-8 flex items-center gap-[10px] font-medium">
           <span className="block w-7 h-px bg-gold" />
           A empresa do século 22
         </div>
-        <h1 className="hero-headline font-display text-[clamp(3.8rem,8.5vw,9rem)] font-light leading-[1.05] tracking-[-0.015em] mb-9">
+        <h1 className="hero-headline font-display text-[clamp(2.8rem,7vw,9rem)] font-light leading-[1.05] tracking-[-0.015em] mb-6 md:mb-9">
           <span className="hero-line block overflow-hidden py-[0.05em]">
             <span className="hero-line-inner block">Construindo</span>
           </span>
@@ -237,15 +215,15 @@ const HeroSection = () => {
             <span className="hero-line-inner block">da sua empresa.</span>
           </span>
         </h1>
-        <div className="flex items-end justify-between gap-10 flex-wrap">
-          <p className="hero-sub text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-10">
+          <p className="hero-sub text-[.85rem] md:text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
             Não somos mais uma consultoria. Somos o sócio estratégico que
             transforma sua empresa em um negócio independente, previsível e escalável.
           </p>
-          <div className="hero-actions flex items-center gap-5 flex-shrink-0 flex-col sm:flex-row">
+          <div className="hero-actions flex items-center gap-4 md:gap-5 flex-shrink-0 flex-col sm:flex-row">
             <a
               href="#cta-section"
-              className="inline-flex items-center gap-3 font-heading text-[.72rem] tracking-[.16em] uppercase font-semibold text-background bg-gold no-underline px-9 py-[18px] hover:bg-gold-light hover:-translate-y-px transition-all group"
+              className="inline-flex items-center gap-3 font-heading text-[.72rem] tracking-[.16em] uppercase font-semibold text-background bg-gold no-underline px-7 py-4 md:px-9 md:py-[18px] hover:bg-gold-light hover:-translate-y-px transition-all group w-full sm:w-auto justify-center"
             >
               Quero construir meu legado
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="transition-transform group-hover:translate-x-1">
@@ -254,7 +232,7 @@ const HeroSection = () => {
             </a>
             <a
               href="#manifesto"
-              className="inline-flex items-center gap-[10px] font-heading text-[.72rem] tracking-[.16em] uppercase font-medium text-foreground no-underline py-[18px] border-b border-foreground/20 hover:text-gold hover:border-gold-border transition-colors"
+              className="inline-flex items-center gap-[10px] font-heading text-[.72rem] tracking-[.16em] uppercase font-medium text-foreground no-underline py-3 md:py-[18px] border-b border-foreground/20 hover:text-gold hover:border-gold-border transition-colors"
             >
               Conhecer a Beezzy
             </a>
