@@ -1,15 +1,19 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Award } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Award, X, Lock } from "lucide-react";
 
 interface Props {
-  userId?: string; // If not provided, show current user's badges
+  userId?: string;
 }
 
 const BadgesPanel = ({ userId }: Props) => {
   const { user } = useAuth();
   const targetUserId = userId || user?.id;
+  const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
 
   const { data: allBadges } = useQuery({
     queryKey: ["badges"],
@@ -31,7 +35,9 @@ const BadgesPanel = ({ userId }: Props) => {
     enabled: !!targetUserId,
   });
 
-  const earnedIds = new Set(earnedBadges?.map((ub) => ub.badge_id));
+  const earnedMap = new Map(earnedBadges?.map((ub) => [ub.badge_id, ub]) ?? []);
+  const selected = selectedBadge ? allBadges?.find((b) => b.id === selectedBadge) : null;
+  const selectedEarned = selectedBadge ? earnedMap.get(selectedBadge) : null;
 
   return (
     <div>
@@ -45,30 +51,72 @@ const BadgesPanel = ({ userId }: Props) => {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
         {allBadges?.map((badge) => {
-          const earned = earnedIds.has(badge.id);
+          const earned = earnedMap.has(badge.id);
           return (
-            <div
+            <button
               key={badge.id}
-              className={`border p-3 text-center transition-all ${
+              onClick={() => setSelectedBadge(badge.id)}
+              className={`border p-3 text-center transition-all hover:scale-105 ${
                 earned
-                  ? "border-gold/30 bg-gold/5"
-                  : "border-border opacity-40 grayscale"
+                  ? "border-gold/30 bg-gold/5 hover:border-gold/50"
+                  : "border-border opacity-40 grayscale hover:opacity-60"
               }`}
             >
               <div className="text-2xl mb-1">{badge.emoji}</div>
-              <p className="text-foreground text-xs font-medium">{badge.name}</p>
-              <p className="text-muted-foreground text-[.6rem] mt-0.5">
-                {badge.description}
+              <p className="text-foreground text-[.6rem] font-medium leading-tight line-clamp-2">
+                {badge.name}
               </p>
-              <p className="text-gold text-[.6rem] font-heading mt-1">
-                +{badge.xp_reward} XP
-              </p>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {/* Badge detail modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedBadge(null)}>
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+          <div
+            className="relative border border-border bg-card p-6 max-w-xs w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedBadge(null)}
+              className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="text-5xl mb-3">{selected.emoji}</div>
+            <h3 className="text-foreground font-semibold text-base mb-1">{selected.name}</h3>
+            <p className="text-muted-foreground text-xs mb-3 leading-relaxed">
+              {selected.description}
+            </p>
+            <p className="text-gold text-xs font-heading mb-4">
+              +{selected.xp_reward} XP
+            </p>
+
+            {selectedEarned ? (
+              <div className="border-t border-border pt-3">
+                <p className="text-[.65rem] text-muted-foreground uppercase tracking-wider font-heading mb-1">
+                  Desbloqueada em
+                </p>
+                <p className="text-foreground text-sm font-medium">
+                  {format(new Date(selectedEarned.earned_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                </p>
+              </div>
+            ) : (
+              <div className="border-t border-border pt-3 flex items-center justify-center gap-2 text-muted-foreground/60">
+                <Lock size={12} />
+                <p className="text-[.65rem] uppercase tracking-wider font-heading">
+                  Ainda não desbloqueada
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
