@@ -6,33 +6,34 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const useScrollReveal = () => {
   useEffect(() => {
-    // ── Reveal elements ──
+    // ── Reveal elements (skip those with custom GSAP animations) ──
+    const customAnimated = new Set<Element>();
+    document.querySelectorAll(".hive-visual-gsap, .vertical-item-gsap, .stat-value-gsap").forEach(el => customAnimated.add(el));
+
     const els = document.querySelectorAll(".reveal");
 
     els.forEach((el) => {
+      if (customAnimated.has(el)) return; // handled separately
+
       let delay = 0;
       el.classList.forEach((cls) => {
         const match = cls.match(/^reveal-delay-(\d+)$/);
         if (match) delay = parseInt(match[1]) * 0.12;
       });
 
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 50, filter: "blur(3px)" },
-        {
-          opacity: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 1,
-          delay,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-            once: true,
-          },
-        }
-      );
+      gsap.set(el, { opacity: 0, y: 50 });
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        delay,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 92%",
+          once: true,
+        },
+      });
     });
 
     // ── Section eyebrow — horizontal drift ──
