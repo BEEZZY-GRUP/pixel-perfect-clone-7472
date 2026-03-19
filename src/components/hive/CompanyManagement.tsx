@@ -16,6 +16,8 @@ import {
   ChevronDown,
   ChevronRight,
   Pencil,
+  Mail,
+  Send,
   X,
 } from "lucide-react";
 
@@ -46,6 +48,8 @@ const CompanyManagement = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState({ name: "", cnpj: "" });
   const [addingMember, setAddingMember] = useState<string | null>(null);
+  const [invitingCompany, setInvitingCompany] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
 
   const { data: companies } = useQuery({
     queryKey: ["companies"],
@@ -112,7 +116,6 @@ const CompanyManagement = () => {
 
   const deleteCompany = useMutation({
     mutationFn: async (id: string) => {
-      // Remove members first
       const { error: profileErr } = await supabase
         .from("profiles")
         .update({ company_id: null })
@@ -159,6 +162,26 @@ const CompanyManagement = () => {
       invalidateAll();
     },
     onError: () => toast.error("Erro ao remover membro."),
+  });
+
+  const inviteMember = useMutation({
+    mutationFn: async ({ email, companyId }: { email: string; companyId: string }) => {
+      const { data, error } = await supabase.functions.invoke("invite-member", {
+        body: { email: email.trim(), company_id: companyId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success(`Convite enviado para ${inviteEmail}!`);
+      setInviteEmail("");
+      setInvitingCompany(null);
+      invalidateAll();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Erro ao enviar convite.");
+    },
   });
 
   if (!isAdmin) return null;
@@ -249,6 +272,7 @@ const CompanyManagement = () => {
           const isExpanded = expandedCompany === company.id;
           const isEditing = editingId === company.id;
           const members = getMembersOf(company.id);
+          const isInviting = invitingCompany === company.id;
 
           return (
             <div key={company.id} className="border border-border">
@@ -335,11 +359,75 @@ const CompanyManagement = () => {
                     </div>
                   )}
 
+                  {/* Invite by email */}
+                  <div className="border border-gold/20 bg-gold/5 p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Mail size={12} className="text-gold" />
+                        <p className="text-[.7rem] text-gold uppercase tracking-wider font-heading">
+                          Convidar por E-mail
+                        </p>
+                      </div>
+                      {!isInviting && (
+                        <Button
+                          size="sm"
+                          onClick={() => setInvitingCompany(company.id)}
+                          className="bg-gold text-background hover:bg-gold-light h-6 px-3 text-[.6rem] tracking-wider uppercase font-heading gap-1"
+                        >
+                          <UserPlus size={10} />
+                          Convidar
+                        </Button>
+                      )}
+                    </div>
+                    {isInviting && (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (inviteEmail.trim()) {
+                            inviteMember.mutate({ email: inviteEmail, companyId: company.id });
+                          }
+                        }}
+                        className="flex gap-2"
+                      >
+                        <Input
+                          type="email"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          placeholder="email@exemplo.com"
+                          className="bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm flex-1"
+                          required
+                          autoFocus
+                        />
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={inviteMember.isPending || !inviteEmail.trim()}
+                          className="bg-gold text-background hover:bg-gold-light h-9 px-3 text-[.6rem] tracking-wider uppercase font-heading gap-1"
+                        >
+                          <Send size={10} />
+                          {inviteMember.isPending ? "..." : "Enviar"}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => { setInvitingCompany(null); setInviteEmail(""); }}
+                          className="text-muted-foreground h-9 px-2"
+                        >
+                          <X size={12} />
+                        </Button>
+                      </form>
+                    )}
+                    <p className="text-muted-foreground text-[.55rem]">
+                      O membro receberá um e-mail para criar senha e acessar. Será vinculado automaticamente a <strong className="text-gold">{company.name}</strong>.
+                    </p>
+                  </div>
+
                   {/* Members */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[.7rem] text-muted-foreground uppercase tracking-wider font-heading">
-                        Usuários ({members.length})
+                        Membros ({members.length})
                       </p>
                       <Button
                         size="sm"
@@ -348,13 +436,13 @@ const CompanyManagement = () => {
                         className="text-gold hover:text-gold h-6 px-2 text-[.6rem] tracking-wider uppercase font-heading gap-1"
                       >
                         <UserPlus size={12} />
-                        Adicionar
+                        Vincular existente
                       </Button>
                     </div>
 
-                    {/* Add member dropdown */}
+                    {/* Add existing member dropdown */}
                     {addingMember === company.id && unassigned.length > 0 && (
-                      <div className="border border-border p-2 mb-2 max-h-[200px] overflow-y-auto space-y-1">
+                      <div className="border border-border p-2 mb-2 max-h-[200px] overflow-y-auto space-y-1 scrollbar-gold">
                         <p className="text-[.6rem] text-muted-foreground uppercase tracking-wider font-heading mb-1 px-1">
                           Usuários sem empresa
                         </p>
