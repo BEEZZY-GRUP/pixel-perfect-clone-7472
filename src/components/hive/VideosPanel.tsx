@@ -15,8 +15,8 @@ import VideoTheater from "./VideoTheater";
 
 const VideosPanel = () => {
   const { user } = useAuth();
-  const { isAdmin, isModerator } = useIsAdmin();
-  const canManageVideos = isAdmin || isModerator;
+  const { canManageVideos, isModerator } = useIsAdmin();
+  const canManageVideos = canManageVideos || isModerator;
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -78,14 +78,14 @@ const VideosPanel = () => {
           <Video size={18} className="text-gold" />
           <h1 className="font-heading text-lg tracking-wide text-foreground">Vídeos</h1>
         </div>
-        {isAdmin && !creating && (
+        {canManageVideos && !creating && (
           <Button onClick={() => setCreating(true)} className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2">
             <Plus size={14} /> Novo Vídeo
           </Button>
         )}
       </div>
 
-      {(creating || editingId) && isAdmin && (
+      {(creating || editingId) && canManageVideos && (
         <div className="border border-gold/20 bg-gold/5 p-5 mb-6 space-y-3">
           <p className="text-[.65rem] text-gold uppercase tracking-wider font-heading mb-2">{editingId ? "Editar vídeo" : "Adicionar novo vídeo"}</p>
           <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Título do vídeo" className="bg-secondary border-border text-foreground text-sm" />
@@ -158,7 +158,7 @@ const VideosPanel = () => {
                         </button>
                       </div>
                     </div>
-                    {isAdmin && (
+                    {canManageVideos && (
                       <div className="flex gap-1 shrink-0">
                         <button onClick={() => { setEditingId(video.id); setForm({ title: video.title, description: video.description || "", video_url: video.video_url, thumbnail_url: video.thumbnail_url || "", category: video.category || "geral" }); }} className="text-muted-foreground hover:text-foreground p-1 transition-colors"><Pencil size={12} /></button>
                         <button onClick={() => { if (confirm("Excluir este vídeo?")) deleteVideo.mutate(video.id); }} className="text-destructive/50 hover:text-destructive p-1 transition-colors"><Trash2 size={12} /></button>
