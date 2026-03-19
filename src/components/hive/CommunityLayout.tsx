@@ -199,7 +199,7 @@ const CommunityLayout = () => {
     if (view === "feed") {
       navigate("/the-hive/community");
     } else if (view === "community") {
-      navigate("/the-hive/community?category=todas");
+      navigate("/the-hive/community?category=browse");
     } else {
       navigate(`/the-hive/community/${view}`);
     }
@@ -214,6 +214,8 @@ const CommunityLayout = () => {
     </span>
   );
 
+  const isBrowsingCategories = activeCategory === "browse";
+  const isCategoryDetail = activeView === "feed" && activeCategory && activeCategory !== "browse" && !isPostDetail && !isProfileView;
   const isHome = activeView === "feed" && !activeCategory && !isPostDetail && !isProfileView;
 
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
@@ -228,7 +230,7 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showSidebar = (activeView === "feed" && !isPostDetail && !isHome && !isProfileView) || (activeView === "feed" && activeCategory);
+  const showSidebar = isCategoryDetail || isBrowsingCategories;
 
   if (isDataLoading) {
     return <LoadingScreen />;
@@ -259,7 +261,7 @@ const CommunityLayout = () => {
               key={item.key}
               onClick={() => handleViewChange(item.key)}
               className={`flex items-center gap-1 px-2 md:px-3 py-1.5 text-[.6rem] md:text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm whitespace-nowrap ${
-                (item.key === "community" && activeView === "feed" && activeCategory && !isPostDetail) ||
+                (item.key === "community" && (isBrowsingCategories || isCategoryDetail)) ||
                 (item.key === "feed" && isHome) ||
                 (item.key !== "feed" && item.key !== "community" && activeView === item.key && !isPostDetail)
                   ? "bg-gold/10 text-gold"
@@ -322,32 +324,46 @@ const CommunityLayout = () => {
                   <WelcomeHome onCreatePost={() => setShowCreate(true)} />
                 )}
 
-                {/* Feed view (when category selected) — categories as blocks */}
-                {activeView === "feed" && !isPostDetail && activeCategory && (
+                {/* Browse categories view */}
+                {activeView === "feed" && isBrowsingCategories && !isPostDetail && (
                   <>
-                    {/* Search bar */}
+                    <div className="mb-5">
+                      <SearchBar />
+                    </div>
+                    <CategoryGrid
+                      categories={categories ?? []}
+                      activeSlug={null}
+                      onSelect={handleCategorySelect}
+                    />
+                  </>
+                )}
+
+                {/* Category detail view — posts filtered by category */}
+                {isCategoryDetail && (
+                  <>
                     <div className="mb-5">
                       <SearchBar />
                     </div>
 
-                    <CategoryGrid
-                      categories={categories ?? []}
-                      activeSlug={activeCategory}
-                      onSelect={handleCategorySelect}
-                    />
-
-                    {(() => {
-                      const isAvisos = activeCategory === "avisos";
-                      const canPostHere = !isAvisos || isAdmin || isModerator;
-                      return (
-                        <div className="flex items-center justify-between mb-4">
-                          <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                            {activeCategory === "todas"
-                              ? "📋 Todas as Publicações"
-                              : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                                (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
-                          </h1>
-                          {canPostHere && (
+                    {/* Back to categories + category header */}
+                    <div className="mb-4">
+                      <button
+                        onClick={() => navigate("/the-hive/community?category=browse")}
+                        className="text-muted-foreground hover:text-gold text-[.65rem] font-heading tracking-wider uppercase mb-3 flex items-center gap-1 transition-colors"
+                      >
+                        ← Voltar às categorias
+                      </button>
+                      <div className="flex items-center justify-between">
+                        <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
+                          {activeCategory === "todas"
+                            ? "📋 Todas as Publicações"
+                            : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
+                        </h1>
+                        {(() => {
+                          const isAvisos = activeCategory === "avisos";
+                          const canPostHere = !isAvisos || isAdmin || isModerator;
+                          return canPostHere ? (
                             <Button
                               onClick={() => setShowCreate(true)}
                               className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
@@ -355,10 +371,10 @@ const CommunityLayout = () => {
                               <Plus size={14} />
                               Criar publicação
                             </Button>
-                          )}
-                        </div>
-                      );
-                    })()}
+                          ) : null;
+                        })()}
+                      </div>
+                    </div>
 
                     {(() => {
                       if (activeCategory === "todas") return null;

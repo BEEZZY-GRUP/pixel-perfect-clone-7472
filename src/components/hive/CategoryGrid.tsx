@@ -30,7 +30,7 @@ const CategoryGrid = ({ categories, activeSlug, onSelect }: Props) => {
     : 0;
 
   const allItems = [
-    { slug: null, name: "Todas", emoji: "📋", count: totalPosts, description: "Todas as publicações" },
+    { slug: "todas", name: "Todas", emoji: "📋", count: totalPosts, description: "Ver todas as publicações da comunidade" },
     ...categories.map((cat) => ({
       slug: cat.slug,
       name: cat.name,
