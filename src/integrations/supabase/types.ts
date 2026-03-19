@@ -599,6 +599,7 @@ export type Database = {
         Args: { _amount: number; _reason: string; _user_id: string }
         Returns: undefined
       }
+      check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
