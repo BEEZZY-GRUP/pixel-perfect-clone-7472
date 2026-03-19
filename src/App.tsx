@@ -7,12 +7,14 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import HiveLogin from "./pages/HiveLogin.tsx";
 import HiveCommunity from "./pages/HiveCommunity.tsx";
+import CustomCursor from "./components/CustomCursor.tsx";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <CustomCursor />
       <Toaster />
       <Sonner />
       <BrowserRouter>
