@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Shield, ShieldOff, Save, Search } from "lucide-react";
 import { useState } from "react";
+import InvitePanel from "./InvitePanel";
 
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
@@ -93,6 +94,8 @@ const AdminPanel = () => {
           Administração
         </h2>
       </div>
+
+      <InvitePanel />
 
       {/* Search */}
       <div className="relative mb-4">
