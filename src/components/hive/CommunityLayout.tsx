@@ -76,6 +76,20 @@ const CommunityLayout = () => {
     },
   });
 
+  const { data: unreadCount } = useQuery({
+    queryKey: ["unread_notifications", user?.id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("read", false);
+      return count ?? 0;
+    },
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/the-hive");
