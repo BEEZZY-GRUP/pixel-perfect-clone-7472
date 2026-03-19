@@ -54,9 +54,54 @@ const SidebarWidgets = () => {
     staleTime: 30_000,
   });
 
+  const { data: recentPosts } = useQuery({
+    queryKey: ["recent_posts_sidebar"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, created_at, categories!posts_category_id_fkey(emoji, name)")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+    staleTime: 30_000,
+  });
+
   return (
     <div className="space-y-4">
-      {/* Insight do Dia - first */}
+      {/* Recent Posts */}
+      {recentPosts && recentPosts.length > 0 && (
+        <div className="border border-border p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock size={13} className="text-gold" />
+            <p className="text-[.6rem] font-heading tracking-widest uppercase text-gold">Posts Recentes</p>
+          </div>
+          <div className="space-y-2.5">
+            {recentPosts.map((post: any) => (
+              <button
+                key={post.id}
+                onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
+                className="w-full text-left hover:bg-secondary/50 rounded-sm p-1.5 -mx-1.5 transition-colors group"
+              >
+                <p className="text-foreground text-[.7rem] leading-snug line-clamp-2 group-hover:text-gold transition-colors">
+                  {post.title}
+                </p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[.55rem] text-gold/50">
+                    {post.categories?.emoji} {post.categories?.name}
+                  </span>
+                  <span className="text-border text-[.5rem]">·</span>
+                  <span className="text-muted-foreground/50 text-[.55rem]">
+                    {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Insight do Dia */}
       <div className="border border-gold/15 bg-gradient-to-br from-gold/5 via-transparent to-gold/3 p-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-20 h-20 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="relative">
