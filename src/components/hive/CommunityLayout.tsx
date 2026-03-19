@@ -80,9 +80,9 @@ const CommunityLayout = () => {
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <a href="/" className="font-sans font-extrabold text-[1rem] tracking-[.22em] uppercase text-foreground no-underline">
+          <button onClick={() => { setActiveView("feed"); setSearchParams({}); }} className="font-sans font-extrabold text-[1rem] tracking-[.22em] uppercase text-foreground">
             Beezzy<span className="text-gold">.</span>
-          </a>
+          </button>
           <span className="text-muted-foreground text-[.65rem] tracking-widest uppercase font-heading hidden sm:inline">
             The Hive
           </span>
