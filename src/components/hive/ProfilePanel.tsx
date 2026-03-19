@@ -161,7 +161,7 @@ const ProfilePanel = () => {
         <div className="px-6 pb-6 -mt-10">
           {/* Avatar + edit button */}
           <div className="flex items-end justify-between mb-4">
-            <div className="relative group">
+            <div className="relative group" data-onboarding="avatar">
               <div className="w-20 h-20 rounded-full border-4 border-background overflow-hidden bg-secondary">
                 <UserAvatar
                   avatarUrl={profile.avatar_url}
