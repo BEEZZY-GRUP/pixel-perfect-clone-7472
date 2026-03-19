@@ -7,8 +7,7 @@ const values = [
 const ManifestoSection = () => (
   <div id="manifesto" className="border-t border-b border-border px-6 md:px-[60px]">
     <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2">
-    {/* Left */}
-    <div className="px-6 py-[72px] md:px-[60px] md:py-[120px] border-b md:border-b-0 md:border-r border-border flex flex-col justify-between">
+    <div className="py-[72px] md:py-[120px] border-b md:border-b-0 md:border-r border-border flex flex-col justify-between pr-0 md:pr-[60px]">
       <div>
         <div className="section-eyebrow">Quem somos</div>
         <blockquote className="reveal font-display text-[clamp(1.7rem,3vw,3rem)] font-light italic leading-[1.3] text-gold-light max-w-[440px]">
