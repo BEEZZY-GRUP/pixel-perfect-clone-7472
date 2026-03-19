@@ -166,21 +166,21 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
           {/* Author info */}
           <div className="flex items-center gap-3 mb-5">
             <button
-              onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-              className={!post.is_anonymous ? "cursor-pointer" : "cursor-default"}
+              onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+              className={!hideAuthor && !post.is_anonymous ? "cursor-pointer" : "cursor-default"}
             >
               <UserAvatar
-                avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
-                name={post.is_anonymous ? "A" : post.profile?.company_name}
+                avatarUrl={hideAuthor ? null : (post.is_anonymous ? null : post.profile?.avatar_url)}
+                name={hideAuthor ? "A" : (post.is_anonymous ? "A" : post.profile?.company_name)}
                 size="lg"
               />
             </button>
             <div>
               <button
-                onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-                className={`text-foreground font-medium text-sm ${!post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+                className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
               >
-                {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
               </button>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
                 <Clock size={10} />
