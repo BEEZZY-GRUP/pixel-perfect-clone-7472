@@ -70,6 +70,7 @@ const CommunityLayout = () => {
     { key: "ranking", label: "Ranking", icon: <Trophy size={14} /> },
     { key: "missions", label: "Missões", icon: <Target size={14} /> },
     { key: "profile", label: "Perfil", icon: <User size={14} /> },
+    ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
   return (
