@@ -101,7 +101,7 @@ const CommunityLayout = () => {
     if (slug) {
       navigate(`/the-hive/community?category=${slug}`);
     } else {
-      navigate("/the-hive/community");
+      navigate("/the-hive/community?category=todas");
     }
     setSidebarOpen(false);
   };
