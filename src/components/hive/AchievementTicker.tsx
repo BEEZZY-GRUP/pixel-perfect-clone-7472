@@ -132,18 +132,18 @@ const AchievementTicker = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full overflow-hidden bg-gold/5 border-b border-gold/10 h-[34px] flex items-center"
+      className="w-full overflow-hidden bg-gold/5 border-b border-gold/10 h-[38px] flex items-center"
     >
       <div ref={innerRef} className="flex whitespace-nowrap items-center">
         {/* Render twice for seamless loop */}
         {[...achievements, ...achievements].map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-2 mx-6 text-xs font-heading tracking-wide"
+            className="inline-flex items-center gap-2 mx-6 text-[0.8rem] font-heading tracking-wide leading-none"
           >
-            <span className="text-base">{item.emoji}</span>
-            <span className="text-gold/80">{item.text}</span>
-            <span className="text-gold/20 mx-4">◆</span>
+            <span className="text-lg leading-none">{item.emoji}</span>
+            <span className="text-gold/80 leading-none">{item.text}</span>
+            <span className="text-gold/20 mx-4 leading-none">◆</span>
           </span>
         ))}
       </div>
