@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,10 +10,11 @@ import CreatePostDialog from "./CreatePostDialog";
 import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
+import AdminPanel from "./AdminPanel";
 import { Button } from "@/components/ui/button";
-import { LogOut, Plus, Menu, X, Trophy, Target, User } from "lucide-react";
+import { LogOut, Plus, Menu, X, Trophy, Target, User, Shield } from "lucide-react";
 
-type View = "feed" | "ranking" | "missions" | "profile";
+type View = "feed" | "ranking" | "missions" | "profile" | "admin";
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
