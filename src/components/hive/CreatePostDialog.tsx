@@ -33,6 +33,14 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
 
   const defaultCat = categories.find((c) => c.slug === defaultCategorySlug);
   const [categoryId, setCategoryId] = useState(defaultCat?.id || "");
+
+  // Sync categoryId when the dialog opens with a new default category
+  useEffect(() => {
+    if (open && defaultCategorySlug && defaultCategorySlug !== "todas" && defaultCategorySlug !== "browse") {
+      const cat = categories.find((c) => c.slug === defaultCategorySlug);
+      if (cat) setCategoryId(cat.id);
+    }
+  }, [open, defaultCategorySlug, categories]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
