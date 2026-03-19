@@ -219,6 +219,7 @@ const HiveSection = () => {
           </svg>
         </a>
       </div>
+      </div>
     </section>
   );
 };

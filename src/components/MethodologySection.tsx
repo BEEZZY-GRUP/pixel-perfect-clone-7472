@@ -118,6 +118,7 @@ const MethodologySection = () => {
           </div>
         </div>
       </div>
+      </div>
     </section>
   );
 };

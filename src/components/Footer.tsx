@@ -61,6 +61,7 @@ const Footer = () => (
       <p className="font-heading text-[.65rem] tracking-[.14em] uppercase text-muted-foreground font-medium">
         A empresa do século 22
       </p>
+      </div>
     </div>
   </>
 );

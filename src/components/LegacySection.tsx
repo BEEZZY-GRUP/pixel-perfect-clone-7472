@@ -143,6 +143,7 @@ const LegacySection = () => {
           </svg>
         </a>
       </div>
+      </div>
     </section>
   );
 };

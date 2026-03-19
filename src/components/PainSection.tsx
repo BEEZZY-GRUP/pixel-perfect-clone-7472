@@ -120,6 +120,7 @@ const PainSection = () => {
           </a>
         </div>
       </div>
+      </div>
     </section>
   );
 };

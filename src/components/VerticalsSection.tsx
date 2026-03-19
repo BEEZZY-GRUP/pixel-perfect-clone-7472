@@ -63,6 +63,7 @@ const VerticalsSection = () => (
         </div>
       ))}
     </div>
+    </div>
   </section>
 );
 

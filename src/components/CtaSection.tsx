@@ -31,7 +31,8 @@ const CtaSection = () => {
         </p>
       </div>
 
-      <ContactFormDialog open={open} onOpenChange={setOpen} />
+        <ContactFormDialog open={open} onOpenChange={setOpen} />
+      </div>
     </section>
   );
 };
