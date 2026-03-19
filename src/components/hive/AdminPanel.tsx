@@ -46,10 +46,11 @@ const AdminPanel = () => {
   const { data: profiles } = useQuery({
     queryKey: ["all_profiles"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
-        .select("*, user_roles(role)")
+        .select("*")
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
     enabled: isAdmin,
