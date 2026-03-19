@@ -185,7 +185,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
             <div key={c.id} className="border border-border p-4">
               <div className="flex items-start justify-between">
                 <div className="text-muted-foreground text-[.7rem] mb-2">
-                  {c.profiles?.company_name} ·{" "}
+                  {c.profile?.company_name} ·{" "}
                   {formatDistanceToNow(new Date(c.created_at), {
                     addSuffix: true,
                     locale: ptBR,
