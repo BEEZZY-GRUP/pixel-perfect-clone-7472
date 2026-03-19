@@ -37,8 +37,13 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  // Filter out staff-only categories for non-admin
-  const availableCategories = categories.filter((c) => !c.staff_only || isAdmin);
+  // Filter out staff-only categories for non-admin, and avisos for non-admin/mod
+  const canPostAvisos = isAdmin || isModerator;
+  const availableCategories = categories.filter((c) => {
+    if (c.staff_only && !isAdmin) return false;
+    if (c.slug === AVISOS_SLUG && !canPostAvisos) return false;
+    return true;
+  });
 
   const createPost = useMutation({
     mutationFn: async () => {
