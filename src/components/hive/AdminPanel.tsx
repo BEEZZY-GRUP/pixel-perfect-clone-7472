@@ -184,15 +184,15 @@ const AdminPanel = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-2 mb-5">
-        <Shield size={16} className="text-gold" />
-        <h2 className="font-heading text-sm tracking-widest uppercase text-foreground">
+      <div className="flex items-center gap-3 mb-6">
+        <Shield size={22} className="text-gold" />
+        <h2 className="font-heading text-lg tracking-widest uppercase text-foreground">
           Administração
         </h2>
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {[
           { label: "Empresas", value: totalCompanies, icon: Building2 },
           { label: "Membros", value: totalMembers, icon: Users },
@@ -201,11 +201,11 @@ const AdminPanel = () => {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="border border-border bg-secondary/30 p-3 text-center"
+            className="border border-border bg-secondary/30 p-4 text-center"
           >
-            <stat.icon size={14} className="text-gold mx-auto mb-1" />
-            <p className="text-foreground text-lg font-bold leading-none">{stat.value}</p>
-            <p className="text-muted-foreground text-[.55rem] uppercase tracking-wider font-heading mt-1">
+            <stat.icon size={18} className="text-gold mx-auto mb-1.5" />
+            <p className="text-foreground text-2xl font-bold leading-none">{stat.value}</p>
+            <p className="text-muted-foreground text-xs uppercase tracking-wider font-heading mt-1.5">
               {stat.label}
             </p>
           </div>
@@ -213,21 +213,21 @@ const AdminPanel = () => {
       </div>
 
       {/* Tab navigation */}
-      <div className="flex border-b border-border mb-5">
+      <div className="flex border-b border-border mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-3 text-[.7rem] uppercase tracking-widest font-heading transition-colors border-b-2 -mb-[1px] ${
+            className={`flex items-center gap-2.5 px-6 py-3.5 text-sm uppercase tracking-widest font-heading transition-colors border-b-2 -mb-[1px] ${
               activeTab === tab.key
                 ? "border-gold text-gold"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            <tab.icon size={14} />
+            <tab.icon size={16} />
             {tab.label}
             <span
-              className={`text-[.55rem] px-1.5 py-0.5 rounded-sm ${
+              className={`text-xs px-2 py-0.5 rounded-sm ${
                 activeTab === tab.key
                   ? "bg-gold/15 text-gold"
                   : "bg-secondary text-muted-foreground"
@@ -246,23 +246,23 @@ const AdminPanel = () => {
       {activeTab === "membros" && (
         <div className="space-y-4">
           {/* Filters & sort bar */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-[220px]">
               <Search
-                size={14}
+                size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar membro..."
-                className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
+                className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-base h-10"
               />
             </div>
 
             {/* Filter buttons */}
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {(
                 [
                   { key: "all", label: "Todos" },
@@ -277,7 +277,7 @@ const AdminPanel = () => {
                   size="sm"
                   variant="ghost"
                   onClick={() => setFilterBy(f.key)}
-                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading ${
+                  className={`text-xs h-9 px-3 uppercase tracking-wider font-heading ${
                     filterBy === f.key
                       ? "bg-gold/15 text-gold border border-gold/30"
                       : "text-muted-foreground"
@@ -289,7 +289,7 @@ const AdminPanel = () => {
             </div>
 
             {/* Sort */}
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-1.5 items-center">
               {(
                 [
                   { key: "date", label: "Data" },
@@ -309,7 +309,7 @@ const AdminPanel = () => {
                       setSortAsc(false);
                     }
                   }}
-                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading gap-1 ${
+                  className={`text-xs h-9 px-3 uppercase tracking-wider font-heading gap-1.5 ${
                     sortBy === s.key
                       ? "bg-gold/15 text-gold border border-gold/30"
                       : "text-muted-foreground"
@@ -317,14 +317,14 @@ const AdminPanel = () => {
                 >
                   {s.label}
                   {sortBy === s.key &&
-                    (sortAsc ? <SortAsc size={10} /> : <SortDesc size={10} />)}
+                    (sortAsc ? <SortAsc size={12} /> : <SortDesc size={12} />)}
                 </Button>
               ))}
             </div>
           </div>
 
           {/* Results count */}
-          <p className="text-muted-foreground text-[.6rem] uppercase tracking-wider font-heading">
+          <p className="text-muted-foreground text-xs uppercase tracking-wider font-heading">
             {filtered?.length ?? 0} resultado{(filtered?.length ?? 0) !== 1 ? "s" : ""}
           </p>
 
@@ -342,50 +342,50 @@ const AdminPanel = () => {
                 <div key={profile.id} className="border border-border">
                   {/* Member header row */}
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-secondary/50 transition-colors"
+                    className="flex items-center justify-between p-5 cursor-pointer hover:bg-secondary/50 transition-colors"
                     onClick={() =>
                       setExpandedMember(isExpanded ? null : profile.user_id)
                     }
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
                       {isExpanded ? (
-                        <ChevronDown size={14} className="text-muted-foreground shrink-0" />
+                        <ChevronDown size={18} className="text-muted-foreground shrink-0" />
                       ) : (
-                        <ChevronRight size={14} className="text-muted-foreground shrink-0" />
+                        <ChevronRight size={18} className="text-muted-foreground shrink-0" />
                       )}
 
                       {/* Avatar placeholder */}
-                      <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                        <span className="text-gold text-[.65rem] font-bold uppercase">
+                      <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                        <span className="text-gold text-sm font-bold uppercase">
                           {(profile.company_name || "U").charAt(0)}
                         </span>
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-foreground text-sm font-medium truncate">
+                        <div className="flex items-center gap-2.5">
+                          <p className="text-foreground text-base font-medium truncate">
                             {profile.company_name}
                           </p>
                           {admin && (
-                            <span className="text-[.55rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                            <span className="text-xs bg-gold/10 text-gold px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
                               Admin
                             </span>
                           )}
                           {moderator && !admin && (
-                            <span className="text-[.55rem] bg-blue-500/10 text-blue-400 px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                            <span className="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
                               Moderador
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-muted-foreground text-[.6rem]">
+                        <div className="flex items-center gap-3 text-muted-foreground text-xs mt-0.5">
                           <span className="flex items-center gap-1">
-                            <Award size={9} />
+                            <Award size={12} />
                             Lv.{profile.level}
                           </span>
                           <span>{profile.xp} XP</span>
                           {linkedCompany && (
                             <span className="flex items-center gap-1">
-                              <Building2 size={9} />
+                              <Building2 size={12} />
                               {linkedCompany}
                             </span>
                           )}
@@ -396,17 +396,17 @@ const AdminPanel = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-muted-foreground text-[.55rem] shrink-0">
-                      <Calendar size={10} />
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs shrink-0">
+                      <Calendar size={13} />
                       {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                     </div>
                   </div>
 
                   {/* Expanded details */}
                   {isExpanded && (
-                    <div className="border-t border-border p-4 space-y-3 bg-secondary/20">
+                    <div className="border-t border-border p-5 space-y-4 bg-secondary/20">
                       {/* Detail grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
                           { label: "Nome", value: profile.company_name },
                           { label: "CNPJ", value: profile.cnpj || "—" },
@@ -421,24 +421,24 @@ const AdminPanel = () => {
                           { label: "Bio", value: profile.bio || "—" },
                         ].map((d) => (
                           <div key={d.label}>
-                            <p className="text-[.55rem] text-muted-foreground uppercase tracking-wider font-heading mb-0.5">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-heading mb-1">
                               {d.label}
                             </p>
-                            <p className="text-foreground text-sm truncate">{d.value}</p>
+                            <p className="text-foreground text-base truncate">{d.value}</p>
                           </div>
                         ))}
                       </div>
 
                       {/* Edit form */}
                       {isEditing ? (
-                        <div className="space-y-2 border-t border-border pt-3">
+                        <div className="space-y-3 border-t border-border pt-4">
                           <Input
                             value={editValues.company_name}
                             onChange={(e) =>
                               setEditValues({ ...editValues, company_name: e.target.value })
                             }
                             placeholder="Nome da empresa"
-                            className="bg-secondary border-border text-foreground text-sm"
+                            className="bg-secondary border-border text-foreground text-base h-10"
                           />
                           <Input
                             value={editValues.cnpj}
@@ -446,7 +446,7 @@ const AdminPanel = () => {
                               setEditValues({ ...editValues, cnpj: e.target.value })
                             }
                             placeholder="CNPJ"
-                            className="bg-secondary border-border text-foreground text-sm"
+                            className="bg-secondary border-border text-foreground text-base h-10"
                           />
                           <div className="flex gap-2">
                             <Button
@@ -459,23 +459,23 @@ const AdminPanel = () => {
                                 })
                               }
                               disabled={updateProfile.isPending}
-                              className="bg-gold text-background hover:bg-gold-light text-[.6rem] tracking-wider uppercase font-heading h-7"
+                              className="bg-gold text-background hover:bg-gold-light text-xs tracking-wider uppercase font-heading h-9"
                             >
-                              <Save size={12} className="mr-1" />
+                              <Save size={14} className="mr-1.5" />
                               Salvar
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => setEditingProfile(null)}
-                              className="text-muted-foreground text-[.6rem] h-7"
+                              className="text-muted-foreground text-xs h-9"
                             >
                               Cancelar
                             </Button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-2 border-t border-border pt-3">
+                        <div className="flex flex-wrap gap-2.5 border-t border-border pt-4">
                           <Button
                             size="sm"
                             variant="ghost"
@@ -487,9 +487,9 @@ const AdminPanel = () => {
                                 cnpj: profile.cnpj || "",
                               });
                             }}
-                            className="text-muted-foreground hover:text-foreground text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading"
+                            className="text-muted-foreground hover:text-foreground text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading"
                           >
-                            <Pencil size={10} />
+                            <Pencil size={13} />
                             Editar
                           </Button>
                           <Button
@@ -504,13 +504,13 @@ const AdminPanel = () => {
                               });
                             }}
                             disabled={toggleRole.isPending}
-                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                            className={`text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading ${
                               admin
                                 ? "text-destructive hover:text-destructive"
                                 : "text-gold hover:text-gold"
                             }`}
                           >
-                            {admin ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {admin ? <ShieldOff size={13} /> : <Shield size={13} />}
                             {admin ? "Remover admin" : "Tornar admin"}
                           </Button>
                           <Button
@@ -525,13 +525,13 @@ const AdminPanel = () => {
                               });
                             }}
                             disabled={toggleRole.isPending}
-                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                            className={`text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading ${
                               moderator
                                 ? "text-destructive hover:text-destructive"
                                 : "text-blue-400 hover:text-blue-400"
                             }`}
                           >
-                            {moderator ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {moderator ? <ShieldOff size={13} /> : <Shield size={13} />}
                             {moderator ? "Remover moderador" : "Tornar moderador"}
                           </Button>
                         </div>
