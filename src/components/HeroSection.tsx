@@ -77,17 +77,24 @@ const HeroSection = () => {
         float d2 = fbm(uv * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
         float d3 = fbm(uv * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
 
-        // Mouse distortion — pushes smoke away
+        // Mouse distortion — soft cloud displacement (x.ai style)
         vec2 delta = uv - mouse;
         float dist = length(delta);
-        float mouseForce = smoothstep(0.5, 0.0, dist) * 0.5;
-        float velForce = length(mvel) * smoothstep(0.4, 0.0, dist) * 2.0;
+        
+        // Soft radial displacement — large radius, gentle push
+        float influence = smoothstep(0.55, 0.0, dist);
+        float softPush = influence * 0.18;
+        
+        // Gentle directional warp based on mouse position
+        vec2 warpDir = normalize(delta + 0.001);
+        float warpNoise = fbm(uv * 2.5 + warpDir * t * 0.3) * influence * 0.12;
+        
+        // Velocity-based turbulence — very subtle
+        float velMag = length(mvel);
+        float velTurb = velMag * smoothstep(0.45, 0.0, dist) * 0.6;
+        float swirl = sin(atan(delta.y, delta.x) * 2.0 + d1 * 3.0 + t) * 0.5 + 0.5;
 
-        // Directional swirl from mouse velocity
-        float swirl = atan(delta.y, delta.x) + t * 0.5;
-        float swirlNoise = sin(swirl * 3.0 + d1 * 4.0) * 0.5 + 0.5;
-
-        float field = d3 + mouseForce + velForce * swirlNoise;
+        float field = d3 + softPush + warpNoise + velTurb * swirl;
         return field;
       }
 
