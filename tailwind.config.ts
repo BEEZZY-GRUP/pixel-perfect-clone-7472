@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["var(--font-display)"],
+        heading: ["var(--font-heading)"],
         sans: ["var(--font-sans)"],
       },
       colors: {
@@ -50,6 +51,13 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dim: "hsl(var(--gold-dim))",
+          border: "hsl(var(--gold-border))",
+          dark: "hsl(var(--gold-dark))",
         },
         "grey-light": "hsl(var(--grey-light))",
         "grey-mid": "hsl(var(--grey-mid))",

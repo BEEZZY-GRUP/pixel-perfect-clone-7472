@@ -1,15 +1,15 @@
 const ManifestoSection = () => (
   <div id="manifesto" className="grid grid-cols-1 md:grid-cols-2 border-t border-b border-border">
     <div className="px-7 py-20 md:px-14 md:py-[140px] border-b md:border-b-0 md:border-r border-border relative">
-      <div className="text-[.65rem] tracking-[.25em] uppercase text-muted-foreground mb-[72px] flex items-center gap-3.5">
-        <span className="block w-6 h-px bg-muted-foreground" />
+      <div className="text-[.65rem] tracking-[.25em] uppercase text-gold mb-[72px] flex items-center gap-3.5">
+        <span className="block w-6 h-px bg-gold" />
         Quem somos
       </div>
-      <blockquote className="reveal font-display text-[clamp(1.6rem,3vw,3.2rem)] font-light italic leading-[1.3] text-foreground">
+      <blockquote className="reveal font-display text-[clamp(1.6rem,3vw,3.2rem)] font-light italic leading-[1.3] text-gold-light">
         "O Legado não é o fim do trabalho. É o começo da independência."
       </blockquote>
       <div className="reveal reveal-delay-1 flex flex-col mt-16">
-        <strong className="font-display text-[clamp(3rem,5vw,6rem)] font-light leading-none">5</strong>
+        <strong className="font-display text-[clamp(3rem,5vw,6rem)] font-light leading-none text-gold">5</strong>
         <span className="text-[.7rem] tracking-[.18em] uppercase text-muted-foreground mt-2.5">
           Pilares da Metodologia Legacy
         </span>
@@ -17,8 +17,8 @@ const ManifestoSection = () => (
     </div>
     <div className="px-7 py-20 md:px-14 md:py-[140px] flex flex-col justify-between">
       <div>
-        <div className="text-[.65rem] tracking-[.25em] uppercase text-muted-foreground mb-[72px] flex items-center gap-3.5">
-          <span className="block w-6 h-px bg-muted-foreground" />
+        <div className="text-[.65rem] tracking-[.25em] uppercase text-gold mb-[72px] flex items-center gap-3.5">
+          <span className="block w-6 h-px bg-gold" />
           Filosofia
         </div>
         <p className="reveal text-sm leading-[2] text-muted-foreground max-w-[480px]">

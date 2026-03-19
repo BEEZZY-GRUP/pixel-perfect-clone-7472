@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@400;500;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -40,7 +40,14 @@
     --grey-mid: 30 4% 59%;
     --grey-dark: 60 2% 16%;
 
+    --gold: 36 35% 61%;
+    --gold-light: 36 54% 71%;
+    --gold-dim: 36 35% 61% / 0.15;
+    --gold-border: 36 35% 61% / 0.35;
+    --gold-dark: 36 48% 37%;
+
     --font-display: 'Cormorant Garamond', serif;
+    --font-heading: 'DM Sans', sans-serif;
     --font-sans: 'Syne', sans-serif;
 
     --sidebar-background: 40 6% 3%;
@@ -74,7 +81,7 @@
 /* ─── CUSTOM CURSOR ─────────────────────────────── */
 #cursor-dot {
   width: 6px; height: 6px;
-  background: hsl(var(--foreground));
+  background: hsl(var(--gold));
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9999;
@@ -83,7 +90,7 @@
 }
 #cursor-ring {
   width: 36px; height: 36px;
-  border: 1px solid hsl(var(--foreground) / 0.5);
+  border: 1px solid hsl(var(--gold-border));
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9998;
@@ -95,7 +102,7 @@
 body:has(a:hover) #cursor-ring,
 body:has(button:hover) #cursor-ring {
   width: 56px; height: 56px;
-  border-color: hsl(var(--foreground));
+  border-color: hsl(var(--gold));
 }
 
 /* ─── REVEAL ANIMATIONS ───────────────────────────── */
@@ -132,4 +139,12 @@ body:has(button:hover) #cursor-ring {
   background-size: 180px;
   pointer-events: none;
   opacity: .6;
+}
+
+/* ─── DIVIDER ────────────────────────────────────── */
+.divider {
+  width: calc(100% - 112px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent);
+  margin: 0 56px;
 }

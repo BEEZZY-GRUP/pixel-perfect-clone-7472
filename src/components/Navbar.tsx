@@ -11,7 +11,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-14 py-7 transition-all duration-400 border-b ${
+      className={`fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-7 py-7 md:px-14 transition-all duration-400 border-b ${
         scrolled
           ? "border-border backdrop-blur-[18px] bg-background/70"
           : "border-transparent"
@@ -34,7 +34,7 @@ const Navbar = () => {
           <li key={href}>
             <a
               href={href}
-              className="text-xs tracking-[.15em] uppercase text-muted-foreground no-underline hover:text-foreground transition-colors"
+              className="text-xs tracking-[.15em] uppercase text-muted-foreground no-underline hover:text-gold transition-colors"
             >
               {label}
             </a>

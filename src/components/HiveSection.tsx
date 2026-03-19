@@ -92,22 +92,22 @@ const HiveSection = () => {
 
   return (
     <section id="hive" className="border-t border-border px-7 py-20 md:px-14 md:py-[140px] grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-      <div className="reveal relative aspect-square max-w-[480px] md:max-w-[480px] max-w-[280px]">
-        <div className="absolute -inset-4 border border-border rounded-full" style={{ animation: "spin-slow 20s linear infinite" }} />
-        <div className="absolute -inset-10 border border-dashed border-border rounded-full" style={{ animation: "spin-slow 35s linear infinite reverse" }} />
+      <div className="reveal relative aspect-square max-w-[280px] md:max-w-[480px]">
+        <div className="absolute -inset-4 border border-gold-border rounded-full" style={{ animation: "spin-slow 20s linear infinite" }} />
+        <div className="absolute -inset-10 border border-dashed border-gold-dim rounded-full" style={{ animation: "spin-slow 35s linear infinite reverse" }} />
         <div className="w-full h-full rounded-full overflow-hidden">
           <canvas ref={canvasRef} className="w-full h-full block" />
         </div>
       </div>
       <div>
-        <div className="reveal text-[.65rem] tracking-[.25em] uppercase text-muted-foreground mb-[72px] flex items-center gap-3.5">
-          <span className="block w-6 h-px bg-muted-foreground" />
+        <div className="reveal text-[.65rem] tracking-[.25em] uppercase text-gold mb-[72px] flex items-center gap-3.5">
+          <span className="block w-6 h-px bg-gold" />
           The Hive
         </div>
-        <h2 className="reveal font-display text-[clamp(2.2rem,5vw,5rem)] font-light leading-[1.08] tracking-tight mb-7">
+        <h2 className="reveal font-heading text-[clamp(2.2rem,5vw,5rem)] font-light leading-[1.08] tracking-tight mb-7">
           Um ecossistema
           <br />
-          <em>vivo e real.</em>
+          <em className="font-display italic font-light text-gold-light">vivo e real.</em>
         </h2>
         <p className="reveal reveal-delay-1 text-sm leading-[1.9] text-muted-foreground max-w-[440px] mt-7">
           The Hive é mais do que uma comunidade. É um ecossistema onde empresários, criativos e inovadores se conectam, colaboram e crescem juntos.
@@ -117,7 +117,7 @@ const HiveSection = () => {
         </p>
         <a
           href="#"
-          className="reveal reveal-delay-3 inline-flex items-center gap-2.5 text-xs tracking-[.15em] uppercase text-foreground no-underline mt-12 pb-2 border-b border-foreground/30 hover:border-foreground transition-colors"
+          className="reveal reveal-delay-3 inline-flex items-center gap-2.5 text-xs tracking-[.15em] uppercase text-gold no-underline mt-12 pb-2 border-b border-gold-border hover:border-gold hover:text-gold-light transition-colors"
         >
           Entrar para o ecossistema
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
