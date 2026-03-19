@@ -267,6 +267,7 @@ const AdminPanel = () => {
                 [
                   { key: "all", label: "Todos" },
                   { key: "admin", label: "Admins" },
+                  { key: "moderator", label: "Moderadores" },
                   { key: "user", label: "Usuários" },
                   { key: "no-company", label: "Sem Empresa" },
                 ] as { key: MemberFilter; label: string }[]
