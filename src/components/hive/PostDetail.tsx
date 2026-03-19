@@ -26,6 +26,19 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const navigateRouter = useNavigate();
   const [comment, setComment] = useState("");
 
+  const { data: currentProfile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("avatar_url, company_name")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: post } = useQuery({
     queryKey: ["post", postId],
     queryFn: async () => {
@@ -297,8 +310,8 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         <form onSubmit={handleSubmitComment} className="border border-border bg-card p-4">
           <div className="flex gap-3">
             <UserAvatar
-              avatarUrl={null}
-              name="Você"
+              avatarUrl={hideAuthor ? null : currentProfile?.avatar_url ?? null}
+              name={hideAuthor ? "A" : currentProfile?.company_name ?? "Você"}
               size="sm"
               className="mt-1"
             />
