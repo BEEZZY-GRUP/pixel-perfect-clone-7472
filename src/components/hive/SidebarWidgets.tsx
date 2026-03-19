@@ -6,6 +6,7 @@ import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award, S
 import { getDailyInsight } from "./dailyInsights";
 
 const SidebarWidgets = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data: stats } = useQuery({
