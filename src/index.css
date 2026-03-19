@@ -128,11 +128,8 @@ body:has(button:hover) #cursor-ring {
   border-color: hsl(var(--gold));
 }
 
-/* ─── REVEAL — initial state for GSAP ────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-}
+/* ─── REVEAL — GSAP handles all animation ────────── */
+/* Initial state is set by GSAP fromTo — no CSS needed */
 
 /* ─── SCROLL LINE ANIMATION ──────────────────────── */
 @keyframes scroll-line {
