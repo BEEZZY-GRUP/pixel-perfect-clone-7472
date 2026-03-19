@@ -236,18 +236,21 @@ const CommunityLayout = () => {
                   />
                 )}
 
-                {/* Feed view */}
-                {activeView === "feed" && !isPostDetail && (
+                {/* Home welcome view */}
+                {isHome && (
+                  <WelcomeHome onCreatePost={() => setShowCreate(true)} />
+                )}
+
+                {/* Feed view (when category selected) */}
+                {activeView === "feed" && !isPostDetail && activeCategory && (
                   <>
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                          {activeCategory
-                            ? (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")
-                            : "Todas as publicações"}
+                          {(categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                            (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
                         </h1>
-                        {activeCategory && (() => {
+                        {(() => {
                           const cat = categories?.find((c) => c.slug === activeCategory);
                           return cat?.description ? (
                             <p className="text-muted-foreground text-[.75rem] leading-relaxed mt-1 max-w-lg">
