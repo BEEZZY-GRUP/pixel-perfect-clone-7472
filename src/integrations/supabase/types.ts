@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          created_at: string
+          description: string | null
+          emoji: string
+          id: string
+          name: string
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          name: string
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          name?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -82,6 +109,45 @@ export type Database = {
           },
         ]
       }
+      missions: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          emoji: string
+          id: string
+          mission_type: string
+          target_action: string
+          target_count: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          mission_type?: string
+          target_action?: string
+          target_count?: number
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          mission_type?: string
+          target_action?: string
+          target_count?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           category_id: string
@@ -134,8 +200,10 @@ export type Database = {
           company_name: string
           created_at: string
           id: string
+          level: number
           updated_at: string
           user_id: string
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
@@ -144,8 +212,10 @@ export type Database = {
           company_name: string
           created_at?: string
           id?: string
+          level?: number
           updated_at?: string
           user_id: string
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
@@ -154,10 +224,79 @@ export type Database = {
           company_name?: string
           created_at?: string
           id?: string
+          level?: number
           updated_at?: string
           user_id?: string
+          xp?: number
         }
         Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_missions: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          id: string
+          mission_id: string
+          progress: number
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          id?: string
+          mission_id: string
+          progress?: number
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          id?: string
+          mission_id?: string
+          progress?: number
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -177,11 +316,39 @@ export type Database = {
         }
         Relationships: []
       }
+      xp_history: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      add_xp: {
+        Args: { _amount: number; _reason: string; _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

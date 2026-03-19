@@ -6,8 +6,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import CategorySidebar from "./CategorySidebar";
 import PostList from "./PostList";
 import CreatePostDialog from "./CreatePostDialog";
+import RankingPanel from "./RankingPanel";
+import MissionsPanel from "./MissionsPanel";
+import ProfilePanel from "./ProfilePanel";
 import { Button } from "@/components/ui/button";
-import { LogOut, Plus, Menu, X } from "lucide-react";
+import { LogOut, Plus, Menu, X, Trophy, Target, User } from "lucide-react";
+
+type View = "feed" | "ranking" | "missions" | "profile";
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
@@ -15,6 +20,7 @@ const CommunityLayout = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showCreate, setShowCreate] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeView, setActiveView] = useState<View>("feed");
 
   const activeCategory = searchParams.get("category") || null;
 
@@ -48,6 +54,7 @@ const CommunityLayout = () => {
   };
 
   const handleCategorySelect = (slug: string | null) => {
+    setActiveView("feed");
     if (slug) {
       setSearchParams({ category: slug });
     } else {
@@ -55,6 +62,12 @@ const CommunityLayout = () => {
     }
     setSidebarOpen(false);
   };
+
+  const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
+    { key: "ranking", label: "Ranking", icon: <Trophy size={14} /> },
+    { key: "missions", label: "Missões", icon: <Target size={14} /> },
+    { key: "profile", label: "Perfil", icon: <User size={14} /> },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,15 +87,43 @@ const CommunityLayout = () => {
             The Hive
           </span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-foreground text-xs font-heading tracking-wide hidden sm:inline">
+
+        <div className="flex items-center gap-1">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setActiveView(item.key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm ${
+                activeView === item.key
+                  ? "bg-gold/10 text-gold"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {item.icon}
+              <span className="hidden sm:inline">{item.label}</span>
+            </button>
+          ))}
+
+          {/* XP badge in header */}
+          {profile && (
+            <div className="hidden md:flex items-center gap-1 px-3 py-1.5 border border-gold/20 ml-2">
+              <span className="text-gold text-[.65rem] font-heading font-semibold">
+                Lv.{profile.level}
+              </span>
+              <span className="text-muted-foreground text-[.6rem]">
+                {profile.xp}XP
+              </span>
+            </div>
+          )}
+
+          <span className="text-foreground text-xs font-heading tracking-wide hidden lg:inline ml-2">
             {profile?.company_name}
           </span>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSignOut}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground ml-1"
           >
             <LogOut size={16} />
           </Button>
@@ -90,21 +131,23 @@ const CommunityLayout = () => {
       </header>
 
       <div className="flex pt-[57px]">
-        {/* Sidebar */}
-        <aside className={`
-          fixed md:sticky top-[57px] left-0 z-40 h-[calc(100vh-57px)] w-[260px] border-r border-border bg-background
-          transition-transform duration-200
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}>
-          <CategorySidebar
-            categories={categories ?? []}
-            activeSlug={activeCategory}
-            onSelect={handleCategorySelect}
-          />
-        </aside>
+        {/* Sidebar - only show on feed view */}
+        {activeView === "feed" && (
+          <aside className={`
+            fixed md:sticky top-[57px] left-0 z-40 h-[calc(100vh-57px)] w-[260px] border-r border-border bg-background
+            transition-transform duration-200
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          `}>
+            <CategorySidebar
+              categories={categories ?? []}
+              activeSlug={activeCategory}
+              onSelect={handleCategorySelect}
+            />
+          </aside>
+        )}
 
         {/* Overlay for mobile */}
-        {sidebarOpen && (
+        {sidebarOpen && activeView === "feed" && (
           <div
             className="fixed inset-0 z-30 bg-background/50 md:hidden"
             onClick={() => setSidebarOpen(false)}
@@ -114,23 +157,30 @@ const CommunityLayout = () => {
         {/* Main content */}
         <main className="flex-1 min-h-[calc(100vh-57px)] px-4 md:px-8 py-6">
           <div className="max-w-[720px] mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="font-heading text-lg tracking-wide text-foreground">
-                {activeCategory
-                  ? categories?.find((c) => c.slug === activeCategory)?.emoji + " " +
-                    categories?.find((c) => c.slug === activeCategory)?.name
-                  : "Todas as publicações"}
-              </h1>
-              <Button
-                onClick={() => setShowCreate(true)}
-                className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2"
-              >
-                <Plus size={14} />
-                Publicar
-              </Button>
-            </div>
+            {activeView === "feed" && (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h1 className="font-heading text-lg tracking-wide text-foreground">
+                    {activeCategory
+                      ? categories?.find((c) => c.slug === activeCategory)?.emoji + " " +
+                        categories?.find((c) => c.slug === activeCategory)?.name
+                      : "Todas as publicações"}
+                  </h1>
+                  <Button
+                    onClick={() => setShowCreate(true)}
+                    className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2"
+                  >
+                    <Plus size={14} />
+                    Publicar
+                  </Button>
+                </div>
+                <PostList categorySlug={activeCategory} categories={categories ?? []} />
+              </>
+            )}
 
-            <PostList categorySlug={activeCategory} categories={categories ?? []} />
+            {activeView === "ranking" && <RankingPanel />}
+            {activeView === "missions" && <MissionsPanel />}
+            {activeView === "profile" && <ProfilePanel />}
           </div>
         </main>
       </div>
