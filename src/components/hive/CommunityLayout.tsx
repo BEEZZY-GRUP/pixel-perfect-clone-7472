@@ -14,15 +14,16 @@ import AdminPanel from "./AdminPanel";
 import AchievementTicker from "./AchievementTicker";
 import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
+import NotificationsPanel from "./NotificationsPanel";
 import SidebarWidgets from "./SidebarWidgets";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Plus, Menu, X, Trophy, Target, User, Shield,
-  Video, BookOpen, MessageCircle,
+  Video, BookOpen, MessageCircle, Bell,
 } from "lucide-react";
 
-type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin";
+type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
 
 const VIEW_MAP: Record<string, View> = {
   videos: "videos",
