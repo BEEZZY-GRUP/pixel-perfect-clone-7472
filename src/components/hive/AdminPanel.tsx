@@ -97,19 +97,19 @@ const AdminPanel = () => {
     onError: () => toast.error("Erro ao atualizar perfil."),
   });
 
-  const toggleAdmin = useMutation({
-    mutationFn: async ({ userId, makeAdmin }: { userId: string; makeAdmin: boolean }) => {
-      if (makeAdmin) {
+  const toggleRole = useMutation({
+    mutationFn: async ({ userId, role, add }: { userId: string; role: "admin" | "moderator"; add: boolean }) => {
+      if (add) {
         const { error } = await supabase
           .from("user_roles")
-          .insert({ user_id: userId, role: "admin" });
+          .insert({ user_id: userId, role });
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("user_roles")
           .delete()
           .eq("user_id", userId)
-          .eq("role", "admin");
+          .eq("role", role);
         if (error) throw error;
       }
     },
