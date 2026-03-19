@@ -192,6 +192,7 @@ const ProfilePanel = () => {
 
             {!editing && (
               <Button
+                data-onboarding="edit"
                 size="sm"
                 variant="ghost"
                 onClick={startEditing}
