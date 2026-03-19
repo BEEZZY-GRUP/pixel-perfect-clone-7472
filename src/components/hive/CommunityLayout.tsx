@@ -11,6 +11,7 @@ import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
 import AdminPanel from "./AdminPanel";
+import AchievementTicker from "./AchievementTicker";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus, Menu, X, Trophy, Target, User, Shield } from "lucide-react";
 
@@ -134,11 +135,16 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-      <div className="flex pt-[57px]">
+      {/* Achievement ticker */}
+      <div className="fixed top-[57px] left-0 right-0 z-40">
+        <AchievementTicker />
+      </div>
+
+      <div className="flex pt-[85px]">
         {/* Sidebar - only show on feed view */}
         {activeView === "feed" && (
           <aside className={`
-            fixed md:sticky top-[57px] left-0 z-40 h-[calc(100vh-57px)] w-[260px] border-r border-border bg-background
+            fixed md:sticky top-[85px] left-0 z-40 h-[calc(100vh-85px)] w-[260px] border-r border-border bg-background
             transition-transform duration-200
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
