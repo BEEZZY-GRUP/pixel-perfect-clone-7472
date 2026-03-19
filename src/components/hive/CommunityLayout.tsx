@@ -166,16 +166,18 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-      {/* Achievement ticker */}
-      <div className="fixed top-[57px] left-0 right-0 z-40">
-        <AchievementTicker />
-      </div>
+      {/* Achievement ticker - only on feed */}
+      {activeView === "feed" && !isPostDetail && (
+        <div className="fixed top-[57px] left-0 right-0 z-40">
+          <AchievementTicker />
+        </div>
+      )}
 
-      <div className="flex pt-[85px]">
+      <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[85px]" : "pt-[57px]"}`}>
         {/* Left Sidebar */}
         {showLeftSidebar && (
           <aside className={`
-            fixed md:sticky top-[85px] left-0 z-40 h-[calc(100vh-85px)] w-[240px] border-r border-border bg-background
+            fixed md:sticky ${activeView === "feed" && !isPostDetail ? "top-[85px] h-[calc(100vh-85px)]" : "top-[57px] h-[calc(100vh-57px)]"} left-0 z-40 w-[280px] border-r border-border bg-background
             transition-transform duration-200 overflow-y-auto scrollbar-thin
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
