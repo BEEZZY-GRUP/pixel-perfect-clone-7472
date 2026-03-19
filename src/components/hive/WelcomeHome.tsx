@@ -157,7 +157,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent posts */}
-        <div className="border border-border bg-card p-5">
+        <div className="border border-border bg-card p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Flame size={14} className="text-gold" />
