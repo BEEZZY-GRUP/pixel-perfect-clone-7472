@@ -155,7 +155,8 @@ const AdminPanel = () => {
       if (!matchName && !matchCnpj) return false;
     }
     if (filterBy === "admin") return isUserAdmin(p.user_id);
-    if (filterBy === "user") return !isUserAdmin(p.user_id);
+    if (filterBy === "moderator") return isUserModerator(p.user_id);
+    if (filterBy === "user") return !isUserAdmin(p.user_id) && !isUserModerator(p.user_id);
     if (filterBy === "no-company") return !p.company_id;
     return true;
   });
