@@ -199,7 +199,7 @@ const CommunityLayout = () => {
         {/* Left Sidebar */}
         {showLeftSidebar && (
           <aside className={`
-            fixed md:sticky ${activeView === "feed" && !isPostDetail ? "top-[95px] h-[calc(100vh-95px)]" : "top-[57px] h-[calc(100vh-57px)]"} left-0 z-40 w-[280px] border-r border-border bg-background
+            fixed md:sticky top-[57px] h-[calc(100vh-57px)] left-0 z-40 w-[280px] border-r border-border bg-background
             transition-transform duration-200 overflow-y-auto scrollbar-thin
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
