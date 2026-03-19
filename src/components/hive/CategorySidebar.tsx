@@ -40,7 +40,7 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
       </div>
 
       {/* Two-column grid */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-col gap-1">
         <button
           onClick={() => onSelect(null)}
           className={`text-left px-3 py-3 transition-colors rounded-sm ${
