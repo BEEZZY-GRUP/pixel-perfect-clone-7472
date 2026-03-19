@@ -54,7 +54,7 @@ const CommunityLayout = () => {
 
   const activeCategory = searchParams.get("category") || null;
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       const { data } = await supabase
