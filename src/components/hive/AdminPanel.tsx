@@ -532,6 +532,42 @@ const AdminPanel = () => {
                               <option value="admin">Administrador</option>
                             </select>
                           </div>
+
+                          {/* Delete member */}
+                          <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                            {confirmDelete === profile.user_id ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-destructive">Confirmar exclusão?</span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => deleteMember.mutate(profile.user_id)}
+                                  disabled={deleteMember.isPending}
+                                  className="text-xs h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 uppercase tracking-wider font-heading"
+                                >
+                                  {deleteMember.isPending ? "Excluindo..." : "Sim, excluir"}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setConfirmDelete(null)}
+                                  className="text-xs h-9 px-3 text-muted-foreground uppercase tracking-wider font-heading"
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setConfirmDelete(profile.user_id)}
+                                className="text-xs h-9 px-4 gap-1.5 text-destructive/60 hover:text-destructive hover:bg-destructive/10 uppercase tracking-wider font-heading"
+                              >
+                                <Trash2 size={13} />
+                                Excluir
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
