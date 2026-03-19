@@ -22,7 +22,7 @@ const ManifestoSection = () => (
           { value: "∞", label: "Potencial de escala" },
         ].map((stat) => (
           <div key={stat.label} className="bg-[hsl(40_6%_5%)] p-8 md:p-9 flex flex-col gap-2">
-            <strong className="font-display text-[clamp(2.8rem,4.5vw,5rem)] font-light leading-none text-gold">
+            <strong className="stat-value-gsap font-display text-[clamp(2.8rem,4.5vw,5rem)] font-light leading-none text-gold">
               {stat.value}
             </strong>
             <span className="font-heading text-[.68rem] tracking-[.16em] uppercase text-muted-foreground font-medium">

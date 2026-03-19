@@ -8,7 +8,7 @@ const items = [
 ];
 
 const ProofBar = () => (
-  <div className="border-t border-b border-border overflow-hidden bg-[hsl(40_6%_5%)]">
+  <div className="proof-bar-wrapper border-t border-b border-border overflow-hidden bg-[hsl(40_6%_5%)]">
     <div className="flex whitespace-nowrap animate-[ticker_28s_linear_infinite] hover:[animation-play-state:paused]">
       {[...items, ...items].map((item, i) => (
         <span key={i} className="contents">
