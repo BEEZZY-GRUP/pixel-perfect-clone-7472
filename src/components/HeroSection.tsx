@@ -170,7 +170,7 @@ const HeroSection = () => {
       raf = requestAnimationFrame(animate);
       uniforms.uTime.value = (performance.now() - startTime) * 0.001;
       // Dampen velocity
-      uniforms.uMouseVel.value.multiplyScalar(0.92);
+      uniforms.uMouseVel.value.multiplyScalar(0.88);
       renderer.render(scene, camera);
     };
     raf = requestAnimationFrame(animate);
