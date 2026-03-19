@@ -134,7 +134,8 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   }
 
   const createdAt = new Date(post.created_at);
-
+  const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
+  const hideAuthor = isConfessionario && !isAdmin;
   return (
     <div>
       {/* Back button */}
