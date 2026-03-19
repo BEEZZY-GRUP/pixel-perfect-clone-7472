@@ -26,7 +26,7 @@ const SidebarWidgets = () => {
   const { data: topMembers } = useQuery({
     queryKey: ["top_3_members"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,
