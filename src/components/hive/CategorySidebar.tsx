@@ -13,26 +13,26 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
     <nav className="p-3 overflow-y-auto h-full scrollbar-gold">
       {/* Header */}
       <div className="px-2 pt-1 pb-3 mb-3 border-b border-border">
-        <p className="text-[.55rem] font-heading tracking-[.2em] uppercase text-gold/50">
+        <p className="text-xs font-heading tracking-[.2em] uppercase text-gold/70">
           Categorias
         </p>
       </div>
 
       {/* Two-column grid */}
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => onSelect(null)}
-          className={`text-left px-2.5 py-2.5 transition-colors rounded-sm ${
+          className={`text-left px-3 py-3 transition-colors rounded-sm ${
             activeSlug === null
               ? "bg-gold/10 text-gold border-l-2 border-gold"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
           }`}
         >
-          <span className="text-[.6rem] tracking-wide font-heading uppercase flex items-center gap-1.5">
+          <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1.5">
             📋 Todas
           </span>
-          <span className="block text-[.5rem] leading-tight mt-0.5 opacity-50 normal-case tracking-normal font-sans">
-            Tudo
+          <span className="block text-[.6rem] leading-tight mt-1 opacity-60 normal-case tracking-normal font-sans">
+            Todas as publicações
           </span>
         </button>
 
@@ -40,20 +40,20 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
           <button
             key={cat.id}
             onClick={() => onSelect(cat.slug)}
-            className={`text-left px-2.5 py-2.5 transition-colors rounded-sm ${
+            className={`text-left px-3 py-3 transition-colors rounded-sm ${
               activeSlug === cat.slug
                 ? "bg-gold/10 text-gold border-l-2 border-gold"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
             }`}
           >
-            <span className="text-[.6rem] tracking-wide font-heading uppercase flex items-center gap-1">
+            <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1.5">
               {cat.emoji} {cat.name}
               {cat.staff_only && (
-                <span className="text-[.45rem] text-gold/60 bg-gold/5 px-0.5 rounded-sm">S</span>
+                <span className="text-[.5rem] text-gold/60 bg-gold/5 px-1 rounded-sm">S</span>
               )}
             </span>
             {cat.description && (
-              <span className="block text-[.5rem] leading-tight mt-0.5 opacity-50 normal-case tracking-normal font-sans line-clamp-1">
+              <span className="block text-[.6rem] leading-tight mt-1 opacity-60 normal-case tracking-normal font-sans line-clamp-2">
                 {cat.description}
               </span>
             )}
@@ -63,11 +63,11 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
 
       {/* Bottom decoration */}
       <div className="pt-3 mt-3 border-t border-border">
-        <div className="px-2.5 py-2 bg-secondary/30 rounded-sm">
-          <p className="text-[.5rem] text-muted-foreground/60 font-heading tracking-wider uppercase mb-1">
+        <div className="px-3 py-2.5 bg-secondary/30 rounded-sm">
+          <p className="text-[.6rem] text-muted-foreground/60 font-heading tracking-wider uppercase mb-1">
             💡 Dica
           </p>
-          <p className="text-[.5rem] text-muted-foreground/50 leading-relaxed">
+          <p className="text-[.6rem] text-muted-foreground/50 leading-relaxed">
             Selecione uma categoria para filtrar os posts.
           </p>
         </div>
