@@ -438,7 +438,7 @@ const AdminPanel = () => {
                               setEditValues({ ...editValues, company_name: e.target.value })
                             }
                             placeholder="Nome da empresa"
-                            className="bg-secondary border-border text-foreground text-sm"
+                            className="bg-secondary border-border text-foreground text-base h-10"
                           />
                           <Input
                             value={editValues.cnpj}
