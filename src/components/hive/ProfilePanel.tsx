@@ -23,7 +23,6 @@ const ProfilePanel = () => {
   const [editValues, setEditValues] = useState({
     company_name: "",
     bio: "",
-    cnpj: "",
   });
 
   const { data: profile } = useQuery({
