@@ -271,6 +271,7 @@ const CommunityLayout = () => {
                   </>
                 )}
 
+                {activeView === "notifications" && <NotificationsPanel />}
                 {activeView === "videos" && <VideosPanel />}
                 {activeView === "glossary" && <GlossaryPanel />}
                 {activeView === "ranking" && <RankingPanel />}
