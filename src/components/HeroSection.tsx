@@ -215,12 +215,12 @@ const HeroSection = () => {
             <span className="hero-line-inner block">da sua empresa.</span>
           </span>
         </h1>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-10">
+        <div className="flex flex-col gap-6 md:gap-8">
           <p className="hero-sub text-[.85rem] md:text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
             Não somos mais uma consultoria. Somos o sócio estratégico que
             transforma sua empresa em um negócio independente, previsível e escalável.
           </p>
-          <div className="hero-actions flex items-center gap-4 md:gap-5 flex-shrink-0 flex-col sm:flex-row">
+          <div className="hero-actions flex items-center gap-4 md:gap-5 flex-col sm:flex-row">
             <a
               href="#cta-section"
               className="inline-flex items-center gap-3 font-heading text-[.72rem] tracking-[.16em] uppercase font-semibold text-background bg-gold no-underline px-7 py-4 md:px-9 md:py-[18px] hover:bg-gold-light hover:-translate-y-px transition-all group w-full sm:w-auto justify-center"
