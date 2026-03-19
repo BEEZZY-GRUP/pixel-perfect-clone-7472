@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
     // Invite user via Supabase Auth with company_id in metadata
     const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
       data: { company_name: company.name, company_id },
-      redirectTo: `${req.headers.get("origin") || supabaseUrl}/the-hive`,
+      redirectTo: `${req.headers.get("origin") || supabaseUrl}/the-hive/setup-password`,
     });
 
     if (inviteError) {
