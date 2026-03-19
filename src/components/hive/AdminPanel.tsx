@@ -342,50 +342,50 @@ const AdminPanel = () => {
                 <div key={profile.id} className="border border-border">
                   {/* Member header row */}
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-secondary/50 transition-colors"
+                    className="flex items-center justify-between p-5 cursor-pointer hover:bg-secondary/50 transition-colors"
                     onClick={() =>
                       setExpandedMember(isExpanded ? null : profile.user_id)
                     }
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
                       {isExpanded ? (
-                        <ChevronDown size={14} className="text-muted-foreground shrink-0" />
+                        <ChevronDown size={18} className="text-muted-foreground shrink-0" />
                       ) : (
-                        <ChevronRight size={14} className="text-muted-foreground shrink-0" />
+                        <ChevronRight size={18} className="text-muted-foreground shrink-0" />
                       )}
 
                       {/* Avatar placeholder */}
-                      <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                        <span className="text-gold text-[.65rem] font-bold uppercase">
+                      <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                        <span className="text-gold text-sm font-bold uppercase">
                           {(profile.company_name || "U").charAt(0)}
                         </span>
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-foreground text-sm font-medium truncate">
+                        <div className="flex items-center gap-2.5">
+                          <p className="text-foreground text-base font-medium truncate">
                             {profile.company_name}
                           </p>
                           {admin && (
-                            <span className="text-[.55rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                            <span className="text-xs bg-gold/10 text-gold px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
                               Admin
                             </span>
                           )}
                           {moderator && !admin && (
-                            <span className="text-[.55rem] bg-blue-500/10 text-blue-400 px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                            <span className="text-xs bg-blue-500/10 text-blue-400 px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
                               Moderador
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-muted-foreground text-[.6rem]">
+                        <div className="flex items-center gap-3 text-muted-foreground text-xs mt-0.5">
                           <span className="flex items-center gap-1">
-                            <Award size={9} />
+                            <Award size={12} />
                             Lv.{profile.level}
                           </span>
                           <span>{profile.xp} XP</span>
                           {linkedCompany && (
                             <span className="flex items-center gap-1">
-                              <Building2 size={9} />
+                              <Building2 size={12} />
                               {linkedCompany}
                             </span>
                           )}
@@ -396,8 +396,8 @@ const AdminPanel = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-muted-foreground text-[.55rem] shrink-0">
-                      <Calendar size={10} />
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs shrink-0">
+                      <Calendar size={13} />
                       {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                     </div>
                   </div>
