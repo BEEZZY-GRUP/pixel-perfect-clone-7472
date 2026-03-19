@@ -143,6 +143,7 @@ const AdminPanel = () => {
     onError: (err: Error) => toast.error(err.message || "Erro ao excluir membro."),
   });
 
+  if (!isAdmin) {
     return (
       <div className="border border-border p-8 text-center">
         <p className="text-muted-foreground text-sm">Acesso restrito a administradores.</p>
