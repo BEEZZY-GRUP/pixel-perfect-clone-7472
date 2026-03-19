@@ -122,11 +122,15 @@ const SidebarWidgets = () => {
           </div>
           <div className="space-y-2">
             {topMembers.map((member: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-2">
+              <button
+                key={idx}
+                onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
+                className="flex items-center gap-2 w-full text-left hover:bg-secondary/50 rounded-sm p-1 -m-1 transition-colors"
+              >
                 <span className={`text-[.6rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>#{idx + 1}</span>
-                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate">{member.company_name}</p></div>
+                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{member.company_name}</p></div>
                 <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
