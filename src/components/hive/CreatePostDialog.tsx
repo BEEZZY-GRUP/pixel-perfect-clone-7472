@@ -71,7 +71,12 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       const cat = categories.find((c) => c.slug === defaultCategorySlug);
-      if (cat && !cat.staff_only) setCategoryId(cat.id);
+      if (cat && (!cat.staff_only || isAdmin)) {
+        setCategoryId(cat.id);
+      } else if (!cat) {
+        // "todas" or no category — keep empty so user picks one
+        setCategoryId("");
+      }
     }
     onOpenChange(isOpen);
   };
