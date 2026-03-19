@@ -4,18 +4,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import LoadingScreen from "@/components/hive/LoadingScreen";
 
 const HiveLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
   // If already logged in, redirect
-  if (user) {
+  if (user && !showTransition) {
     navigate("/the-hive/community", { replace: true });
     return null;
+  }
+
+  if (showTransition) {
+    return <LoadingScreen />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +35,10 @@ const HiveLogin = () => {
     if (error) {
       toast.error("Credenciais inválidas. Verifique seu email e senha.");
     } else {
-      navigate("/the-hive/community");
+      setShowTransition(true);
+      setTimeout(() => {
+        navigate("/the-hive/community");
+      }, 1800);
     }
   };
 
