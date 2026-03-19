@@ -27,7 +27,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
     queryFn: async () => {
       let query = supabase
         .from("posts")
-        .select("*, profiles!inner(company_name, avatar_url), categories!posts_category_id_fkey(name, emoji, slug), comments(count)")
+        .select("*, categories!posts_category_id_fkey(name, emoji, slug), comments(count)")
         .order("pinned", { ascending: false })
         .order("created_at", { ascending: false });
 
@@ -35,8 +35,19 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
         query = query.eq("category_id", categoryId);
       }
 
-      const { data } = await query;
-      return data ?? [];
+      const { data, error } = await query;
+      if (error) { console.error("Posts query error:", error); return []; }
+      if (!data?.length) return [];
+
+      // Fetch profiles for post authors
+      const userIds = [...new Set(data.map((p) => p.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, company_name, avatar_url")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+      return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
     },
   });
 
