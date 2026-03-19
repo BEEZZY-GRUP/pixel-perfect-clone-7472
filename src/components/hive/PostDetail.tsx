@@ -253,18 +253,18 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
                 className="flex gap-3 p-4 border border-border border-t-0 first:border-t bg-card hover:bg-secondary/30 transition-colors"
               >
                 <UserAvatar
-                  avatarUrl={c.profile?.avatar_url}
-                  name={c.profile?.company_name}
+                  avatarUrl={isConfessionario && !isAdmin ? null : c.profile?.avatar_url}
+                  name={isConfessionario && !isAdmin ? "A" : c.profile?.company_name}
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
                       <button
-                        onClick={() => navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
-                        className="text-foreground text-[.8rem] font-medium truncate hover:text-gold transition-colors"
+                        onClick={() => !(isConfessionario && !isAdmin) && navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
+                        className={`text-foreground text-[.8rem] font-medium truncate ${!(isConfessionario && !isAdmin) ? "hover:text-gold transition-colors" : ""}`}
                       >
-                        {c.profile?.company_name || "Membro"}
+                        {isConfessionario && !isAdmin ? "Anônimo" : (c.profile?.company_name || "Membro")}
                       </button>
                       <time
                         className="text-muted-foreground text-[.6rem] shrink-0"
