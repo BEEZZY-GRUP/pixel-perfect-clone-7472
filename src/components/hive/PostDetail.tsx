@@ -1,16 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowLeft, Send, Trash2, Pin, MessageSquare, Clock } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
+import CommentItem from "./CommentItem";
 
 const CONFESSIONARIO_SLUG = "confessionario";
 
@@ -59,7 +60,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     },
   });
 
-  const { data: comments } = useQuery({
+  const { data: rawComments } = useQuery({
     queryKey: ["comments", postId],
     queryFn: async () => {
       const { data } = await supabase
@@ -79,6 +80,28 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
       return data.map((c) => ({ ...c, profile: profileMap.get(c.user_id) ?? null }));
     },
   });
+
+  // Build threaded comment tree
+  const threadedComments = useMemo(() => {
+    if (!rawComments?.length) return [];
+    const map = new Map<string, any>();
+    const roots: any[] = [];
+
+    for (const c of rawComments) {
+      map.set(c.id, { ...c, replies: [] });
+    }
+    for (const c of rawComments) {
+      const node = map.get(c.id)!;
+      if (c.parent_id && map.has(c.parent_id)) {
+        map.get(c.parent_id)!.replies.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    return roots;
+  }, [rawComments]);
+
+  const totalComments = rawComments?.length ?? 0;
 
   const addComment = useMutation({
     mutationFn: async (content: string) => {
@@ -111,18 +134,6 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     onError: () => toast.error("Erro ao excluir."),
   });
 
-  const deleteComment = useMutation({
-    mutationFn: async (commentId: string) => {
-      const { error } = await supabase.from("comments").delete().eq("id", commentId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      toast.success("Comentário excluído!");
-    },
-    onError: () => toast.error("Erro ao excluir comentário."),
-  });
-
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
@@ -149,6 +160,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const createdAt = new Date(post.created_at);
   const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
   const hideAuthor = isConfessionario && !isAdmin;
+
   return (
     <div>
       {/* Back button */}
@@ -223,7 +235,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
           <PostReactions postId={post.id} />
           <span className="text-muted-foreground text-[.65rem] font-heading flex items-center gap-1.5">
             <MessageSquare size={13} />
-            {comments?.length ?? 0} {(comments?.length ?? 0) === 1 ? "comentário" : "comentários"}
+            {totalComments} {totalComments === 1 ? "comentário" : "comentários"}
           </span>
         </div>
 
@@ -248,62 +260,26 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
       <div className="mt-6">
         <h3 className="text-xs font-heading tracking-widest uppercase text-muted-foreground mb-5 flex items-center gap-2">
           <MessageSquare size={13} />
-          Comentários ({comments?.length ?? 0})
+          Comentários ({totalComments})
         </h3>
 
-        {/* Comment list */}
+        {/* Threaded comment list */}
         <div className="space-y-0 mb-6">
-          {comments?.length === 0 && (
+          {threadedComments.length === 0 && (
             <p className="text-muted-foreground/60 text-sm text-center py-8 border border-border border-dashed">
               Nenhum comentário ainda. Seja o primeiro!
             </p>
           )}
-          {comments?.map((c: any, idx: number) => {
-            const commentDate = new Date(c.created_at);
-            return (
-              <div
-                key={c.id}
-                className="flex gap-3 p-4 border border-border border-t-0 first:border-t bg-card hover:bg-secondary/30 transition-colors"
-              >
-                <UserAvatar
-                  avatarUrl={isConfessionario && !isAdmin ? null : c.profile?.avatar_url}
-                  name={isConfessionario && !isAdmin ? "A" : c.profile?.company_name}
-                  size="sm"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <button
-                        onClick={() => !(isConfessionario && !isAdmin) && navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
-                        className={`text-foreground text-[.8rem] font-medium truncate ${!(isConfessionario && !isAdmin) ? "hover:text-gold transition-colors" : ""}`}
-                      >
-                        {isConfessionario && !isAdmin ? "Anônimo" : (c.profile?.company_name || "Membro")}
-                      </button>
-                      <time
-                        className="text-muted-foreground text-[.6rem] shrink-0"
-                        dateTime={c.created_at}
-                        title={format(commentDate, "dd/MM/yyyy 'às' HH:mm")}
-                      >
-                        {formatDistanceToNow(commentDate, { addSuffix: true, locale: ptBR })}
-                      </time>
-                    </div>
-                    {(isAdmin || c.user_id === user?.id) && (
-                      <button
-                        onClick={() => deleteComment.mutate(c.id)}
-                        className="text-destructive/40 hover:text-destructive transition-colors shrink-0 p-1"
-                        title="Excluir comentário"
-                      >
-                        <Trash2 size={11} />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-foreground/85 text-[.82rem] leading-relaxed whitespace-pre-wrap">
-                    {c.content}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          {threadedComments.map((c: any) => (
+            <CommentItem
+              key={c.id}
+              comment={c}
+              postId={postId}
+              isAdmin={isAdmin ?? false}
+              isConfessionario={isConfessionario}
+              currentProfile={currentProfile ?? null}
+            />
+          ))}
         </div>
 
         {/* Comment form */}
