@@ -138,8 +138,8 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showLeftSidebar = activeView === "feed" && !isPostDetail;
-  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail;
+  const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome;
+  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
 
   return (
     <div className="min-h-screen bg-background" style={{ zoom: 1.25 }}>
