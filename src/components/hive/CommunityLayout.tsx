@@ -25,7 +25,7 @@ import {
   Video, BookOpen, MessageCircle, Bell,
 } from "lucide-react";
 
-type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
+type View = "feed" | "community" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
 
 const VIEW_MAP: Record<string, View> = {
   videos: "videos",
