@@ -77,37 +77,31 @@ const LegacySection = () => {
         ref={containerRef}
         className="reveal reveal-delay-2 relative mt-16 mb-[72px] border border-border h-[340px] md:h-[340px] overflow-hidden select-none"
       >
-        {/* Shared layout — both layers use identical positioning */}
-        {/* Before — clipped from the right */}
-        <div
-          className="absolute inset-0"
-          style={{ clipPath: `inset(0 ${100 - displayPos}% 0 0)` }}
-        >
-          <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center items-center">
-            <div className="w-[260px]">
-              <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30">
-                Antes
-              </div>
-              <div className="flex flex-col gap-3">
-                {beforeItems.map((item) => (
-                  <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground/35 whitespace-nowrap">
-                    <span className="text-[.75rem] text-foreground/25">✕</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
+        {/* Before (base layer — visible by default, revealed when dragging LEFT) */}
+        <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center items-center">
+          <div className="w-[260px]">
+            <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30 text-center">
+              Antes
+            </div>
+            <div className="flex flex-col gap-3">
+              {beforeItems.map((item) => (
+                <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground/35 whitespace-nowrap">
+                  <span className="text-[.75rem] text-foreground/25">✕</span>
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* After — clipped from the left */}
+        {/* After (overlay — revealed when dragging RIGHT) */}
         <div
           className="absolute inset-0"
-          style={{ clipPath: `inset(0 0 0 ${displayPos}%)` }}
+          style={{ clipPath: `inset(0 ${100 - displayPos}% 0 0)` }}
         >
           <div className="absolute inset-0 bg-background flex flex-col justify-center items-center">
             <div className="w-[260px]">
-              <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
+              <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold text-center">
                 Legado
               </div>
               <div className="flex flex-col gap-3">
