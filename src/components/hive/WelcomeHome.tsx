@@ -171,26 +171,34 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
             </button>
           </div>
           <div className="space-y-3">
-            {recentPosts?.map((post: any) => (
-              <button
-                key={post.id}
-                onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
-                className="w-full text-left flex items-start gap-3 py-2 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors -mx-1 px-1 rounded-sm"
-              >
-                <UserAvatar avatarUrl={post.profile?.avatar_url} name={post.profile?.company_name} size="sm" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-foreground text-[.75rem] font-medium truncate leading-snug">{post.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-gold/60 text-[.55rem] font-heading tracking-wider">
-                      {post.categories?.emoji} {post.categories?.name}
-                    </span>
-                    <span className="text-muted-foreground text-[.55rem]">
-                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
-                    </span>
+            {recentPosts?.map((post: any) => {
+              const isConfessionario = post.categories?.slug === "confessionario";
+              const isAnon = isConfessionario || post.is_anonymous;
+              return (
+                <button
+                  key={post.id}
+                  onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
+                  className="w-full text-left flex items-start gap-3 py-2 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors -mx-1 px-1 rounded-sm"
+                >
+                  <UserAvatar
+                    avatarUrl={isAnon ? null : post.profile?.avatar_url}
+                    name={isAnon ? "A" : post.profile?.company_name}
+                    size="sm"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-[.75rem] font-medium truncate leading-snug">{post.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-gold/60 text-[.55rem] font-heading tracking-wider">
+                        {post.categories?.emoji} {post.categories?.name}
+                      </span>
+                      <span className="text-muted-foreground text-[.55rem]">
+                        {isAnon ? "Anônimo" : (post.profile?.company_name || "Membro")} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
             {(!recentPosts || recentPosts.length === 0) && (
               <p className="text-muted-foreground text-[.7rem] text-center py-4">Nenhuma publicação ainda.</p>
             )}
