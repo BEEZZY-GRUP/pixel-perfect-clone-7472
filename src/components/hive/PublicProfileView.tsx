@@ -39,17 +39,6 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
     },
   });
 
-  const { data: badges } = useQuery({
-    queryKey: ["public_user_badges", userId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("user_badges")
-        .select("*, badges(*)")
-        .eq("user_id", userId)
-        .order("earned_at", { ascending: false });
-      return data ?? [];
-    },
-  });
 
   if (isLoading) {
     return (
