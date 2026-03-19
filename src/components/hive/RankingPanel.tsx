@@ -9,6 +9,7 @@ import UserAvatar from "./UserAvatar";
 const ITEMS_PER_PAGE = 10;
 
 const RankingPanel = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
 
   const { data: rankings, isLoading } = useQuery({
