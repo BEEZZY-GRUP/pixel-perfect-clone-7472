@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PublicProfileView from "./PublicProfileView";
 import CategorySidebar from "./CategorySidebar";
+import WelcomeHome from "./WelcomeHome";
 import PostList from "./PostList";
 import CreatePostDialog from "./CreatePostDialog";
 import RankingPanel from "./RankingPanel";
