@@ -111,7 +111,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
             >
               <button
                 onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
-                className="w-full text-left p-5 pb-3"
+                className="w-full text-left p-4 md:p-5 pb-3"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <UserAvatar
@@ -155,7 +155,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                 </p>
               </button>
 
-              <div className="px-5 pb-4 pt-1 flex items-center justify-between gap-3">
+              <div className="px-4 md:px-5 pb-3 md:pb-4 pt-1 flex items-center justify-between gap-2 flex-wrap">
                 <PostReactions postId={post.id} compact />
                 <button
                   onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
@@ -174,19 +174,19 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6 pt-4 border-t border-border">
-          <Button size="sm" variant="ghost" onClick={() => setPage(Math.max(1, currentPage - 1))} disabled={currentPage <= 1} className="text-xs h-9 px-3 text-muted-foreground hover:text-foreground gap-1 font-heading">
-            <ChevronLeft size={14} /> Anterior
+        <div className="flex items-center justify-center gap-1 md:gap-2 mt-6 pt-4 border-t border-border flex-wrap">
+          <Button size="sm" variant="ghost" onClick={() => setPage(Math.max(1, currentPage - 1))} disabled={currentPage <= 1} className="text-xs h-8 md:h-9 px-2 md:px-3 text-muted-foreground hover:text-foreground gap-1 font-heading">
+            <ChevronLeft size={14} /> <span className="hidden sm:inline">Anterior</span>
           </Button>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 md:gap-1 flex-wrap justify-center">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button key={p} onClick={() => setPage(p)} className={`w-9 h-9 flex items-center justify-center text-xs font-heading transition-colors ${p === currentPage ? "bg-gold text-background font-bold" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
+              <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 md:w-9 md:h-9 flex items-center justify-center text-xs font-heading transition-colors ${p === currentPage ? "bg-gold text-background font-bold" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
                 {p}
               </button>
             ))}
           </div>
-          <Button size="sm" variant="ghost" onClick={() => setPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages} className="text-xs h-9 px-3 text-muted-foreground hover:text-foreground gap-1 font-heading">
-            Próxima <ChevronRight size={14} />
+          <Button size="sm" variant="ghost" onClick={() => setPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages} className="text-xs h-8 md:h-9 px-2 md:px-3 text-muted-foreground hover:text-foreground gap-1 font-heading">
+            <span className="hidden sm:inline">Próxima</span> <ChevronRight size={14} />
           </Button>
         </div>
       )}

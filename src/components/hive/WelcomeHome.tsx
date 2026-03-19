@@ -88,11 +88,11 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Hero greeting */}
       <div className="border border-border bg-card overflow-hidden">
-        <div className="bg-gradient-to-br from-gold/10 via-gold/5 to-transparent p-6">
-          <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-br from-gold/10 via-gold/5 to-transparent p-4 md:p-6">
+          <div className="flex items-center gap-3 md:gap-4">
             <UserAvatar avatarUrl={profile?.avatar_url} name={profile?.company_name} size="lg" />
             <div className="flex-1 min-w-0">
               <p className="text-muted-foreground text-[.7rem] font-heading tracking-wider uppercase">
@@ -104,10 +104,17 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
             </div>
             <Button
               onClick={onCreatePost}
-              className="bg-gold text-background hover:bg-gold-light font-heading text-[.6rem] tracking-widest uppercase gap-2 shrink-0"
+              className="bg-gold text-background hover:bg-gold-light font-heading text-[.6rem] tracking-widest uppercase gap-2 shrink-0 hidden sm:flex"
             >
               <Plus size={14} />
               Publicar
+            </Button>
+            <Button
+              onClick={onCreatePost}
+              size="icon"
+              className="bg-gold text-background hover:bg-gold-light shrink-0 sm:hidden w-8 h-8"
+            >
+              <Plus size={14} />
             </Button>
           </div>
 
@@ -133,15 +140,15 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3">
         {quickLinks.map((link) => (
           <button
             key={link.label}
             onClick={() => navigate(link.path)}
-            className="border border-border bg-card hover:border-gold/25 transition-all p-4 flex flex-col items-center gap-2 group"
+            className="border border-border bg-card hover:border-gold/25 transition-all p-3 md:p-4 flex flex-col items-center gap-1.5 md:gap-2 group"
           >
             <span className="text-muted-foreground group-hover:text-gold transition-colors">{link.icon}</span>
-            <span className="text-[.6rem] font-heading tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors">
+            <span className="text-[.5rem] md:text-[.6rem] font-heading tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">
               {link.label}
             </span>
           </button>
@@ -150,7 +157,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent posts */}
-        <div className="border border-border bg-card p-5">
+        <div className="border border-border bg-card p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Flame size={14} className="text-gold" />
@@ -193,7 +200,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
         {/* Right column: missions + ranking */}
         <div className="space-y-6">
           {/* Active missions */}
-          <div className="border border-border bg-card p-5">
+          <div className="border border-border bg-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Target size={14} className="text-gold" />
@@ -233,7 +240,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
           </div>
 
           {/* Top 3 ranking */}
-          <div className="border border-border bg-card p-5">
+          <div className="border border-border bg-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Trophy size={14} className="text-gold" />

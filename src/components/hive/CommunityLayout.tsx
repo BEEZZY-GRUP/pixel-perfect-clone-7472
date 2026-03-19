@@ -145,9 +145,9 @@ const CommunityLayout = () => {
   const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
 
   return (
-    <div className="min-h-screen bg-background" style={{ zoom: 1.25 }}>
+    <div className="min-h-screen bg-background community-zoom">
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-md px-4 md:px-8 py-3 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-md px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -228,7 +228,7 @@ const CommunityLayout = () => {
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-h-[calc(100vh-85px)] px-4 md:px-6 py-6">
+        <main className="flex-1 min-h-[calc(100vh-85px)] px-3 md:px-6 py-4 md:py-6 overflow-x-hidden">
           <div className={`mx-auto ${showRightSidebar ? "max-w-[1100px]" : "max-w-[720px]"}`}>
             <div className={`${showRightSidebar ? "flex gap-6" : ""}`}>
               <div className={`${showRightSidebar ? "flex-1 min-w-0" : ""}`}>

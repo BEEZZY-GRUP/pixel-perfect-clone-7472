@@ -146,7 +146,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
       {/* Post article */}
       <article className="border border-border bg-card">
-        <div className="p-6 pb-4">
+        <div className="p-4 md:p-6 pb-4">
           {/* Category + pin badge */}
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[.65rem] font-heading tracking-wider uppercase text-gold/70 bg-gold/5 px-2 py-1">
@@ -195,7 +195,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         </div>
 
         {/* Reactions bar */}
-        <div className="px-6 py-3 border-t border-border flex items-center justify-between">
+        <div className="px-4 md:px-6 py-3 border-t border-border flex items-center justify-between flex-wrap gap-2">
           <PostReactions postId={post.id} />
           <span className="text-muted-foreground text-[.65rem] font-heading flex items-center gap-1.5">
             <MessageSquare size={13} />
@@ -205,7 +205,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
         {/* Admin/owner actions */}
         {(isAdmin || post.user_id === user?.id) && (
-          <div className="px-6 py-3 border-t border-border">
+          <div className="px-4 md:px-6 py-3 border-t border-border">
             <Button
               size="sm"
               variant="ghost"
