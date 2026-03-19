@@ -21,11 +21,11 @@ import SidebarWidgets from "./SidebarWidgets";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Plus, Menu, X, Trophy, Target, User, Shield,
+  LogOut, Plus, Menu, X, Trophy, Target, User, Shield, Home,
   Video, BookOpen, MessageCircle, Bell,
 } from "lucide-react";
 
-type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
+type View = "feed" | "community" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
 
 const VIEW_MAP: Record<string, View> = {
   videos: "videos",
@@ -109,6 +109,8 @@ const CommunityLayout = () => {
   const handleViewChange = (view: View) => {
     if (view === "feed") {
       navigate("/the-hive/community");
+    } else if (view === "community") {
+      navigate("/the-hive/community?category=geral");
     } else {
       navigate(`/the-hive/community/${view}`);
     }
@@ -128,7 +130,8 @@ const CommunityLayout = () => {
   const isHome = activeView === "feed" && !activeCategory && !isPostDetail;
 
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
-    { key: "feed", label: "Início", icon: <MessageCircle size={14} /> },
+    { key: "feed", label: "Início", icon: <Home size={14} /> },
+    { key: "community", label: "Comunidade", icon: <MessageCircle size={14} /> },
     { key: "notifications", label: "Notificações", icon: notifIcon },
     { key: "videos", label: "Vídeos", icon: <Video size={14} /> },
     { key: "glossary", label: "Sumário", icon: <BookOpen size={14} /> },
@@ -166,7 +169,9 @@ const CommunityLayout = () => {
               key={item.key}
               onClick={() => handleViewChange(item.key)}
               className={`flex items-center gap-1 px-2 md:px-3 py-1.5 text-[.6rem] md:text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm whitespace-nowrap ${
-                activeView === item.key && !isPostDetail
+                (item.key === "community" && activeView === "feed" && activeCategory && !isPostDetail) ||
+                (item.key === "feed" && isHome) ||
+                (item.key !== "feed" && item.key !== "community" && activeView === item.key && !isPostDetail)
                   ? "bg-gold/10 text-gold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
