@@ -431,7 +431,7 @@ const AdminPanel = () => {
 
                       {/* Edit form */}
                       {isEditing ? (
-                        <div className="space-y-2 border-t border-border pt-3">
+                        <div className="space-y-3 border-t border-border pt-4">
                           <Input
                             value={editValues.company_name}
                             onChange={(e) =>
