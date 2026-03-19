@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Shield, ShieldOff, Save, Search } from "lucide-react";
 import { useState } from "react";
-import InvitePanel from "./InvitePanel";
 import CompanyManagement from "./CompanyManagement";
 
 const AdminPanel = () => {
