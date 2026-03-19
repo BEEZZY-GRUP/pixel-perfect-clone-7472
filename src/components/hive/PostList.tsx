@@ -111,7 +111,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
             >
               <button
                 onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
-                className="w-full text-left p-5 pb-3"
+                className="w-full text-left p-4 md:p-5 pb-3"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <UserAvatar
