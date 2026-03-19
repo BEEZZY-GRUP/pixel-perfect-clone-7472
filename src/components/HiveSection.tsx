@@ -207,7 +207,9 @@ const HiveSection = () => {
           Queremos que você, empresário(a), faça parte de algo maior — onde cada conexão é uma oportunidade e cada encontro pode mudar o rumo do seu negócio.
         </p>
         <a
-          href="#"
+          href="https://api.whatsapp.com/send/?phone=555584291090&text=Ol%C3%A1%21+Vim+pelo+site+da+Beezzy+e+gostaria+de+saber+como+minha+empresa+pode+fazer+parte+do+ecossistema.&type=phone_number&app_absent=0"
+          target="_blank"
+          rel="noopener noreferrer"
           className="reveal reveal-delay-3 inline-flex items-center gap-[10px] font-heading text-[.72rem] tracking-[.15em] uppercase text-gold no-underline mt-12 pb-2 border-b border-gold-border hover:border-gold hover:gap-4 transition-all font-semibold"
         >
           Entrar para o ecossistema
