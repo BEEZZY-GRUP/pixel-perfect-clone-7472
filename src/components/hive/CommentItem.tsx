@@ -37,7 +37,7 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
   const navigateRouter = useNavigate();
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const hideAuthor = isConfessionario && !isAdmin;
+  const hideAuthor = isConfessionario; // Always anonymous in Confessionário for comments
 
   // Likes query
   const { data: likes } = useQuery({
