@@ -39,7 +39,7 @@ const VIEW_MAP: Record<string, View> = {
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, isModerator } = useIsAdmin();
   const navigate = useNavigate();
   const params = useParams();
   const [searchParams] = useSearchParams();
