@@ -27,7 +27,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
     queryFn: async () => {
       let query = supabase
         .from("posts")
-        .select("*, categories!posts_category_id_fkey(name, emoji, slug), comments(count)")
+        .select("*, profiles!inner(company_name, avatar_url), categories!posts_category_id_fkey(name, emoji, slug), comments(count)")
         .order("pinned", { ascending: false })
         .order("created_at", { ascending: false });
 
