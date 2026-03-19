@@ -115,12 +115,24 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
   const maxDepth = 2; // limit nesting
 
   return (
-    <div>
+    <div className={depth > 0 ? "relative" : ""}>
+      {/* Thread connector line for nested replies */}
+      {depth > 0 && (
+        <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-gold/25 via-gold/10 to-transparent" />
+      )}
+
       <div
-        className={`flex gap-3 p-4 border border-border bg-card hover:bg-secondary/30 transition-colors ${
-          depth > 0 ? "border-t-0 ml-6 md:ml-10 border-l-2 border-l-gold/10" : "border-t-0 first:border-t"
+        className={`flex gap-3 transition-colors ${
+          depth > 0
+            ? "ml-5 md:ml-8 pl-4 py-3 pr-4 rounded-md bg-secondary/20 hover:bg-secondary/40 mb-2 border border-border/50"
+            : "p-4 border border-border border-t-0 first:border-t bg-card hover:bg-secondary/30"
         }`}
       >
+        {/* Reply curve indicator */}
+        {depth > 0 && (
+          <div className="absolute left-0 top-5 w-4 h-px bg-gold/15" />
+        )}
+
         <UserAvatar
           avatarUrl={hideAuthor ? null : comment.profile?.avatar_url ?? null}
           name={hideAuthor ? "A" : comment.profile?.company_name ?? "M"}
@@ -129,6 +141,9 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
             <div className="flex items-center gap-2 min-w-0">
+              {depth > 0 && (
+                <span className="text-gold/40 text-[.6rem] font-heading tracking-wider uppercase shrink-0">↳</span>
+              )}
               <button
                 onClick={() => !hideAuthor && navigateRouter(`/the-hive/community/profile/${comment.user_id}`)}
                 className={`text-foreground text-[.8rem] font-medium truncate ${!hideAuthor ? "hover:text-gold transition-colors" : ""}`}
@@ -223,17 +238,21 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
       </div>
 
       {/* Render nested replies */}
-      {comment.replies?.map((reply) => (
-        <CommentItem
-          key={reply.id}
-          comment={reply}
-          postId={postId}
-          isAdmin={isAdmin}
-          isConfessionario={isConfessionario}
-          currentProfile={currentProfile}
-          depth={depth + 1}
-        />
-      ))}
+      {comment.replies && comment.replies.length > 0 && (
+        <div className={depth === 0 ? "relative" : ""}>
+          {comment.replies.map((reply: CommentData) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              isAdmin={isAdmin}
+              isConfessionario={isConfessionario}
+              currentProfile={currentProfile}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
