@@ -72,30 +72,22 @@ const HeroSection = () => {
 
       // Warped domain smoke
       float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
-        // Mouse displacement — warp UV coords to "part" the clouds
+        // Gentle mouse displacement — barely perceptible cloud drift
         vec2 delta = uv - mouse;
         float dist = length(delta);
-        float influence = smoothstep(0.35, 0.0, dist);
+        float influence = smoothstep(0.4, 0.0, dist);
         vec2 pushDir = normalize(delta + 0.0001);
         
-        // Displace UVs away from mouse — this creates the "parting" effect
-        vec2 displaced = uv + pushDir * influence * 0.12;
-        
-        // Velocity adds extra turbulent displacement
-        float velMag = length(mvel);
-        vec2 velDisplace = mvel * smoothstep(0.4, 0.0, dist) * 0.8;
-        displaced += velDisplace;
+        // Very subtle UV warp
+        vec2 displaced = uv + pushDir * influence * 0.03;
+        displaced += mvel * smoothstep(0.35, 0.0, dist) * 0.15;
 
-        // Base warp layers on displaced coords
+        // Base warp layers
         float d1 = fbm(displaced * 2.0 + vec2(t * 0.5, t * 0.3));
         float d2 = fbm(displaced * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
         float d3 = fbm(displaced * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
 
-        // Darken near mouse center for a "cleared" look
-        float clearHole = smoothstep(0.0, 0.2, dist);
-        float field = d3 * mix(0.5, 1.0, clearHole);
-        
-        return field;
+        return d3;
       }
 
       // Film grain
