@@ -88,11 +88,11 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Hero greeting */}
       <div className="border border-border bg-card overflow-hidden">
-        <div className="bg-gradient-to-br from-gold/10 via-gold/5 to-transparent p-6">
-          <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-br from-gold/10 via-gold/5 to-transparent p-4 md:p-6">
+          <div className="flex items-center gap-3 md:gap-4">
             <UserAvatar avatarUrl={profile?.avatar_url} name={profile?.company_name} size="lg" />
             <div className="flex-1 min-w-0">
               <p className="text-muted-foreground text-[.7rem] font-heading tracking-wider uppercase">
