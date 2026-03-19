@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PublicProfileView from "./PublicProfileView";
 import LoadingScreen from "./LoadingScreen";
-import CategorySidebar from "./CategorySidebar";
+import CategoryGrid from "./CategoryGrid";
 import WelcomeHome from "./WelcomeHome";
 import PostList from "./PostList";
 import CreatePostDialog from "./CreatePostDialog";
@@ -113,7 +113,7 @@ const CommunityLayout = () => {
     if (view === "feed") {
       navigate("/the-hive/community");
     } else if (view === "community") {
-      navigate("/the-hive/community?category=geral");
+      navigate("/the-hive/community?category=todas");
     } else {
       navigate(`/the-hive/community/${view}`);
     }
@@ -142,8 +142,7 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome && !isProfileView;
-  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome && !isProfileView;
+  const showRightSidebar = ["feed"].includes(activeView) && !isPostDetail && !isHome && !isProfileView;
 
   if (isDataLoading) {
     return <LoadingScreen />;
@@ -208,32 +207,9 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-
-      <div className="flex pt-[57px]">
-        {/* Left Sidebar */}
-        {showLeftSidebar && (
-          <aside className={`
-            fixed md:sticky top-[57px] h-[calc(100vh-57px)] left-0 z-40 w-[280px] border-r border-border bg-background
-            transition-transform duration-200 overflow-y-auto scrollbar-thin
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-          `}>
-            <CategorySidebar
-              categories={categories ?? []}
-              activeSlug={activeCategory}
-              onSelect={handleCategorySelect}
-            />
-          </aside>
-        )}
-
-        {sidebarOpen && showLeftSidebar && (
-          <div
-            className="fixed inset-0 z-30 bg-background/50 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
+      <div className="pt-[57px]">
         {/* Main content */}
-        <main className="flex-1 min-h-[calc(100vh-85px)] px-3 md:px-6 py-4 md:py-6 overflow-x-hidden">
+        <main className="min-h-[calc(100vh-85px)] px-3 md:px-6 py-4 md:py-6 overflow-x-hidden">
           <div className={`mx-auto ${showRightSidebar ? "max-w-[1100px]" : "max-w-[720px]"}`}>
             <div className={`${showRightSidebar ? "flex gap-6" : ""}`}>
               <div className={`${showRightSidebar ? "flex-1 min-w-0" : ""}`}>
@@ -251,27 +227,22 @@ const CommunityLayout = () => {
                   <WelcomeHome onCreatePost={() => setShowCreate(true)} />
                 )}
 
-                {/* Feed view (when category selected) */}
+                {/* Feed view (when category selected) — categories as blocks */}
                 {activeView === "feed" && !isPostDetail && activeCategory && (
                   <>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                          {activeCategory === "todas"
-                            ? "📋 Todas as Publicações"
-                            : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
-                        </h1>
-                        {(() => {
-                          if (activeCategory === "todas") return null;
-                          const cat = categories?.find((c) => c.slug === activeCategory);
-                          return cat?.description ? (
-                            <p className="text-muted-foreground text-[.75rem] leading-relaxed mt-1 max-w-lg">
-                              {cat.description}
-                            </p>
-                          ) : null;
-                        })()}
-                      </div>
+                    <CategoryGrid
+                      categories={categories ?? []}
+                      activeSlug={activeCategory}
+                      onSelect={handleCategorySelect}
+                    />
+
+                    <div className="flex items-center justify-between mb-4">
+                      <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
+                        {activeCategory === "todas"
+                          ? "📋 Todas as Publicações"
+                          : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                            (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
+                      </h1>
                       <Button
                         onClick={() => setShowCreate(true)}
                         className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
@@ -280,6 +251,16 @@ const CommunityLayout = () => {
                         Publicar
                       </Button>
                     </div>
+
+                    {(() => {
+                      if (activeCategory === "todas") return null;
+                      const cat = categories?.find((c) => c.slug === activeCategory);
+                      return cat?.description ? (
+                        <p className="text-muted-foreground text-[.75rem] leading-relaxed mb-4 max-w-lg">
+                          {cat.description}
+                        </p>
+                      ) : null;
+                    })()}
 
                     <PostList categorySlug={activeCategory === "todas" ? null : activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
                   </>
@@ -299,7 +280,7 @@ const CommunityLayout = () => {
 
               {showRightSidebar && (
                 <aside className="hidden lg:block w-[260px] shrink-0">
-                  <div className="sticky top-[100px]">
+                  <div className="sticky top-[80px]">
                     <SidebarWidgets />
                   </div>
                 </aside>
