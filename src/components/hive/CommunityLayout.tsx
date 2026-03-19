@@ -109,6 +109,8 @@ const CommunityLayout = () => {
   const handleViewChange = (view: View) => {
     if (view === "feed") {
       navigate("/the-hive/community");
+    } else if (view === "community") {
+      navigate("/the-hive/community?category=geral");
     } else {
       navigate(`/the-hive/community/${view}`);
     }
