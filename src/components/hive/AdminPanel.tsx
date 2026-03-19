@@ -20,6 +20,7 @@ import {
   Calendar,
   Award,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import CompanyManagement from "./CompanyManagement";
@@ -42,6 +43,7 @@ const AdminPanel = () => {
   const [sortAsc, setSortAsc] = useState(false);
   const [filterBy, setFilterBy] = useState<MemberFilter>("all");
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const { data: profiles } = useQuery({
     queryKey: ["all_profiles"],
@@ -121,6 +123,24 @@ const AdminPanel = () => {
       queryClient.invalidateQueries({ queryKey: ["all_roles"] });
     },
     onError: () => toast.error("Erro ao atualizar cargo."),
+  });
+
+  const deleteMember = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke("delete-member", {
+        body: { user_id: userId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      toast.success("Membro excluído!");
+      setConfirmDelete(null);
+      setExpandedMember(null);
+      queryClient.invalidateQueries({ queryKey: ["all_profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["all_roles"] });
+    },
+    onError: (err: Error) => toast.error(err.message || "Erro ao excluir membro."),
   });
 
   if (!isAdmin) {
@@ -511,6 +531,42 @@ const AdminPanel = () => {
                               <option value="moderator">Moderador</option>
                               <option value="admin">Administrador</option>
                             </select>
+                          </div>
+
+                          {/* Delete member */}
+                          <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                            {confirmDelete === profile.user_id ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-destructive">Confirmar exclusão?</span>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => deleteMember.mutate(profile.user_id)}
+                                  disabled={deleteMember.isPending}
+                                  className="text-xs h-9 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 uppercase tracking-wider font-heading"
+                                >
+                                  {deleteMember.isPending ? "Excluindo..." : "Sim, excluir"}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setConfirmDelete(null)}
+                                  className="text-xs h-9 px-3 text-muted-foreground uppercase tracking-wider font-heading"
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setConfirmDelete(profile.user_id)}
+                                className="text-xs h-9 px-4 gap-1.5 text-destructive/60 hover:text-destructive hover:bg-destructive/10 uppercase tracking-wider font-heading"
+                              >
+                                <Trash2 size={13} />
+                                Excluir
+                              </Button>
+                            )}
                           </div>
                         </div>
                       )}
