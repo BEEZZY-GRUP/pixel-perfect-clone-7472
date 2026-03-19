@@ -1,13 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, Send, Trash2, Pin, MessageSquare, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import PostReactions from "./PostReactions";
+import UserAvatar from "./UserAvatar";
 
 interface Props {
   postId: string;
@@ -30,7 +32,6 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         .maybeSingle();
       if (!data) return null;
 
-      // Fetch author profile
       const { data: profile } = await supabase
         .from("profiles")
         .select("company_name, avatar_url")
@@ -114,15 +115,25 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   if (!post) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-6 bg-secondary rounded w-1/3" />
-        <div className="h-4 bg-secondary rounded w-3/4" />
-        <div className="h-20 bg-secondary rounded" />
+        <div className="h-4 bg-secondary rounded w-20" />
+        <div className="flex gap-3 items-center">
+          <div className="w-12 h-12 rounded-full bg-secondary" />
+          <div className="space-y-2 flex-1">
+            <div className="h-4 bg-secondary rounded w-1/3" />
+            <div className="h-3 bg-secondary rounded w-1/4" />
+          </div>
+        </div>
+        <div className="h-6 bg-secondary rounded w-3/4" />
+        <div className="h-24 bg-secondary rounded" />
       </div>
     );
   }
 
+  const createdAt = new Date(post.created_at);
+
   return (
     <div>
+      {/* Back button */}
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs font-heading tracking-widest uppercase mb-6 transition-colors"
@@ -131,98 +142,169 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         Voltar
       </button>
 
-      <article className="border border-border p-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[.65rem] font-heading tracking-wider uppercase text-gold/70">
-            {post.categories?.emoji} {post.categories?.name}
-          </span>
-          {post.pinned && (
-            <span className="text-[.6rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading">
-              Fixado
+      {/* Post article */}
+      <article className="border border-border bg-card">
+        <div className="p-6 pb-4">
+          {/* Category + pin badge */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[.65rem] font-heading tracking-wider uppercase text-gold/70 bg-gold/5 px-2 py-1">
+              {post.categories?.emoji} {post.categories?.name}
             </span>
-          )}
+            {post.pinned && (
+              <span className="inline-flex items-center gap-1 text-[.55rem] bg-gold/10 text-gold px-2 py-1 uppercase tracking-wider font-heading">
+                <Pin size={9} />
+                Fixado
+              </span>
+            )}
+          </div>
+
+          {/* Author info */}
+          <div className="flex items-center gap-3 mb-5">
+            <UserAvatar
+              avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
+              name={post.is_anonymous ? "A" : post.profile?.company_name}
+              size="lg"
+            />
+            <div>
+              <p className="text-foreground font-medium text-sm">
+                {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+              </p>
+              <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
+                <Clock size={10} />
+                <time
+                  dateTime={post.created_at}
+                  title={format(createdAt, "dd/MM/yyyy 'às' HH:mm")}
+                >
+                  {format(createdAt, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
+                </time>
+              </div>
+            </div>
+          </div>
+
+          {/* Title */}
+          <h1 className="text-foreground text-xl font-semibold leading-tight mb-4">
+            {post.title}
+          </h1>
+
+          {/* Content */}
+          <div className="text-foreground/85 text-sm leading-[1.75] whitespace-pre-wrap">
+            {post.content}
+          </div>
         </div>
 
-        <h2 className="text-foreground text-lg font-medium mb-2">{post.title}</h2>
-
-        <div className="text-muted-foreground text-[.7rem] mb-5">
-          {post.is_anonymous ? "Anônimo" : post.profile?.company_name} ·{" "}
-          {formatDistanceToNow(new Date(post.created_at), {
-            addSuffix: true,
-            locale: ptBR,
-          })}
+        {/* Reactions bar */}
+        <div className="px-6 py-3 border-t border-border flex items-center justify-between">
+          <PostReactions postId={post.id} />
+          <span className="text-muted-foreground text-[.65rem] font-heading flex items-center gap-1.5">
+            <MessageSquare size={13} />
+            {comments?.length ?? 0} {(comments?.length ?? 0) === 1 ? "comentário" : "comentários"}
+          </span>
         </div>
 
-        <div className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
-          {post.content}
-        </div>
-
-        {/* Admin or owner can delete */}
+        {/* Admin/owner actions */}
         {(isAdmin || post.user_id === user?.id) && (
-          <div className="mt-4 pt-4 border-t border-border flex gap-2">
+          <div className="px-6 py-3 border-t border-border">
             <Button
               size="sm"
               variant="ghost"
               onClick={() => deletePost.mutate()}
               disabled={deletePost.isPending}
-              className="text-destructive hover:text-destructive text-[.6rem] tracking-wider uppercase font-heading h-7"
+              className="text-destructive/70 hover:text-destructive hover:bg-destructive/5 text-[.6rem] tracking-wider uppercase font-heading h-7 gap-1"
             >
-              <Trash2 size={12} className="mr-1" />
+              <Trash2 size={12} />
               Excluir publicação
             </Button>
           </div>
         )}
       </article>
 
-      {/* Comments */}
+      {/* Comments section */}
       <div className="mt-6">
-        <h3 className="text-xs font-heading tracking-widest uppercase text-muted-foreground mb-4">
+        <h3 className="text-xs font-heading tracking-widest uppercase text-muted-foreground mb-5 flex items-center gap-2">
+          <MessageSquare size={13} />
           Comentários ({comments?.length ?? 0})
         </h3>
 
-        <div className="space-y-3 mb-6">
-          {comments?.map((c: any) => (
-            <div key={c.id} className="border border-border p-4">
-              <div className="flex items-start justify-between">
-                <div className="text-muted-foreground text-[.7rem] mb-2">
-                  {c.profile?.company_name} ·{" "}
-                  {formatDistanceToNow(new Date(c.created_at), {
-                    addSuffix: true,
-                    locale: ptBR,
-                  })}
+        {/* Comment list */}
+        <div className="space-y-0 mb-6">
+          {comments?.length === 0 && (
+            <p className="text-muted-foreground/60 text-sm text-center py-8 border border-border border-dashed">
+              Nenhum comentário ainda. Seja o primeiro!
+            </p>
+          )}
+          {comments?.map((c: any, idx: number) => {
+            const commentDate = new Date(c.created_at);
+            return (
+              <div
+                key={c.id}
+                className="flex gap-3 p-4 border border-border border-t-0 first:border-t bg-card hover:bg-secondary/30 transition-colors"
+              >
+                <UserAvatar
+                  avatarUrl={c.profile?.avatar_url}
+                  name={c.profile?.company_name}
+                  size="sm"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-foreground text-[.8rem] font-medium truncate">
+                        {c.profile?.company_name || "Membro"}
+                      </span>
+                      <time
+                        className="text-muted-foreground text-[.6rem] shrink-0"
+                        dateTime={c.created_at}
+                        title={format(commentDate, "dd/MM/yyyy 'às' HH:mm")}
+                      >
+                        {formatDistanceToNow(commentDate, { addSuffix: true, locale: ptBR })}
+                      </time>
+                    </div>
+                    {(isAdmin || c.user_id === user?.id) && (
+                      <button
+                        onClick={() => deleteComment.mutate(c.id)}
+                        className="text-destructive/40 hover:text-destructive transition-colors shrink-0 p-1"
+                        title="Excluir comentário"
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-foreground/85 text-[.82rem] leading-relaxed whitespace-pre-wrap">
+                    {c.content}
+                  </p>
                 </div>
-                {(isAdmin || c.user_id === user?.id) && (
-                  <button
-                    onClick={() => deleteComment.mutate(c.id)}
-                    className="text-destructive/50 hover:text-destructive transition-colors"
-                    title="Excluir comentário"
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                )}
               </div>
-              <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
-                {c.content}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <form onSubmit={handleSubmitComment} className="flex gap-3">
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Escreva um comentário..."
-            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground min-h-[60px] flex-1 text-sm"
-          />
-          <Button
-            type="submit"
-            disabled={addComment.isPending || !comment.trim()}
-            className="bg-gold text-background hover:bg-gold-light self-end"
-            size="icon"
-          >
-            <Send size={14} />
-          </Button>
+        {/* Comment form */}
+        <form onSubmit={handleSubmitComment} className="border border-border bg-card p-4">
+          <div className="flex gap-3">
+            <UserAvatar
+              avatarUrl={null}
+              name="Você"
+              size="sm"
+              className="mt-1"
+            />
+            <div className="flex-1 space-y-3">
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Escreva um comentário..."
+                className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground/50 min-h-[70px] text-sm resize-none focus:border-gold/30"
+              />
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={addComment.isPending || !comment.trim()}
+                  className="bg-gold text-background hover:bg-gold-light font-heading text-[.6rem] tracking-widest uppercase gap-1.5 h-8"
+                >
+                  <Send size={12} />
+                  Comentar
+                </Button>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     </div>
