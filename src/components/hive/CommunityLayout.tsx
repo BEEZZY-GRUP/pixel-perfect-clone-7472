@@ -130,7 +130,8 @@ const CommunityLayout = () => {
   const isHome = activeView === "feed" && !activeCategory && !isPostDetail;
 
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
-    { key: "feed", label: "Início", icon: <MessageCircle size={14} /> },
+    { key: "feed", label: "Início", icon: <Home size={14} /> },
+    { key: "community", label: "Comunidade", icon: <MessageCircle size={14} /> },
     { key: "notifications", label: "Notificações", icon: notifIcon },
     { key: "videos", label: "Vídeos", icon: <Video size={14} /> },
     { key: "glossary", label: "Sumário", icon: <BookOpen size={14} /> },
