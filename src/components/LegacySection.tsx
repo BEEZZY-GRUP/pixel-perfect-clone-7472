@@ -61,39 +61,45 @@ const LegacySection = () => {
         ref={containerRef}
         className="reveal reveal-delay-2 relative mt-16 mb-[72px] border border-border h-[340px] md:h-[340px] overflow-hidden select-none"
       >
-        {/* Before */}
+        {/* Before — full-width layer, clipped from the right */}
         <div
-          className="absolute top-0 bottom-0 left-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center px-8 md:px-14"
-          style={{ right: `${100 - pos}%` }}
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
         >
-          <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30">
-            Antes
-          </div>
-          <div className="flex flex-col gap-3">
-            {beforeItems.map((item) => (
-              <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground/35">
-                <span className="text-[.75rem] text-foreground/25">✕</span>
-                <span>{item}</span>
-              </div>
-            ))}
+          <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center px-8 md:px-14">
+            <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30">
+              Antes
+            </div>
+            <div className="flex flex-col gap-3">
+              {beforeItems.map((item) => (
+                <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground/35 whitespace-nowrap">
+                  <span className="text-[.75rem] text-foreground/25">✕</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* After */}
+        {/* After — full-width layer, clipped from the left */}
         <div
-          className="absolute top-0 bottom-0 right-0 bg-background flex flex-col justify-center px-8 md:px-14"
-          style={{ left: `${pos}%` }}
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
         >
-          <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
-            Legado
-          </div>
-          <div className="flex flex-col gap-3">
-            {afterItems.map((item) => (
-              <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground">
-                <span className="text-[.75rem] text-gold">✓</span>
-                <span>{item}</span>
+          <div className="absolute inset-0 bg-background flex flex-col justify-center items-end px-8 md:px-14">
+            <div className="w-full max-w-[50%] ml-auto">
+              <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
+                Legado
               </div>
-            ))}
+              <div className="flex flex-col gap-3">
+                {afterItems.map((item) => (
+                  <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground whitespace-nowrap">
+                    <span className="text-[.75rem] text-gold">✓</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
