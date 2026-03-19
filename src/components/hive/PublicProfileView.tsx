@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import UserAvatar from "./UserAvatar";
+import BadgesPanel from "./BadgesPanel";
 import { ArrowLeft, FileText, MessageSquare, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
