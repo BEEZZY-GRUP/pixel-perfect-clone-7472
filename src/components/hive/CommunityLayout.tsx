@@ -32,6 +32,7 @@ const VIEW_MAP: Record<string, View> = {
   missions: "missions",
   profile: "profile",
   admin: "admin",
+  notifications: "notifications",
 };
 
 const CommunityLayout = () => {
