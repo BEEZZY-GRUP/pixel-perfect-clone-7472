@@ -173,11 +173,11 @@ const CommunityLayout = () => {
         </div>
       )}
 
-      <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[85px]" : "pt-[57px]"}`}>
+      <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[91px]" : "pt-[57px]"}`}>
         {/* Left Sidebar */}
         {showLeftSidebar && (
           <aside className={`
-            fixed md:sticky ${activeView === "feed" && !isPostDetail ? "top-[85px] h-[calc(100vh-85px)]" : "top-[57px] h-[calc(100vh-57px)]"} left-0 z-40 w-[280px] border-r border-border bg-background
+            fixed md:sticky ${activeView === "feed" && !isPostDetail ? "top-[91px] h-[calc(100vh-91px)]" : "top-[57px] h-[calc(100vh-57px)]"} left-0 z-40 w-[280px] border-r border-border bg-background
             transition-transform duration-200 overflow-y-auto scrollbar-thin
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
