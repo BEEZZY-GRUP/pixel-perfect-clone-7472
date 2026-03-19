@@ -11,7 +11,7 @@ import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
 import AdminPanel from "./AdminPanel";
-import AchievementTicker from "./AchievementTicker";
+
 import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
 import NotificationsPanel from "./NotificationsPanel";
@@ -194,18 +194,12 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-      {/* Achievement ticker - only on feed */}
-      {activeView === "feed" && !isPostDetail && (
-        <div className="fixed top-[57px] left-0 right-0 z-40">
-          <AchievementTicker />
-        </div>
-      )}
 
-      <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[95px]" : "pt-[57px]"}`}>
+      <div className="flex pt-[57px]">
         {/* Left Sidebar */}
         {showLeftSidebar && (
           <aside className={`
-            fixed md:sticky ${activeView === "feed" && !isPostDetail ? "top-[95px] h-[calc(100vh-95px)]" : "top-[57px] h-[calc(100vh-57px)]"} left-0 z-40 w-[280px] border-r border-border bg-background
+            fixed md:sticky top-[57px] h-[calc(100vh-57px)] left-0 z-40 w-[280px] border-r border-border bg-background
             transition-transform duration-200 overflow-y-auto scrollbar-thin
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
