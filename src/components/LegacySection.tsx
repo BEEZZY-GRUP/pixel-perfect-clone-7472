@@ -80,7 +80,7 @@ const LegacySection = () => {
         {/* Before — full-width, clipped from the right */}
         <div
           className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+          style={{ clipPath: `inset(0 ${100 - displayPos}% 0 0)` }}
         >
           <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center items-center text-center">
             <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30">
@@ -100,7 +100,7 @@ const LegacySection = () => {
         {/* After — full-width, clipped from the left */}
         <div
           className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
+          style={{ clipPath: `inset(0 0 0 ${displayPos}%)` }}
         >
           <div className="absolute inset-0 bg-background flex flex-col justify-center items-center text-center">
             <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
@@ -120,7 +120,7 @@ const LegacySection = () => {
         {/* Divider */}
         <div
           className="absolute top-0 bottom-0 w-0.5 bg-gold cursor-ew-resize flex items-center justify-center z-10"
-          style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${displayPos}%`, transform: "translateX(-50%)" }}
           onMouseDown={(e) => { setDragging(true); e.preventDefault(); }}
           onTouchStart={() => setDragging(true)}
         >
