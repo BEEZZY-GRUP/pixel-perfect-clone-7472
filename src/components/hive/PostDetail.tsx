@@ -5,6 +5,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowLeft, Send, Trash2, Pin, MessageSquare, Clock } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ interface Props {
 const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigateRouter = useNavigate();
   const [comment, setComment] = useState("");
 
   const { data: post } = useQuery({
@@ -89,7 +91,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     onSuccess: () => {
       toast.success("Publicação excluída!");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      onBack();
+      navigateRouter("/the-hive/community");
     },
     onError: () => toast.error("Erro ao excluir."),
   });

@@ -3,8 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MessageSquare, Pin } from "lucide-react";
-import { useState, useEffect } from "react";
-import PostDetail from "./PostDetail";
+import { useNavigate } from "react-router-dom";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 import type { Tables } from "@/integrations/supabase/types";
@@ -18,12 +17,7 @@ interface Props {
 }
 
 const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-
-  // Reset selection when category changes
-  useEffect(() => {
-    setSelectedPostId(null);
-  }, [categorySlug]);
+  const navigate = useNavigate();
 
   const categoryId = categorySlug
     ? categories.find((c) => c.slug === categorySlug)?.id
@@ -56,16 +50,6 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
       return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
     },
   });
-
-  if (selectedPostId) {
-    return (
-      <PostDetail
-        postId={selectedPostId}
-        onBack={() => setSelectedPostId(null)}
-        isAdmin={isAdmin}
-      />
-    );
-  }
 
   if (isLoading) {
     return (
@@ -111,12 +95,10 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
             key={post.id}
             className="border border-border hover:border-gold/25 transition-all duration-200 group bg-card"
           >
-            {/* Post header + content (clickable) */}
             <button
-              onClick={() => setSelectedPostId(post.id)}
+              onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
               className="w-full text-left p-5 pb-3"
             >
-              {/* Author row */}
               <div className="flex items-center gap-3 mb-3">
                 <UserAvatar
                   avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
@@ -150,22 +132,19 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                 </div>
               </div>
 
-              {/* Title */}
               <h3 className="text-foreground font-medium text-[.95rem] leading-snug mb-1.5 group-hover:text-gold transition-colors">
                 {post.title}
               </h3>
 
-              {/* Content preview */}
               <p className="text-muted-foreground text-[.8rem] leading-relaxed line-clamp-3">
                 {contentPreview}
               </p>
             </button>
 
-            {/* Footer: reactions + comment count */}
             <div className="px-5 pb-4 pt-1 flex items-center justify-between gap-3">
               <PostReactions postId={post.id} compact />
               <button
-                onClick={() => setSelectedPostId(post.id)}
+                onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
                 className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-[.7rem] transition-colors shrink-0"
               >
                 <MessageSquare size={14} />

@@ -10,16 +10,28 @@ interface Props {
 
 const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
   return (
-    <nav className="p-4 space-y-1 overflow-y-auto h-full">
+    <nav className="p-4 space-y-1 overflow-y-auto h-full scrollbar-thin">
+      {/* Header */}
+      <div className="px-3 pt-1 pb-3 mb-2 border-b border-border">
+        <p className="text-[.55rem] font-heading tracking-[.2em] uppercase text-gold/50">
+          Categorias
+        </p>
+      </div>
+
       <button
         onClick={() => onSelect(null)}
-        className={`w-full text-left px-3 py-2 text-xs tracking-wide font-heading uppercase transition-colors rounded-sm ${
+        className={`w-full text-left px-3 py-2.5 text-xs tracking-wide font-heading uppercase transition-colors rounded-sm ${
           activeSlug === null
-            ? "bg-gold/10 text-gold"
+            ? "bg-gold/10 text-gold border-l-2 border-gold"
             : "text-muted-foreground hover:text-foreground hover:bg-secondary"
         }`}
       >
-        📋 Todas
+        <span className="flex items-center gap-2">
+          📋 Todas
+        </span>
+        <span className="block text-[.55rem] leading-tight mt-0.5 opacity-50 normal-case tracking-normal font-sans">
+          Ver todas as publicações
+        </span>
       </button>
 
       {categories.map((cat) => (
@@ -28,23 +40,35 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
           onClick={() => onSelect(cat.slug)}
           className={`w-full text-left px-3 py-2.5 transition-colors rounded-sm ${
             activeSlug === cat.slug
-              ? "bg-gold/10 text-gold"
-              : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              ? "bg-gold/10 text-gold border-l-2 border-gold"
+              : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
           }`}
         >
-          <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1">
+          <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1.5">
             {cat.emoji} {cat.name}
             {cat.staff_only && (
-              <span className="text-[.6rem] text-gold/60">STAFF</span>
+              <span className="text-[.5rem] text-gold/60 bg-gold/5 px-1 py-0.5 rounded-sm">STAFF</span>
             )}
           </span>
           {cat.description && (
-            <span className="block text-[.6rem] leading-tight mt-0.5 opacity-60 normal-case tracking-normal font-sans">
+            <span className="block text-[.55rem] leading-tight mt-1 opacity-50 normal-case tracking-normal font-sans line-clamp-2">
               {cat.description}
             </span>
           )}
         </button>
       ))}
+
+      {/* Bottom decoration */}
+      <div className="pt-4 mt-4 border-t border-border">
+        <div className="px-3 py-2 bg-secondary/30 rounded-sm">
+          <p className="text-[.5rem] text-muted-foreground/60 font-heading tracking-wider uppercase mb-1">
+            💡 Dica
+          </p>
+          <p className="text-[.55rem] text-muted-foreground/50 leading-relaxed">
+            Selecione uma categoria para filtrar os posts e ver o conteúdo que mais interessa.
+          </p>
+        </div>
+      </div>
     </nav>
   );
 };
