@@ -51,8 +51,10 @@ const Footer = () => (
           </ul>
         </div>
       ))}
+      </div>
     </footer>
-    <div className="border-t border-border px-6 py-6 md:px-[60px] flex flex-col sm:flex-row justify-between items-center gap-2">
+    <div className="border-t border-border px-6 py-6 md:px-[60px]">
+      <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
       <p className="font-heading text-[.65rem] tracking-[.14em] uppercase text-muted-foreground font-medium">
         © 2025 Beezzy · Todos os direitos reservados
       </p>
