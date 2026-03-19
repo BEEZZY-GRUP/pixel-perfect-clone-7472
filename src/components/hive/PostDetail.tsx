@@ -162,15 +162,23 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
           {/* Author info */}
           <div className="flex items-center gap-3 mb-5">
-            <UserAvatar
-              avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
-              name={post.is_anonymous ? "A" : post.profile?.company_name}
-              size="lg"
-            />
+            <button
+              onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+              className={!post.is_anonymous ? "cursor-pointer" : "cursor-default"}
+            >
+              <UserAvatar
+                avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
+                name={post.is_anonymous ? "A" : post.profile?.company_name}
+                size="lg"
+              />
+            </button>
             <div>
-              <p className="text-foreground font-medium text-sm">
+              <button
+                onClick={() => !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+                className={`text-foreground font-medium text-sm ${!post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+              >
                 {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
-              </p>
+              </button>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
                 <Clock size={10} />
                 <time
@@ -249,9 +257,12 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-foreground text-[.8rem] font-medium truncate">
+                      <button
+                        onClick={() => navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
+                        className="text-foreground text-[.8rem] font-medium truncate hover:text-gold transition-colors"
+                      >
                         {c.profile?.company_name || "Membro"}
-                      </span>
+                      </button>
                       <time
                         className="text-muted-foreground text-[.6rem] shrink-0"
                         dateTime={c.created_at}
