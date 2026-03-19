@@ -109,7 +109,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
               </h3>
               <div className="flex items-center gap-3 mt-2 text-muted-foreground text-[.7rem]">
                 <span>
-                  {post.is_anonymous ? "Anônimo" : post.profiles?.company_name}
+                  {post.is_anonymous ? "Anônimo" : post.profile?.company_name}
                 </span>
                 <span>·</span>
                 <span>
