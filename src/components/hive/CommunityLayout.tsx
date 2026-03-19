@@ -178,13 +178,14 @@ const CommunityLayout = () => {
                     Publicar
                   </Button>
                 </div>
-                <PostList categorySlug={activeCategory} categories={categories ?? []} />
+                <PostList categorySlug={activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
               </>
             )}
 
             {activeView === "ranking" && <RankingPanel />}
             {activeView === "missions" && <MissionsPanel />}
             {activeView === "profile" && <ProfilePanel />}
+            {activeView === "admin" && <AdminPanel />}
           </div>
         </main>
       </div>
@@ -194,6 +195,7 @@ const CommunityLayout = () => {
         onOpenChange={setShowCreate}
         categories={categories ?? []}
         defaultCategorySlug={activeCategory}
+        isAdmin={isAdmin}
       />
     </div>
   );
