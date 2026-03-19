@@ -45,6 +45,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
       <PostDetail
         postId={selectedPostId}
         onBack={() => setSelectedPostId(null)}
+        isAdmin={isAdmin}
       />
     );
   }
