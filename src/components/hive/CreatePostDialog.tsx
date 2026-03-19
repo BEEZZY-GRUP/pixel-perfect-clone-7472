@@ -131,17 +131,11 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
             />
           </div>
 
-          {/* Anonymous option only for Confessionário */}
+          {/* Confessionário is always anonymous — show info notice */}
           {categories.find((c) => c.id === categoryId)?.slug === "confessionario" && (
-            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="accent-gold"
-              />
-              Publicar anonimamente
-            </label>
+            <p className="text-xs text-gold/70 bg-gold/5 border border-gold/10 px-3 py-2 rounded-sm">
+              🔒 Publicações no Confessionário são sempre anônimas. Apenas administradores podem ver o autor.
+            </p>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
