@@ -468,7 +468,7 @@ const AdminPanel = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => setEditingProfile(null)}
-                              className="text-muted-foreground text-[.6rem] h-7"
+                              className="text-muted-foreground text-xs h-9"
                             >
                               Cancelar
                             </Button>
