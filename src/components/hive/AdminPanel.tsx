@@ -132,6 +132,15 @@ const AdminPanel = () => {
   const isUserAdmin = (userId: string) =>
     roles?.some((r) => r.user_id === userId && r.role === "admin");
 
+  const isUserModerator = (userId: string) =>
+    roles?.some((r) => r.user_id === userId && r.role === "moderator");
+
+  const getUserRole = (userId: string) => {
+    if (isUserAdmin(userId)) return "admin";
+    if (isUserModerator(userId)) return "moderator";
+    return "user";
+  };
+
   const getCompanyName = (companyId: string | null) => {
     if (!companyId) return null;
     return companies?.find((c) => c.id === companyId)?.name ?? null;
