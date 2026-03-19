@@ -195,7 +195,7 @@ const CommunityLayout = () => {
       </header>
 
 
-      <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[95px]" : "pt-[57px]"}`}>
+      <div className="flex pt-[57px]">
         {/* Left Sidebar */}
         {showLeftSidebar && (
           <aside className={`
