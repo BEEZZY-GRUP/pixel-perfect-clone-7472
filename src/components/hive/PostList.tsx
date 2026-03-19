@@ -121,9 +121,17 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-foreground text-sm font-medium truncate">
+                      <button
+                        onClick={(e) => {
+                          if (!post.is_anonymous) {
+                            e.stopPropagation();
+                            navigate(`/the-hive/community/profile/${post.user_id}`);
+                          }
+                        }}
+                        className={`text-foreground text-sm font-medium truncate ${!post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                      >
                         {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
-                      </span>
+                      </button>
                       {post.pinned && (
                         <span className="inline-flex items-center gap-1 text-[.55rem] bg-gold/10 text-gold px-1.5 py-0.5 uppercase tracking-wider font-heading">
                           <Pin size={9} />

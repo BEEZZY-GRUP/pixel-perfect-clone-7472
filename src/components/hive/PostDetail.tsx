@@ -257,9 +257,12 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-foreground text-[.8rem] font-medium truncate">
+                      <button
+                        onClick={() => navigateRouter(`/the-hive/community/profile/${c.user_id}`)}
+                        className="text-foreground text-[.8rem] font-medium truncate hover:text-gold transition-colors"
+                      >
                         {c.profile?.company_name || "Membro"}
-                      </span>
+                      </button>
                       <time
                         className="text-muted-foreground text-[.6rem] shrink-0"
                         dateTime={c.created_at}

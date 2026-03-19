@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Category = Tables<"categories">;
@@ -9,6 +11,25 @@ interface Props {
 }
 
 const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
+  const { data: postCounts } = useQuery({
+    queryKey: ["category_post_counts"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("category_id");
+      if (!data) return {};
+      const counts: Record<string, number> = {};
+      data.forEach((p) => {
+        counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+      });
+      return counts;
+    },
+  });
+
+  const totalPosts = postCounts
+    ? Object.values(postCounts).reduce((a, b) => a + b, 0)
+    : 0;
+
   return (
     <nav className="p-3 overflow-y-auto h-full scrollbar-gold">
       {/* Header */}
@@ -32,33 +53,34 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
             📋 Todas
           </span>
           <span className="block text-[.6rem] leading-tight mt-1 opacity-60 normal-case tracking-normal font-sans">
-            Todas as publicações
+            {totalPosts} publicações
           </span>
         </button>
 
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => onSelect(cat.slug)}
-            className={`text-left px-3 py-3 transition-colors rounded-sm ${
-              activeSlug === cat.slug
-                ? "bg-gold/10 text-gold border-l-2 border-gold"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
-            }`}
-          >
-            <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1.5">
-              {cat.emoji} {cat.name}
-              {cat.staff_only && (
-                <span className="text-[.5rem] text-gold/60 bg-gold/5 px-1 rounded-sm">S</span>
-              )}
-            </span>
-            {cat.description && (
-              <span className="block text-[.6rem] leading-tight mt-1 opacity-60 normal-case tracking-normal font-sans line-clamp-2">
-                {cat.description}
+        {categories.map((cat) => {
+          const count = postCounts?.[cat.id] ?? 0;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => onSelect(cat.slug)}
+              className={`text-left px-3 py-3 transition-colors rounded-sm ${
+                activeSlug === cat.slug
+                  ? "bg-gold/10 text-gold border-l-2 border-gold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
+              }`}
+            >
+              <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1.5">
+                {cat.emoji} {cat.name}
+                {cat.staff_only && (
+                  <span className="text-[.5rem] text-gold/60 bg-gold/5 px-1 rounded-sm">S</span>
+                )}
               </span>
-            )}
-          </button>
-        ))}
+              <span className="block text-[.6rem] leading-tight mt-1 opacity-60 normal-case tracking-normal font-sans">
+                {count} {count === 1 ? "publicação" : "publicações"}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Bottom decoration */}
