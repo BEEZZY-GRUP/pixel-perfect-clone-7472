@@ -52,6 +52,23 @@ const SidebarWidgets = () => {
 
   return (
     <div className="space-y-4">
+      {/* Insight do Dia - first */}
+      <div className="border border-gold/15 bg-gradient-to-br from-gold/5 via-transparent to-gold/3 p-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles size={13} className="text-gold" />
+            <p className="text-[.6rem] font-heading tracking-widest uppercase text-gold">Insight do Dia</p>
+          </div>
+          <p className="text-foreground/80 text-[.72rem] leading-relaxed italic mb-2">
+            "{getDailyInsight().text}"
+          </p>
+          <p className="text-gold/60 text-[.6rem] font-heading tracking-wide text-right">
+            — {getDailyInsight().author}
+          </p>
+        </div>
+      </div>
+
       {myProfile && (
         <div className="border border-gold/20 bg-gradient-to-br from-gold/5 to-transparent p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -112,22 +129,6 @@ const SidebarWidgets = () => {
           </div>
         </div>
       )}
-
-      <div className="border border-gold/15 bg-gradient-to-br from-gold/5 via-transparent to-gold/3 p-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="relative">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles size={13} className="text-gold" />
-            <p className="text-[.6rem] font-heading tracking-widest uppercase text-gold">Insight do Dia</p>
-          </div>
-          <p className="text-foreground/80 text-[.72rem] leading-relaxed italic mb-2">
-            "{getDailyInsight().text}"
-          </p>
-          <p className="text-gold/60 text-[.6rem] font-heading tracking-wide text-right">
-            — {getDailyInsight().author}
-          </p>
-        </div>
-      </div>
     </div>
   );
 };
