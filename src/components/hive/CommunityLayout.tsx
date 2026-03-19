@@ -11,6 +11,7 @@ import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
 import AdminPanel from "./AdminPanel";
+import AchievementTicker from "./AchievementTicker";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus, Menu, X, Trophy, Target, User, Shield } from "lucide-react";
 
