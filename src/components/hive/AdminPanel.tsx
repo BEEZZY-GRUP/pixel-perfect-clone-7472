@@ -125,7 +125,24 @@ const AdminPanel = () => {
     onError: () => toast.error("Erro ao atualizar cargo."),
   });
 
-  if (!isAdmin) {
+  const deleteMember = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke("delete-member", {
+        body: { user_id: userId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      toast.success("Membro excluído!");
+      setConfirmDelete(null);
+      setExpandedMember(null);
+      queryClient.invalidateQueries({ queryKey: ["all_profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["all_roles"] });
+    },
+    onError: (err: Error) => toast.error(err.message || "Erro ao excluir membro."),
+  });
+
     return (
       <div className="border border-border p-8 text-center">
         <p className="text-muted-foreground text-sm">Acesso restrito a administradores.</p>
