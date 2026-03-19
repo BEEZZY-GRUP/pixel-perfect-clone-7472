@@ -306,6 +306,7 @@ const CommunityLayout = () => {
         isAdmin={isAdmin}
         isModerator={isModerator}
       />
+      <BadgeUnlockCelebration />
     </div>
   );
 };
