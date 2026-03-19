@@ -404,7 +404,7 @@ const AdminPanel = () => {
 
                   {/* Expanded details */}
                   {isExpanded && (
-                    <div className="border-t border-border p-4 space-y-3 bg-secondary/20">
+                    <div className="border-t border-border p-5 space-y-4 bg-secondary/20">
                       {/* Detail grid */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {[
