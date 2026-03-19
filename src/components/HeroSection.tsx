@@ -72,29 +72,29 @@ const HeroSection = () => {
 
       // Warped domain smoke
       float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
-        // Base warp layers
-        float d1 = fbm(uv * 2.0 + vec2(t * 0.5, t * 0.3));
-        float d2 = fbm(uv * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
-        float d3 = fbm(uv * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
-
-        // Mouse distortion — soft cloud displacement (x.ai style)
+        // Mouse displacement — warp UV coords to "part" the clouds
         vec2 delta = uv - mouse;
         float dist = length(delta);
+        float influence = smoothstep(0.35, 0.0, dist);
+        vec2 pushDir = normalize(delta + 0.0001);
         
-        // Soft radial displacement — large radius, gentle push
-        float influence = smoothstep(0.55, 0.0, dist);
-        float softPush = influence * 0.18;
+        // Displace UVs away from mouse — this creates the "parting" effect
+        vec2 displaced = uv + pushDir * influence * 0.12;
         
-        // Gentle directional warp based on mouse position
-        vec2 warpDir = normalize(delta + 0.001);
-        float warpNoise = fbm(uv * 2.5 + warpDir * t * 0.3) * influence * 0.12;
-        
-        // Velocity-based turbulence — very subtle
+        // Velocity adds extra turbulent displacement
         float velMag = length(mvel);
-        float velTurb = velMag * smoothstep(0.45, 0.0, dist) * 0.6;
-        float swirl = sin(atan(delta.y, delta.x) * 2.0 + d1 * 3.0 + t) * 0.5 + 0.5;
+        vec2 velDisplace = mvel * smoothstep(0.4, 0.0, dist) * 0.8;
+        displaced += velDisplace;
 
-        float field = d3 + softPush + warpNoise + velTurb * swirl;
+        // Base warp layers on displaced coords
+        float d1 = fbm(displaced * 2.0 + vec2(t * 0.5, t * 0.3));
+        float d2 = fbm(displaced * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
+        float d3 = fbm(displaced * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
+
+        // Darken near mouse center for a "cleared" look
+        float clearHole = smoothstep(0.0, 0.2, dist);
+        float field = d3 * mix(0.5, 1.0, clearHole);
+        
         return field;
       }
 
