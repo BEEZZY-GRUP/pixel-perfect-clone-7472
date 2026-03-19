@@ -146,7 +146,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         <h2 className="text-foreground text-lg font-medium mb-2">{post.title}</h2>
 
         <div className="text-muted-foreground text-[.7rem] mb-5">
-          {post.is_anonymous ? "Anônimo" : (post as any).profiles?.company_name} ·{" "}
+          {post.is_anonymous ? "Anônimo" : post.profile?.company_name} ·{" "}
           {formatDistanceToNow(new Date(post.created_at), {
             addSuffix: true,
             locale: ptBR,
