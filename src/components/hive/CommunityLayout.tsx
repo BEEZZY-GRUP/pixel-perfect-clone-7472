@@ -194,12 +194,6 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-      {/* Achievement ticker - only on feed */}
-      {activeView === "feed" && !isPostDetail && (
-        <div className="fixed top-[57px] left-0 right-0 z-40">
-          <AchievementTicker />
-        </div>
-      )}
 
       <div className={`flex ${activeView === "feed" && !isPostDetail ? "pt-[95px]" : "pt-[57px]"}`}>
         {/* Left Sidebar */}
