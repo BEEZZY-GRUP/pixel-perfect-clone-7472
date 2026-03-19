@@ -20,6 +20,7 @@ import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
 import NotificationsPanel from "./NotificationsPanel";
 import SidebarWidgets from "./SidebarWidgets";
+import SearchBar from "./SearchBar";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
 import {
