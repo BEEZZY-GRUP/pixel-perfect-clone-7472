@@ -92,7 +92,7 @@ const HiveSection = () => {
 
   return (
     <section id="hive" className="border-t border-border px-6 py-[72px] md:px-[60px] md:py-[130px] grid grid-cols-1 md:grid-cols-2 gap-[60px] md:gap-[100px] items-center">
-      <div className="reveal relative aspect-square max-w-[280px] md:max-w-[460px]">
+      <div className="reveal hive-visual-gsap relative aspect-square max-w-[280px] md:max-w-[460px]">
         <div className="absolute -inset-4 border border-gold-border rounded-full" style={{ animation: "spin-slow 22s linear infinite" }} />
         <div className="absolute -inset-11 border border-dashed border-[rgba(200,169,110,0.12)] rounded-full" style={{ animation: "spin-slow 40s linear infinite reverse" }} />
         <div className="w-full h-full rounded-full overflow-hidden">
