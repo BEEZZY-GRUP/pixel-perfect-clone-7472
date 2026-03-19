@@ -252,10 +252,13 @@ const CommunityLayout = () => {
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                          {(categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                            (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
+                          {activeCategory === "todas"
+                            ? "📋 Todas as Publicações"
+                            : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
                         </h1>
                         {(() => {
+                          if (activeCategory === "todas") return null;
                           const cat = categories?.find((c) => c.slug === activeCategory);
                           return cat?.description ? (
                             <p className="text-muted-foreground text-[.75rem] leading-relaxed mt-1 max-w-lg">
@@ -273,7 +276,7 @@ const CommunityLayout = () => {
                       </Button>
                     </div>
 
-                    <PostList categorySlug={activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
+                    <PostList categorySlug={activeCategory === "todas" ? null : activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
                   </>
                 )}
 
