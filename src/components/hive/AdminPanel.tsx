@@ -446,7 +446,7 @@ const AdminPanel = () => {
                               setEditValues({ ...editValues, cnpj: e.target.value })
                             }
                             placeholder="CNPJ"
-                            className="bg-secondary border-border text-foreground text-sm"
+                            className="bg-secondary border-border text-foreground text-base h-10"
                           />
                           <div className="flex gap-2">
                             <Button
