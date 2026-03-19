@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Play, Plus, Save, Trash2, Pencil, Video } from "lucide-react";
+import { Play, Plus, Save, Trash2, Pencil, Video, Maximize2, MessageCircle } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import VideoTheater from "./VideoTheater";
 
 const VideosPanel = () => {
   const { user } = useAuth();
