@@ -261,8 +261,8 @@ const ProfilePanel = () => {
           ) : (
             <>
               <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
-              {profile.cnpj && (
-                <p className="text-muted-foreground text-xs mt-0.5">{profile.cnpj}</p>
+              {((profile as any)?.companies?.cnpj || profile.cnpj) && (
+                <p className="text-muted-foreground text-xs mt-0.5">{(profile as any)?.companies?.cnpj || profile.cnpj}</p>
               )}
               {profile.bio && (
                 <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{profile.bio}</p>
