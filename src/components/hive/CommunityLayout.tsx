@@ -230,7 +230,7 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showSidebar = (activeView === "feed" && !isPostDetail && !isHome && !isProfileView) || (activeView === "feed" && activeCategory);
+  const showSidebar = isCategoryDetail || isBrowsingCategories;
 
   if (isDataLoading) {
     return <LoadingScreen />;
