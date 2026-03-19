@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@400;500;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -30,9 +30,10 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 40 11% 95%;
 
-    --border: 40 11% 95% / 0.12;
-    --input: 40 11% 95% / 0.12;
+    --border: 40 11% 95% / 0.1;
+    --input: 40 11% 95% / 0.1;
     --ring: 40 11% 95%;
+    --border-strong: 40 11% 95% / 0.18;
 
     --radius: 0rem;
 
@@ -42,8 +43,8 @@
 
     --gold: 36 35% 61%;
     --gold-light: 36 54% 71%;
-    --gold-dim: 36 35% 61% / 0.15;
-    --gold-border: 36 35% 61% / 0.35;
+    --gold-dim: 36 35% 61% / 0.12;
+    --gold-border: 36 35% 61% / 0.3;
     --gold-dark: 36 48% 37%;
 
     --font-display: 'Cormorant Garamond', serif;
@@ -72,24 +73,46 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans);
+    font-family: var(--font-heading);
     overflow-x: hidden;
     cursor: none;
+    -webkit-font-smoothing: antialiased;
   }
+}
+
+/* ─── SECTION EYEBROW ───────────────────────────── */
+.section-eyebrow {
+  @apply font-heading text-gold mb-6 inline-flex items-center gap-3 font-medium;
+  font-size: .65rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+.section-eyebrow::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: hsl(var(--gold));
+}
+
+/* ─── SECTION TITLE ─────────────────────────────── */
+.section-title {
+  @apply font-display font-light leading-[1.06] tracking-tight;
+  font-size: clamp(2.4rem, 5vw, 5.2rem);
+  letter-spacing: -0.02em;
 }
 
 /* ─── CUSTOM CURSOR ─────────────────────────────── */
 #cursor-dot {
-  width: 6px; height: 6px;
+  width: 5px; height: 5px;
   background: hsl(var(--gold));
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
   pointer-events: none; z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: width .2s, height .2s, background .2s;
 }
 #cursor-ring {
-  width: 36px; height: 36px;
+  width: 32px; height: 32px;
   border: 1px solid hsl(var(--gold-border));
   border-radius: 50%;
   position: fixed; top: 0; left: 0;
@@ -101,35 +124,41 @@
 }
 body:has(a:hover) #cursor-ring,
 body:has(button:hover) #cursor-ring {
-  width: 56px; height: 56px;
+  width: 52px; height: 52px;
   border-color: hsl(var(--gold));
 }
 
 /* ─── REVEAL ANIMATIONS ───────────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity .9s cubic-bezier(.25,.46,.45,.94),
-              transform .9s cubic-bezier(.25,.46,.45,.94);
+  transform: translateY(32px);
+  transition: opacity .8s cubic-bezier(.25,.46,.45,.94),
+              transform .8s cubic-bezier(.25,.46,.45,.94);
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
-.reveal-delay-1 { transition-delay: .15s; }
-.reveal-delay-2 { transition-delay: .3s; }
-.reveal-delay-3 { transition-delay: .45s; }
-.reveal-delay-4 { transition-delay: .6s; }
-.reveal-delay-5 { transition-delay: .75s; }
+.reveal-delay-1 { transition-delay: .12s; }
+.reveal-delay-2 { transition-delay: .24s; }
+.reveal-delay-3 { transition-delay: .36s; }
+.reveal-delay-4 { transition-delay: .48s; }
+.reveal-delay-5 { transition-delay: .6s; }
 
 /* ─── SCROLL LINE ANIMATION ──────────────────────── */
 @keyframes scroll-line {
-  0%,100% { transform: scaleY(1); opacity: 1; }
-  50% { transform: scaleY(.4); opacity: .4; }
+  0%,100% { opacity: 1; transform: scaleY(1); }
+  50% { opacity: .3; transform: scaleY(.5); }
 }
 
 @keyframes spin-slow {
   to { transform: rotate(360deg); }
+}
+
+/* ─── TICKER ────────────────────────────────────── */
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ─── NOISE TEXTURE ──────────────────────────────── */
@@ -138,7 +167,7 @@ body:has(button:hover) #cursor-ring {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
   background-size: 180px;
   pointer-events: none;
-  opacity: .6;
+  opacity: .5;
 }
 
 /* ─── DIVIDER ────────────────────────────────────── */
