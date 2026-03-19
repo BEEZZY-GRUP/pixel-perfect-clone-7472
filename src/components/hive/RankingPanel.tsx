@@ -60,7 +60,8 @@ const RankingPanel = () => {
           return (
             <div
               key={profile.user_id}
-              className={`flex items-center gap-3 p-3 border transition-colors ${
+              onClick={() => navigate(`/the-hive/community/profile/${profile.user_id}`)}
+              className={`flex items-center gap-3 p-3 border transition-colors cursor-pointer hover:bg-secondary/50 ${
                 globalIndex < 3
                   ? "border-gold/20 bg-gold/5"
                   : "border-border"
@@ -69,8 +70,13 @@ const RankingPanel = () => {
               <span className="text-sm w-8 text-center shrink-0">
                 {medalEmoji(globalIndex)}
               </span>
+              <UserAvatar
+                avatarUrl={profile.avatar_url}
+                name={profile.company_name}
+                size="sm"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-foreground text-sm font-medium truncate">
+                <p className="text-foreground text-sm font-medium truncate hover:text-gold transition-colors">
                   {profile.company_name}
                 </p>
                 <p className="text-muted-foreground text-[.65rem]">
