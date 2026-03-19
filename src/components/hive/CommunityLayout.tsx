@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PublicProfileView from "./PublicProfileView";
+import LoadingScreen from "./LoadingScreen";
 import CategorySidebar from "./CategorySidebar";
 import WelcomeHome from "./WelcomeHome";
 import PostList from "./PostList";
