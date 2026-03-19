@@ -504,13 +504,13 @@ const AdminPanel = () => {
                               });
                             }}
                             disabled={toggleRole.isPending}
-                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                            className={`text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading ${
                               admin
                                 ? "text-destructive hover:text-destructive"
                                 : "text-gold hover:text-gold"
                             }`}
                           >
-                            {admin ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {admin ? <ShieldOff size={13} /> : <Shield size={13} />}
                             {admin ? "Remover admin" : "Tornar admin"}
                           </Button>
                           <Button
