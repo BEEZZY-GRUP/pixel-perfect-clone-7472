@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award, Sparkles } from "lucide-react";
 import { getDailyInsight } from "./dailyInsights";
 
