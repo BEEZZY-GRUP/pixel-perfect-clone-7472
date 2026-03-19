@@ -21,7 +21,7 @@ import SidebarWidgets from "./SidebarWidgets";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut, Plus, Menu, X, Trophy, Target, User, Shield,
+  LogOut, Plus, Menu, X, Trophy, Target, User, Shield, Home,
   Video, BookOpen, MessageCircle, Bell,
 } from "lucide-react";
 
