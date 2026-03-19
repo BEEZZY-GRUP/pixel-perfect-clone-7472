@@ -15,9 +15,11 @@ import { useState, useRef } from "react";
 const ProfilePanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(searchParams.get("onboarding") === "true");
   const [editValues, setEditValues] = useState({
     company_name: "",
     bio: "",
