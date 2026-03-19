@@ -96,42 +96,38 @@ const HeroSection = () => {
     if (!section) return;
 
     const badge = section.querySelector(".hero-badge");
-    const headline = section.querySelector(".hero-headline");
-    const headlineLines = headline?.querySelectorAll(".hero-line");
+    const headlineInners = section.querySelectorAll(".hero-line-inner");
     const sub = section.querySelector(".hero-sub");
     const actions = section.querySelector(".hero-actions");
     const scroll = section.querySelector(".hero-scroll-indicator");
     const nav = document.querySelector("nav");
 
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
     // Set initial states
-    gsap.set([badge, headlineLines, sub, actions, scroll, nav], {
-      opacity: 0,
-    });
-    gsap.set(badge, { y: 20 });
-    gsap.set(headlineLines, { y: 60, clipPath: "inset(0 0 100% 0)" });
-    gsap.set(sub, { y: 30 });
-    gsap.set(actions, { y: 30 });
-    gsap.set(scroll, { y: -20 });
-    gsap.set(nav, { y: -20 });
+    gsap.set([badge, sub, actions, scroll, nav], { opacity: 0 });
+    gsap.set(badge, { y: 24, scale: 0.95 });
+    gsap.set(headlineInners, { y: "110%" });
+    gsap.set(sub, { y: 30, filter: "blur(4px)" });
+    gsap.set(actions, { y: 30, filter: "blur(4px)" });
+    gsap.set(scroll, { opacity: 0 });
+    gsap.set(nav, { y: -30 });
 
-    tl.to(nav, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
-      .to(badge, { opacity: 1, y: 0, duration: 0.7 }, 0.4)
+    tl.to(nav, { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, 0.1)
+      .to(badge, { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 0.3)
       .to(
-        headlineLines,
+        headlineInners,
         {
-          opacity: 1,
-          y: 0,
-          clipPath: "inset(0 0 0% 0)",
-          duration: 1,
-          stagger: 0.12,
+          y: "0%",
+          duration: 1.2,
+          stagger: 0.1,
+          ease: "power4.out",
         },
-        0.6
+        0.5
       )
-      .to(sub, { opacity: 1, y: 0, duration: 0.8 }, 1.1)
-      .to(actions, { opacity: 1, y: 0, duration: 0.8 }, 1.25)
-      .to(scroll, { opacity: 1, y: 0, duration: 0.6 }, 1.5);
+      .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 1.2)
+      .to(actions, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 1.35)
+      .to(scroll, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 1.6);
 
     return () => {
       tl.kill();
