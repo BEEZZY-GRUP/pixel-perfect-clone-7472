@@ -26,6 +26,19 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const navigateRouter = useNavigate();
   const [comment, setComment] = useState("");
 
+  const { data: currentProfile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("avatar_url, company_name")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: post } = useQuery({
     queryKey: ["post", postId],
     queryFn: async () => {
