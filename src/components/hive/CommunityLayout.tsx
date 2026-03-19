@@ -214,6 +214,8 @@ const CommunityLayout = () => {
     </span>
   );
 
+  const isBrowsingCategories = activeCategory === "browse";
+  const isCategoryDetail = activeView === "feed" && activeCategory && activeCategory !== "browse" && !isPostDetail && !isProfileView;
   const isHome = activeView === "feed" && !activeCategory && !isPostDetail && !isProfileView;
 
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
