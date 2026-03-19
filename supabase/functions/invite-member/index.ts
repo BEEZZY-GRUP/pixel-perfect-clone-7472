@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -24,12 +24,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const callerClient = createClient(supabaseUrl, serviceRoleKey, {
-      global: { headers: { Authorization: authHeader } },
-      auth: { persistSession: false },
-    });
-
-    // Get caller's user
     const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY")!;
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
@@ -43,7 +37,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if caller is admin
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false },
     });
@@ -62,11 +55,24 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Parse request
-    const { email, company_name } = await req.json();
-    if (!email || !company_name) {
-      return new Response(JSON.stringify({ error: "Email e nome da empresa são obrigatórios" }), {
+    const { email, company_id } = await req.json();
+    if (!email || !company_id) {
+      return new Response(JSON.stringify({ error: "Email e empresa são obrigatórios" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Get company name
+    const { data: company } = await adminClient
+      .from("companies")
+      .select("name")
+      .eq("id", company_id)
+      .single();
+
+    if (!company) {
+      return new Response(JSON.stringify({ error: "Empresa não encontrada" }), {
+        status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -81,9 +87,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Invite user via Supabase Auth
+    // Invite user via Supabase Auth with company_id in metadata
     const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-      data: { company_name },
+      data: { company_name: company.name, company_id },
       redirectTo: `${req.headers.get("origin") || supabaseUrl}/the-hive`,
     });
 
@@ -95,7 +101,19 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, user_id: inviteData.user.id }), {
+    // Update the profile to assign company_id (the trigger creates the profile)
+    // We need to wait a moment for the trigger to fire, then update
+    const userId = inviteData.user.id;
+    
+    // Try to update profile with company_id (trigger may have already created it)
+    setTimeout(async () => {
+      await adminClient
+        .from("profiles")
+        .update({ company_id, company_name: company.name })
+        .eq("user_id", userId);
+    }, 500);
+
+    return new Response(JSON.stringify({ success: true, user_id: userId }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

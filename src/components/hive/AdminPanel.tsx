@@ -95,9 +95,6 @@ const AdminPanel = () => {
         </h2>
       </div>
 
-      <InvitePanel />
-
-      <div className="my-6" />
       <CompanyManagement />
 
       <div className="my-6" />
