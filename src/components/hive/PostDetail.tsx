@@ -62,6 +62,31 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     onError: () => toast.error("Erro ao comentar."),
   });
 
+  const deletePost = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("posts").delete().eq("id", postId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Publicação excluída!");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      onBack();
+    },
+    onError: () => toast.error("Erro ao excluir."),
+  });
+
+  const deleteComment = useMutation({
+    mutationFn: async (commentId: string) => {
+      const { error } = await supabase.from("comments").delete().eq("id", commentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      toast.success("Comentário excluído!");
+    },
+    onError: () => toast.error("Erro ao excluir comentário."),
+  });
+
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
