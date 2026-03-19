@@ -76,6 +76,7 @@ const ManifestoSection = () => (
         </div>
       </div>
     </div>
+    </div>
   </div>
 );
 
