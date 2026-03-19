@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import HiveLogin from "./pages/HiveLogin.tsx";
 import HiveCommunity from "./pages/HiveCommunity.tsx";
+import SetupPassword from "./pages/SetupPassword.tsx";
 import CustomCursor from "./components/CustomCursor.tsx";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/the-hive" element={<HiveLogin />} />
+          <Route path="/the-hive/setup-password" element={<SetupPassword />} />
           <Route path="/the-hive/community" element={<HiveCommunity />} />
           <Route path="/the-hive/community/:view" element={<HiveCommunity />} />
           <Route path="/the-hive/community/post/:postId" element={<HiveCommunity />} />

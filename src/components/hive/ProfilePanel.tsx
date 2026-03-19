@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSearchParams } from "react-router-dom";
 import BadgesPanel from "./BadgesPanel";
 import UserAvatar from "./UserAvatar";
+import OnboardingTutorial from "./OnboardingTutorial";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -13,9 +15,11 @@ import { useState, useRef } from "react";
 const ProfilePanel = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(searchParams.get("onboarding") === "true");
   const [editValues, setEditValues] = useState({
     company_name: "",
     bio: "",
@@ -136,8 +140,19 @@ const ProfilePanel = () => {
     ? ((profile.xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100
     : 0;
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Remove query param
+    searchParams.delete("onboarding");
+    setSearchParams(searchParams, { replace: true });
+    // Auto-open edit mode
+    startEditing();
+  };
+
   return (
     <div className="space-y-8">
+      {showOnboarding && <OnboardingTutorial onComplete={handleOnboardingComplete} />}
+
       {/* Profile header */}
       <div className="border border-border bg-card">
         {/* Cover gradient */}
@@ -146,7 +161,7 @@ const ProfilePanel = () => {
         <div className="px-6 pb-6 -mt-10">
           {/* Avatar + edit button */}
           <div className="flex items-end justify-between mb-4">
-            <div className="relative group">
+            <div className="relative group" data-onboarding="avatar">
               <div className="w-20 h-20 rounded-full border-4 border-background overflow-hidden bg-secondary">
                 <UserAvatar
                   avatarUrl={profile.avatar_url}
@@ -177,6 +192,7 @@ const ProfilePanel = () => {
 
             {!editing && (
               <Button
+                data-onboarding="edit"
                 size="sm"
                 variant="ghost"
                 onClick={startEditing}
