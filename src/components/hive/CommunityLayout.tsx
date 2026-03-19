@@ -144,7 +144,7 @@ const CommunityLayout = () => {
         {/* Sidebar - only show on feed view */}
         {activeView === "feed" && (
           <aside className={`
-            fixed md:sticky top-[57px] left-0 z-40 h-[calc(100vh-57px)] w-[260px] border-r border-border bg-background
+            fixed md:sticky top-[85px] left-0 z-40 h-[calc(100vh-85px)] w-[260px] border-r border-border bg-background
             transition-transform duration-200
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}>
