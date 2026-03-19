@@ -261,7 +261,7 @@ const CommunityLayout = () => {
               key={item.key}
               onClick={() => handleViewChange(item.key)}
               className={`flex items-center gap-1 px-2 md:px-3 py-1.5 text-[.6rem] md:text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm whitespace-nowrap ${
-                (item.key === "community" && activeView === "feed" && activeCategory && !isPostDetail) ||
+                (item.key === "community" && (isBrowsingCategories || isCategoryDetail)) ||
                 (item.key === "feed" && isHome) ||
                 (item.key !== "feed" && item.key !== "community" && activeView === item.key && !isPostDetail)
                   ? "bg-gold/10 text-gold"
