@@ -296,9 +296,18 @@ const CommunityLayout = () => {
       <div className="pt-[57px]">
         {/* Main content */}
         <main className="min-h-[calc(100vh-85px)] px-3 md:px-6 py-4 md:py-6 overflow-x-hidden">
-          <div className={`mx-auto ${showRightSidebar ? "max-w-[1100px]" : "max-w-[720px]"}`}>
-            <div className={`${showRightSidebar ? "flex gap-6" : ""}`}>
-              <div className={`${showRightSidebar ? "flex-1 min-w-0" : ""}`}>
+          <div className={`mx-auto ${showSidebar ? "max-w-[1200px]" : "max-w-[720px]"}`}>
+            <div className={`${showSidebar ? "flex gap-6" : ""}`}>
+              {/* Left sidebar */}
+              {showSidebar && (
+                <aside className="hidden lg:block w-[260px] shrink-0">
+                  <div className="sticky top-[80px]">
+                    <SidebarWidgets />
+                  </div>
+                </aside>
+              )}
+
+              <div className={`${showSidebar ? "flex-1 min-w-0" : ""}`}>
                 {/* Post detail view */}
                 {isPostDetail && params.postId && (
                   <PostDetail
@@ -316,6 +325,11 @@ const CommunityLayout = () => {
                 {/* Feed view (when category selected) — categories as blocks */}
                 {activeView === "feed" && !isPostDetail && activeCategory && (
                   <>
+                    {/* Search bar */}
+                    <div className="mb-5">
+                      <SearchBar />
+                    </div>
+
                     <CategoryGrid
                       categories={categories ?? []}
                       activeSlug={activeCategory}
@@ -339,7 +353,7 @@ const CommunityLayout = () => {
                               className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
                             >
                               <Plus size={14} />
-                              Publicar
+                              Criar publicação
                             </Button>
                           )}
                         </div>
@@ -371,14 +385,6 @@ const CommunityLayout = () => {
                 )}
                 {activeView === "admin" && <AdminPanel />}
               </div>
-
-              {showRightSidebar && (
-                <aside className="hidden lg:block w-[260px] shrink-0">
-                  <div className="sticky top-[80px]">
-                    <SidebarWidgets />
-                  </div>
-                </aside>
-              )}
             </div>
           </div>
         </main>
