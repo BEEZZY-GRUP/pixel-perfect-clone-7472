@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 
+const CONFESSIONARIO_SLUG = "confessionario";
+
 interface Props {
   postId: string;
   onBack: () => void;
