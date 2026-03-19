@@ -139,11 +139,11 @@ const AchievementTicker = () => {
         {[...achievements, ...achievements].map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-2 mx-6 text-[0.8rem] font-heading tracking-wide leading-none"
+            className="inline-flex items-center gap-2 mx-6 text-[0.8rem] font-heading tracking-wide"
           >
             <span className="text-lg leading-none">{item.emoji}</span>
-            <span className="text-gold/80 leading-none">{item.text}</span>
-            <span className="text-gold/20 mx-4 leading-none">◆</span>
+            <span className="text-gold/80" style={{ lineHeight: '38px' }}>{item.text}</span>
+            <span className="text-gold/20 mx-4" style={{ lineHeight: '38px' }}>◆</span>
           </span>
         ))}
       </div>
