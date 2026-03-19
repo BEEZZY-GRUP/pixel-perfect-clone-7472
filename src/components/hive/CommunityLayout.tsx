@@ -18,6 +18,7 @@ type View = "feed" | "ranking" | "missions" | "profile" | "admin";
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showCreate, setShowCreate] = useState(false);
