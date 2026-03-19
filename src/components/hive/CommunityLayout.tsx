@@ -214,34 +214,30 @@ const CommunityLayout = () => {
                 {activeView === "feed" && !isPostDetail && (
                   <>
                     <div className="flex items-center justify-between mb-6">
-                      <h1 className="font-heading text-lg tracking-wide text-foreground">
-                        {activeCategory
-                          ? categories?.find((c) => c.slug === activeCategory)?.emoji + " " +
-                            categories?.find((c) => c.slug === activeCategory)?.name
-                          : "Todas as publicações"}
-                      </h1>
+                      <div>
+                        <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
+                          {activeCategory
+                            ? (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")
+                            : "Todas as publicações"}
+                        </h1>
+                        {activeCategory && (() => {
+                          const cat = categories?.find((c) => c.slug === activeCategory);
+                          return cat?.description ? (
+                            <p className="text-muted-foreground text-[.75rem] leading-relaxed mt-1 max-w-lg">
+                              {cat.description}
+                            </p>
+                          ) : null;
+                        })()}
+                      </div>
                       <Button
                         onClick={() => setShowCreate(true)}
-                        className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2"
+                        className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
                       >
                         <Plus size={14} />
                         Publicar
                       </Button>
                     </div>
-
-                    {/* Category description banner */}
-                    {activeCategory && (() => {
-                      const cat = categories?.find((c) => c.slug === activeCategory);
-                      return cat?.description ? (
-                        <div className="border border-border bg-card p-4 mb-6 flex items-start gap-3">
-                          <span className="text-2xl leading-none">{cat.emoji}</span>
-                          <div>
-                            <p className="text-foreground text-sm font-medium mb-0.5">{cat.name}</p>
-                            <p className="text-muted-foreground text-[.75rem] leading-relaxed">{cat.description}</p>
-                          </div>
-                        </div>
-                      ) : null;
-                    })()}
 
                     <PostList categorySlug={activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
                   </>
