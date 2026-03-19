@@ -63,6 +63,7 @@ const LegacySection = () => {
 
   return (
     <section id="legacy" className="bg-foreground text-background px-6 py-[72px] md:px-[60px] md:py-[130px]">
+      <div className="max-w-[1200px] mx-auto">
       <div className="section-eyebrow !text-gold-dark before:!bg-gold-dark">O que entregamos</div>
       <h2 className="section-title reveal !text-background">
         De dependente<br />
