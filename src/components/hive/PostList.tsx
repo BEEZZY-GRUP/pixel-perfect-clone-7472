@@ -105,6 +105,8 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
           const contentPreview = post.content?.length > 180
             ? post.content.slice(0, 180) + "..."
             : post.content;
+          const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
+          const hideAuthor = isConfessionario && !isAdmin;
 
           return (
             <article
@@ -117,22 +119,22 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <UserAvatar
-                    avatarUrl={post.is_anonymous ? null : post.profile?.avatar_url}
-                    name={post.is_anonymous ? "A" : post.profile?.company_name}
+                    avatarUrl={hideAuthor ? null : (post.is_anonymous ? null : post.profile?.avatar_url)}
+                    name={hideAuthor ? "A" : (post.is_anonymous ? "A" : post.profile?.company_name)}
                     size="md"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={(e) => {
-                          if (!post.is_anonymous) {
+                          if (!hideAuthor && !post.is_anonymous) {
                             e.stopPropagation();
                             navigate(`/the-hive/community/profile/${post.user_id}`);
                           }
                         }}
-                        className={`text-foreground text-sm font-medium truncate ${!post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                        className={`text-foreground text-sm font-medium truncate ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
                       >
-                        {post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                        {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
                       </button>
                       {post.pinned && (
                         <span className="inline-flex items-center gap-1 text-[.55rem] bg-gold/10 text-gold px-1.5 py-0.5 uppercase tracking-wider font-heading">
