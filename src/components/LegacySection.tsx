@@ -61,12 +61,12 @@ const LegacySection = () => {
         ref={containerRef}
         className="reveal reveal-delay-2 relative mt-16 mb-[72px] border border-border h-[340px] md:h-[340px] overflow-hidden select-none"
       >
-        {/* Before — full-width layer, clipped from the right */}
+        {/* Before — full-width, clipped from the right */}
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
         >
-          <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center px-8 md:px-14">
+          <div className="absolute inset-0 bg-[hsl(40_6%_5%)] flex flex-col justify-center items-center text-center">
             <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-foreground/30">
               Antes
             </div>
@@ -81,24 +81,22 @@ const LegacySection = () => {
           </div>
         </div>
 
-        {/* After — full-width layer, clipped from the left */}
+        {/* After — full-width, clipped from the left */}
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
         >
-          <div className="absolute inset-0 bg-background flex flex-col justify-center items-end px-8 md:px-14">
-            <div className="w-full max-w-[50%] ml-auto">
-              <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
-                Legado
-              </div>
-              <div className="flex flex-col gap-3">
-                {afterItems.map((item) => (
-                  <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground whitespace-nowrap">
-                    <span className="text-[.75rem] text-gold">✓</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="absolute inset-0 bg-background flex flex-col justify-center items-center text-center">
+            <div className="font-heading text-[.62rem] tracking-[.22em] uppercase font-bold mb-6 text-gold">
+              Legado
+            </div>
+            <div className="flex flex-col gap-3">
+              {afterItems.map((item) => (
+                <div key={item} className="flex items-center gap-3 font-heading text-[.82rem] font-medium text-foreground whitespace-nowrap">
+                  <span className="text-[.75rem] text-gold">✓</span>
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
