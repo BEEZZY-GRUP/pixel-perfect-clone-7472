@@ -34,18 +34,10 @@ const HeroSection = () => {
       uniform vec2 uMouseVel;
       varying vec2 vUv;
 
-      #define PI 3.14159265359
-      #define OCTAVES 6
+      #define OCTAVES 5
 
-      // Improved hash
-      vec3 hash33(vec3 p) {
-        p = fract(p * vec3(443.897, 441.423, 437.195));
-        p += dot(p, p.yzx + 19.19);
-        return fract((p.xxy + p.yxx) * p.zyx);
-      }
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
 
-      // Simplex-like noise
       float noise(vec2 p) {
         vec2 i = floor(p);
         vec2 f = fract(p);
@@ -57,10 +49,8 @@ const HeroSection = () => {
         );
       }
 
-      // Fractal Brownian Motion — smoke layers
       float fbm(vec2 p) {
-        float v = 0.0;
-        float a = 0.5;
+        float v = 0.0, a = 0.5;
         mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
         for (int i = 0; i < OCTAVES; i++) {
           v += a * noise(p);
@@ -70,71 +60,81 @@ const HeroSection = () => {
         return v;
       }
 
-      // Warped domain smoke
-      float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
-        // Ultra-subtle mouse trail — whisper-thin cloud separation
-        vec2 delta = uv - mouse;
-        float dist = length(delta);
-        float influence = smoothstep(0.25, 0.0, dist);
-        vec2 pushDir = normalize(delta + 0.0001);
-        
-        // Barely-there UV nudge
-        vec2 displaced = uv + pushDir * influence * 0.012;
-        displaced += mvel * smoothstep(0.2, 0.0, dist) * 0.06;
-
-        // Base warp layers
-        float d1 = fbm(displaced * 2.0 + vec2(t * 0.5, t * 0.3));
-        float d2 = fbm(displaced * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
-        float d3 = fbm(displaced * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
-
-        // Faint brightness trail where mouse passes
-        float trail = influence * 0.015;
-        return d3 + trail;
-      }
-
-      // Film grain
       float grain(vec2 uv, float t) {
-        return (hash(uv * uResolution * 0.5 + fract(t * 43.0)) * 2.0 - 1.0) * 0.035;
+        return (hash(uv * uResolution * 0.5 + fract(t * 43.0)) * 2.0 - 1.0) * 0.025;
       }
 
       void main() {
         vec2 uv = vUv;
-        float t = uTime * 0.07;
-        vec2 mouse = uMouse;
-        vec2 mvel = uMouseVel;
+        float aspect = uResolution.x / uResolution.y;
+        vec2 st = vec2((uv.x - 0.5) * aspect, uv.y - 0.5);
+        float t = uTime * 0.06;
 
-        float smoke = smokeField(uv, t, mouse, mvel);
+        // Mouse displacement — soft cloud parting
+        vec2 mouse = vec2((uMouse.x - 0.5) * aspect, uMouse.y - 0.5);
+        vec2 delta = st - mouse;
+        float dist = length(delta);
+        float influence = smoothstep(0.35, 0.0, dist);
+        vec2 pushDir = normalize(delta + 0.0001);
+        vec2 displaced = st + pushDir * influence * 0.04;
+        displaced += uMouseVel * smoothstep(0.3, 0.0, dist) * 0.15;
 
-        // Color mapping — volumetric depth
-        float base = smoothstep(0.25, 0.75, smoke);
+        // Nebula cloud layers — warped domain
+        float n1 = fbm(displaced * 1.8 + vec2(t * 0.4, t * 0.25));
+        float n2 = fbm(displaced * 1.4 + vec2(n1 * 0.8 - t * 0.3, n1 * 0.6 + t * 0.15));
+        float n3 = fbm(displaced * 2.2 + vec2(n2 * 0.7 + t * 0.2, -n2 * 0.5 + t * 0.3));
 
-        // Layer separation for depth
-        float layer1 = smoothstep(0.35, 0.55, fbm(uv * 1.8 + t * 0.2)) * 0.4;
-        float layer2 = smoothstep(0.4, 0.65, fbm(uv * 3.0 - t * 0.15)) * 0.25;
+        // Volumetric light source — upper right area
+        vec2 lightPos = vec2(0.3, 0.25);
+        float lightDist = length(st - lightPos);
+        float lightBeam = exp(-lightDist * 2.5) * 1.2;
 
-        // Volumetric light from top-left
-        float lightDir = dot(normalize(uv - vec2(0.2, 0.8)), vec2(0.7, -0.7));
-        float volumeLight = smoothstep(-0.2, 0.6, lightDir) * base * 0.15;
+        // Secondary light — subtle left glow
+        float lightBeam2 = exp(-length(st - vec2(-0.4, 0.1)) * 3.0) * 0.3;
 
-        // Combine luminance
-        float lum = mix(0.03, 0.14, base);
-        lum += layer1;
-        lum -= layer2;
-        lum += volumeLight;
+        // Cloud density with volumetric scattering
+        float cloud = smoothstep(0.3, 0.7, n3);
+        float cloudEdge = smoothstep(0.35, 0.65, n2) * 0.6;
 
-        // Subtle golden tint in bright areas
-        vec3 col = vec3(lum);
-        col += vec3(0.04, 0.025, 0.005) * smoothstep(0.12, 0.25, lum);
+        // Light scattering through clouds
+        float scatter = cloud * lightBeam * 0.8;
+        float scatter2 = cloudEdge * lightBeam2 * 0.5;
 
-        // Edge darkening (vignette)
-        float vig = 1.0 - smoothstep(0.3, 0.85, length(uv - 0.5) * 1.2);
-        col *= mix(0.6, 1.0, vig);
+        // Base luminance — bright volumetric feel
+        float lum = 0.02;
+        lum += scatter + scatter2;
+        lum += lightBeam * 0.15;
+        lum += lightBeam2 * 0.08;
+        lum += cloud * 0.06;
+        lum += cloudEdge * 0.03;
+
+        // Wisps — bright streaks through the cloud
+        float wisp = smoothstep(0.48, 0.52, fbm(displaced * 3.5 + vec2(t * 0.5, -t * 0.2))) * lightBeam * 0.4;
+        lum += wisp;
+
+        // Cool blue-white color palette (x.ai style)
+        vec3 col = vec3(0.0);
+        vec3 coolWhite = vec3(0.85, 0.9, 1.0);
+        vec3 warmHighlight = vec3(1.0, 0.95, 0.88);
+        vec3 deepBlue = vec3(0.15, 0.2, 0.35);
+
+        col = mix(deepBlue * 0.1, coolWhite, lum);
+        col += warmHighlight * wisp * 0.5;
+        col += vec3(0.03, 0.025, 0.01) * smoothstep(0.15, 0.4, lum); // subtle warm tint
+
+        // Mouse glow — faint light where cursor is
+        float mouseGlow = exp(-dist * 6.0) * 0.04;
+        col += coolWhite * mouseGlow;
+
+        // Vignette
+        float vig = 1.0 - smoothstep(0.2, 0.9, length(uv - 0.5) * 1.3);
+        col *= mix(0.4, 1.0, vig);
 
         // Grain
         col += grain(uv, uTime);
         col = clamp(col, 0.0, 1.0);
 
-        gl_FragColor = vec4(col, 0.92);
+        gl_FragColor = vec4(col, 0.85);
       }
     `;
 
