@@ -216,13 +216,14 @@ const ProfilePanel = () => {
               </div>
               <div>
                 <label className="text-[.6rem] text-muted-foreground uppercase tracking-wider font-heading mb-1 block">
-                  CNPJ
+                  CNPJ <span className="text-muted-foreground/50">(vinculado à empresa)</span>
                 </label>
                 <Input
-                  value={editValues.cnpj}
-                  onChange={(e) => setEditValues({ ...editValues, cnpj: e.target.value })}
-                  placeholder="00.000.000/0000-00"
-                  className="bg-secondary border-border text-foreground text-sm"
+                  value={(profile as any)?.companies?.cnpj || profile.cnpj || ""}
+                  readOnly
+                  disabled
+                  placeholder="Sem CNPJ vinculado"
+                  className="bg-secondary/50 border-border text-muted-foreground text-sm cursor-not-allowed"
                 />
               </div>
               <div>
