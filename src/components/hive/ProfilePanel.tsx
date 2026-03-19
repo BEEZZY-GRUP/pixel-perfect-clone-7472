@@ -23,7 +23,6 @@ const ProfilePanel = () => {
   const [editValues, setEditValues] = useState({
     company_name: "",
     bio: "",
-    cnpj: "",
   });
 
   const { data: profile } = useQuery({
@@ -31,7 +30,7 @@ const ProfilePanel = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("*, companies(cnpj)")
         .eq("user_id", user!.id)
         .single();
       return data;
@@ -57,13 +56,12 @@ const ProfilePanel = () => {
   });
 
   const updateProfile = useMutation({
-    mutationFn: async (vals: { company_name: string; bio: string; cnpj: string }) => {
+    mutationFn: async (vals: { company_name: string; bio: string }) => {
       const { error } = await supabase
         .from("profiles")
         .update({
           company_name: vals.company_name,
           bio: vals.bio || null,
-          cnpj: vals.cnpj || null,
         })
         .eq("user_id", user!.id);
       if (error) throw error;
@@ -127,7 +125,6 @@ const ProfilePanel = () => {
     setEditValues({
       company_name: profile.company_name,
       bio: profile.bio || "",
-      cnpj: profile.cnpj || "",
     });
     setEditing(true);
   };
@@ -219,13 +216,14 @@ const ProfilePanel = () => {
               </div>
               <div>
                 <label className="text-[.6rem] text-muted-foreground uppercase tracking-wider font-heading mb-1 block">
-                  CNPJ
+                  CNPJ <span className="text-muted-foreground/50">(vinculado à empresa)</span>
                 </label>
                 <Input
-                  value={editValues.cnpj}
-                  onChange={(e) => setEditValues({ ...editValues, cnpj: e.target.value })}
-                  placeholder="00.000.000/0000-00"
-                  className="bg-secondary border-border text-foreground text-sm"
+                  value={(profile as any)?.companies?.cnpj || profile.cnpj || ""}
+                  readOnly
+                  disabled
+                  placeholder="Sem CNPJ vinculado"
+                  className="bg-secondary/50 border-border text-muted-foreground text-sm cursor-not-allowed"
                 />
               </div>
               <div>
@@ -263,8 +261,8 @@ const ProfilePanel = () => {
           ) : (
             <>
               <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
-              {profile.cnpj && (
-                <p className="text-muted-foreground text-xs mt-0.5">{profile.cnpj}</p>
+              {((profile as any)?.companies?.cnpj || profile.cnpj) && (
+                <p className="text-muted-foreground text-xs mt-0.5">{(profile as any)?.companies?.cnpj || profile.cnpj}</p>
               )}
               {profile.bio && (
                 <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{profile.bio}</p>
