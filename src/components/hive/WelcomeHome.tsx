@@ -30,7 +30,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("posts")
-        .select("id, title, created_at, user_id, categories!posts_category_id_fkey(name, emoji, slug)")
+        .select("id, title, created_at, user_id, is_anonymous, categories!posts_category_id_fkey(name, emoji, slug)")
         .order("created_at", { ascending: false })
         .limit(5);
       if (!data?.length) return [];
@@ -60,7 +60,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
   const { data: topMembers } = useQuery({
     queryKey: ["top_3_home"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,
@@ -171,26 +171,34 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
             </button>
           </div>
           <div className="space-y-3">
-            {recentPosts?.map((post: any) => (
-              <button
-                key={post.id}
-                onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
-                className="w-full text-left flex items-start gap-3 py-2 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors -mx-1 px-1 rounded-sm"
-              >
-                <UserAvatar avatarUrl={post.profile?.avatar_url} name={post.profile?.company_name} size="sm" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-foreground text-[.75rem] font-medium truncate leading-snug">{post.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-gold/60 text-[.55rem] font-heading tracking-wider">
-                      {post.categories?.emoji} {post.categories?.name}
-                    </span>
-                    <span className="text-muted-foreground text-[.55rem]">
-                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
-                    </span>
+            {recentPosts?.map((post: any) => {
+              const isConfessionario = post.categories?.slug === "confessionario";
+              const isAnon = isConfessionario || post.is_anonymous;
+              return (
+                <button
+                  key={post.id}
+                  onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
+                  className="w-full text-left flex items-start gap-3 py-2 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors -mx-1 px-1 rounded-sm"
+                >
+                  <UserAvatar
+                    avatarUrl={isAnon ? null : post.profile?.avatar_url}
+                    name={isAnon ? "A" : post.profile?.company_name}
+                    size="sm"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-[.75rem] font-medium truncate leading-snug">{post.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-gold/60 text-[.55rem] font-heading tracking-wider">
+                        {post.categories?.emoji} {post.categories?.name}
+                      </span>
+                      <span className="text-muted-foreground text-[.55rem]">
+                        {isAnon ? "Anônimo" : (post.profile?.company_name || "Membro")} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
             {(!recentPosts || recentPosts.length === 0) && (
               <p className="text-muted-foreground text-[.7rem] text-center py-4">Nenhuma publicação ainda.</p>
             )}
@@ -255,16 +263,20 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
             </div>
             <div className="space-y-3">
               {topMembers?.map((member: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-3">
+                <button
+                  key={idx}
+                  onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
+                  className="flex items-center gap-3 w-full text-left hover:bg-secondary/30 -mx-1 px-1 py-1 rounded-sm transition-colors"
+                >
                   <span className={`text-[.65rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>
                     #{idx + 1}
                   </span>
                   <UserAvatar avatarUrl={member.avatar_url} name={member.company_name} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-[.7rem] truncate">{member.company_name}</p>
+                    <p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{member.company_name}</p>
                   </div>
                   <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
