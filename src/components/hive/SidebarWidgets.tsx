@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award, Sparkles } from "lucide-react";
 import { getDailyInsight } from "./dailyInsights";
-import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award } from "lucide-react";
 
 const SidebarWidgets = () => {
   const { user } = useAuth();
