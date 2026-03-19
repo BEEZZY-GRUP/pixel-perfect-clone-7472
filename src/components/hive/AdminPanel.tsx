@@ -98,28 +98,29 @@ const AdminPanel = () => {
     onError: () => toast.error("Erro ao atualizar perfil."),
   });
 
-  const toggleRole = useMutation({
-    mutationFn: async ({ userId, role, add }: { userId: string; role: "admin" | "moderator"; add: boolean }) => {
-      if (add) {
-        const { error } = await supabase
+  const setRole = useMutation({
+    mutationFn: async ({ userId, newRole }: { userId: string; newRole: "admin" | "moderator" | "user" }) => {
+      // Remove all existing roles for user
+      const { error: deleteErr } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId);
+      if (deleteErr) throw deleteErr;
+
+      // Add new role if not "user" (user = no role entry)
+      if (newRole !== "user") {
+        const { error: insertErr } = await supabase
           .from("user_roles")
-          .insert({ user_id: userId, role });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("user_roles")
-          .delete()
-          .eq("user_id", userId)
-          .eq("role", role);
-        if (error) throw error;
+          .insert({ user_id: userId, role: newRole });
+        if (insertErr) throw insertErr;
       }
     },
     onSuccess: () => {
-      toast.success("Papel atualizado!");
+      toast.success("Cargo atualizado!");
       queryClient.invalidateQueries({ queryKey: ["all_profiles"] });
       queryClient.invalidateQueries({ queryKey: ["all_roles"] });
     },
-    onError: () => toast.error("Erro ao atualizar papel."),
+    onError: () => toast.error("Erro ao atualizar cargo."),
   });
 
   if (!isAdmin) {
