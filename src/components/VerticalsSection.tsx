@@ -44,7 +44,7 @@ const VerticalsSection = () => (
       {verticals.map((v, i) => (
         <div
           key={v.index}
-          className={`reveal ${i > 0 ? `reveal-delay-${i}` : ""} grid grid-cols-[52px_1fr] md:grid-cols-[80px_1fr_1fr_auto] gap-5 md:gap-10 items-start py-[52px] border-b border-border transition-opacity group-hover/list:opacity-35 hover:!opacity-100 group cursor-pointer`}
+          className={`vertical-item-gsap grid grid-cols-[52px_1fr] md:grid-cols-[80px_1fr_1fr_auto] gap-5 md:gap-10 items-start py-[52px] border-b border-border transition-opacity group-hover/list:opacity-35 hover:!opacity-100 group cursor-pointer`}
         >
           <span className="font-display text-[1.1rem] text-gold pt-1.5">{v.index}</span>
           <div>
