@@ -184,15 +184,15 @@ const AdminPanel = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-2 mb-5">
-        <Shield size={16} className="text-gold" />
-        <h2 className="font-heading text-sm tracking-widest uppercase text-foreground">
+      <div className="flex items-center gap-3 mb-6">
+        <Shield size={22} className="text-gold" />
+        <h2 className="font-heading text-lg tracking-widest uppercase text-foreground">
           Administração
         </h2>
       </div>
 
       {/* Stats bar */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         {[
           { label: "Empresas", value: totalCompanies, icon: Building2 },
           { label: "Membros", value: totalMembers, icon: Users },
@@ -201,11 +201,11 @@ const AdminPanel = () => {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="border border-border bg-secondary/30 p-3 text-center"
+            className="border border-border bg-secondary/30 p-4 text-center"
           >
-            <stat.icon size={14} className="text-gold mx-auto mb-1" />
-            <p className="text-foreground text-lg font-bold leading-none">{stat.value}</p>
-            <p className="text-muted-foreground text-[.55rem] uppercase tracking-wider font-heading mt-1">
+            <stat.icon size={18} className="text-gold mx-auto mb-1.5" />
+            <p className="text-foreground text-2xl font-bold leading-none">{stat.value}</p>
+            <p className="text-muted-foreground text-xs uppercase tracking-wider font-heading mt-1.5">
               {stat.label}
             </p>
           </div>
