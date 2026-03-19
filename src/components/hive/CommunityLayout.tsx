@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PublicProfileView from "./PublicProfileView";
+import LoadingScreen from "./LoadingScreen";
 import CategorySidebar from "./CategorySidebar";
 import WelcomeHome from "./WelcomeHome";
 import PostList from "./PostList";
@@ -54,7 +55,7 @@ const CommunityLayout = () => {
 
   const activeCategory = searchParams.get("category") || null;
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       const { data } = await supabase
@@ -67,7 +68,7 @@ const CommunityLayout = () => {
     enabled: !!user,
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await supabase
@@ -77,6 +78,8 @@ const CommunityLayout = () => {
       return data ?? [];
     },
   });
+
+  const isDataLoading = profileLoading || categoriesLoading;
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unread_notifications", user?.id],
@@ -143,6 +146,10 @@ const CommunityLayout = () => {
 
   const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome;
   const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
+
+  if (isDataLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-background community-zoom">
