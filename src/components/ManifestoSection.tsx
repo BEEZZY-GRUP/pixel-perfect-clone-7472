@@ -5,7 +5,8 @@ const values = [
 ];
 
 const ManifestoSection = () => (
-  <div id="manifesto" className="grid grid-cols-1 md:grid-cols-2 border-t border-b border-border">
+  <div id="manifesto" className="border-t border-b border-border px-6 md:px-[60px]">
+    <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2">
     {/* Left */}
     <div className="px-6 py-[72px] md:px-[60px] md:py-[120px] border-b md:border-b-0 md:border-r border-border flex flex-col justify-between">
       <div>
