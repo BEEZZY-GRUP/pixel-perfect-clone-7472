@@ -18,20 +18,36 @@ const afterItems = [
 
 const LegacySection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState(50);
+  const [displayPos, setDisplayPos] = useState(50);
+  const targetPos = useRef(50);
+  const animFrame = useRef<number>(0);
   const [dragging, setDragging] = useState(false);
 
-  const updatePos = useCallback((clientX: number) => {
+  const updateTarget = useCallback((clientX: number) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const pct = Math.max(15, Math.min(85, ((clientX - rect.left) / rect.width) * 100));
-    setPos(pct);
+    targetPos.current = Math.max(15, Math.min(85, ((clientX - rect.left) / rect.width) * 100));
+  }, []);
+
+  // Smooth lerp loop
+  useEffect(() => {
+    let running = true;
+    const lerp = () => {
+      setDisplayPos((prev) => {
+        const diff = targetPos.current - prev;
+        if (Math.abs(diff) < 0.1) return targetPos.current;
+        return prev + diff * 0.15;
+      });
+      if (running) animFrame.current = requestAnimationFrame(lerp);
+    };
+    animFrame.current = requestAnimationFrame(lerp);
+    return () => { running = false; cancelAnimationFrame(animFrame.current); };
   }, []);
 
   useEffect(() => {
     if (!dragging) return;
-    const onMove = (e: MouseEvent) => updatePos(e.clientX);
-    const onTouchMove = (e: TouchEvent) => updatePos(e.touches[0].clientX);
+    const onMove = (e: MouseEvent) => updateTarget(e.clientX);
+    const onTouchMove = (e: TouchEvent) => updateTarget(e.touches[0].clientX);
     const onUp = () => setDragging(false);
     document.addEventListener("mousemove", onMove);
     document.addEventListener("touchmove", onTouchMove, { passive: true });
@@ -43,7 +59,7 @@ const LegacySection = () => {
       document.removeEventListener("mouseup", onUp);
       document.removeEventListener("touchend", onUp);
     };
-  }, [dragging, updatePos]);
+  }, [dragging, updateTarget]);
 
   return (
     <section id="legacy" className="bg-foreground text-background px-6 py-[72px] md:px-[60px] md:py-[130px]">
