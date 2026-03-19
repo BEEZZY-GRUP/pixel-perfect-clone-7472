@@ -475,7 +475,7 @@ const AdminPanel = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-2 border-t border-border pt-3">
+                        <div className="flex flex-wrap gap-2.5 border-t border-border pt-4">
                           <Button
                             size="sm"
                             variant="ghost"
