@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MessageSquare, Pin } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PostDetail from "./PostDetail";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
