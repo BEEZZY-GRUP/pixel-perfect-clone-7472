@@ -199,7 +199,7 @@ const CommunityLayout = () => {
     if (view === "feed") {
       navigate("/the-hive/community");
     } else if (view === "community") {
-      navigate("/the-hive/community?category=todas");
+      navigate("/the-hive/community?category=browse");
     } else {
       navigate(`/the-hive/community/${view}`);
     }
