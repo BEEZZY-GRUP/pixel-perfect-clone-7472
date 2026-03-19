@@ -30,7 +30,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("posts")
-        .select("id, title, created_at, user_id, categories!posts_category_id_fkey(name, emoji, slug)")
+        .select("id, title, created_at, user_id, is_anonymous, categories!posts_category_id_fkey(name, emoji, slug)")
         .order("created_at", { ascending: false })
         .limit(5);
       if (!data?.length) return [];
