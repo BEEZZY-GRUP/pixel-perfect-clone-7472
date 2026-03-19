@@ -4,16 +4,44 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Shield, ShieldOff, Save, Search } from "lucide-react";
+import {
+  Shield,
+  ShieldOff,
+  Save,
+  Search,
+  Building2,
+  Users,
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Mail,
+  Calendar,
+  Award,
+  Pencil,
+} from "lucide-react";
 import { useState } from "react";
 import CompanyManagement from "./CompanyManagement";
+
+type AdminTab = "empresas" | "membros";
+type MemberSort = "name" | "level" | "xp" | "date";
+type MemberFilter = "all" | "admin" | "user" | "no-company";
 
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<AdminTab>("empresas");
   const [search, setSearch] = useState("");
   const [editingProfile, setEditingProfile] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ company_name: string; cnpj: string }>({ company_name: "", cnpj: "" });
+  const [editValues, setEditValues] = useState<{ company_name: string; cnpj: string }>({
+    company_name: "",
+    cnpj: "",
+  });
+  const [sortBy, setSortBy] = useState<MemberSort>("date");
+  const [sortAsc, setSortAsc] = useState(false);
+  const [filterBy, setFilterBy] = useState<MemberFilter>("all");
+  const [expandedMember, setExpandedMember] = useState<string | null>(null);
 
   const { data: profiles } = useQuery({
     queryKey: ["all_profiles"],
@@ -36,8 +64,25 @@ const AdminPanel = () => {
     enabled: isAdmin,
   });
 
+  const { data: companies } = useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const { data } = await supabase.from("companies").select("*").order("name");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
   const updateProfile = useMutation({
-    mutationFn: async ({ userId, company_name, cnpj }: { userId: string; company_name: string; cnpj: string }) => {
+    mutationFn: async ({
+      userId,
+      company_name,
+      cnpj,
+    }: {
+      userId: string;
+      company_name: string;
+      cnpj: string;
+    }) => {
       const { error } = await supabase
         .from("profiles")
         .update({ company_name, cnpj })
@@ -55,10 +100,16 @@ const AdminPanel = () => {
   const toggleAdmin = useMutation({
     mutationFn: async ({ userId, makeAdmin }: { userId: string; makeAdmin: boolean }) => {
       if (makeAdmin) {
-        const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
+        const { error } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userId, role: "admin" });
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
+        const { error } = await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", userId)
+          .eq("role", "admin");
         if (error) throw error;
       }
     },
@@ -81,13 +132,48 @@ const AdminPanel = () => {
   const isUserAdmin = (userId: string) =>
     roles?.some((r) => r.user_id === userId && r.role === "admin");
 
-  const filtered = profiles?.filter((p) =>
-    !search || p.company_name.toLowerCase().includes(search.toLowerCase()) ||
-    (p.cnpj && p.cnpj.includes(search))
-  );
+  const getCompanyName = (companyId: string | null) => {
+    if (!companyId) return null;
+    return companies?.find((c) => c.id === companyId)?.name ?? null;
+  };
+
+  // Filter
+  let filtered = profiles?.filter((p: any) => {
+    if (search) {
+      const s = search.toLowerCase();
+      const matchName = p.company_name?.toLowerCase().includes(s);
+      const matchCnpj = p.cnpj?.includes(s);
+      if (!matchName && !matchCnpj) return false;
+    }
+    if (filterBy === "admin") return isUserAdmin(p.user_id);
+    if (filterBy === "user") return !isUserAdmin(p.user_id);
+    if (filterBy === "no-company") return !p.company_id;
+    return true;
+  });
+
+  // Sort
+  filtered = filtered?.sort((a: any, b: any) => {
+    let cmp = 0;
+    if (sortBy === "name") cmp = (a.company_name || "").localeCompare(b.company_name || "");
+    else if (sortBy === "level") cmp = (a.level || 0) - (b.level || 0);
+    else if (sortBy === "xp") cmp = (a.xp || 0) - (b.xp || 0);
+    else cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    return sortAsc ? cmp : -cmp;
+  });
+
+  const totalMembers = profiles?.length ?? 0;
+  const totalAdmins = profiles?.filter((p: any) => isUserAdmin(p.user_id)).length ?? 0;
+  const totalNoCompany = profiles?.filter((p: any) => !p.company_id).length ?? 0;
+  const totalCompanies = companies?.length ?? 0;
+
+  const tabs: { key: AdminTab; label: string; icon: typeof Building2; count: number }[] = [
+    { key: "empresas", label: "Empresas", icon: Building2, count: totalCompanies },
+    { key: "membros", label: "Membros", icon: Users, count: totalMembers },
+  ];
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center gap-2 mb-5">
         <Shield size={16} className="text-gold" />
         <h2 className="font-heading text-sm tracking-widest uppercase text-foreground">
@@ -95,131 +181,334 @@ const AdminPanel = () => {
         </h2>
       </div>
 
-      <CompanyManagement />
-
-      <div className="my-6" />
-
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar membro..."
-          className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground"
-        />
+      {/* Stats bar */}
+      <div className="grid grid-cols-4 gap-3 mb-5">
+        {[
+          { label: "Empresas", value: totalCompanies, icon: Building2 },
+          { label: "Membros", value: totalMembers, icon: Users },
+          { label: "Admins", value: totalAdmins, icon: Shield },
+          { label: "Sem Empresa", value: totalNoCompany, icon: Filter },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className="border border-border bg-secondary/30 p-3 text-center"
+          >
+            <stat.icon size={14} className="text-gold mx-auto mb-1" />
+            <p className="text-foreground text-lg font-bold leading-none">{stat.value}</p>
+            <p className="text-muted-foreground text-[.55rem] uppercase tracking-wider font-heading mt-1">
+              {stat.label}
+            </p>
+          </div>
+        ))}
       </div>
 
-      <div className="space-y-2">
-        {filtered?.map((profile: any) => {
-          const admin = isUserAdmin(profile.user_id);
-          const isEditing = editingProfile === profile.user_id;
+      {/* Tab navigation */}
+      <div className="flex border-b border-border mb-5">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex items-center gap-2 px-5 py-3 text-[.7rem] uppercase tracking-widest font-heading transition-colors border-b-2 -mb-[1px] ${
+              activeTab === tab.key
+                ? "border-gold text-gold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <tab.icon size={14} />
+            {tab.label}
+            <span
+              className={`text-[.55rem] px-1.5 py-0.5 rounded-sm ${
+                activeTab === tab.key
+                  ? "bg-gold/15 text-gold"
+                  : "bg-secondary text-muted-foreground"
+              }`}
+            >
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
 
-          return (
-            <div key={profile.id} className="border border-border p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={editValues.company_name}
-                        onChange={(e) => setEditValues({ ...editValues, company_name: e.target.value })}
-                        placeholder="Nome da empresa"
-                        className="bg-secondary border-border text-foreground text-sm"
-                      />
-                      <Input
-                        value={editValues.cnpj}
-                        onChange={(e) => setEditValues({ ...editValues, cnpj: e.target.value })}
-                        placeholder="CNPJ"
-                        className="bg-secondary border-border text-foreground text-sm"
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => updateProfile.mutate({
-                            userId: profile.user_id,
-                            company_name: editValues.company_name,
-                            cnpj: editValues.cnpj,
-                          })}
-                          disabled={updateProfile.isPending}
-                          className="bg-gold text-background hover:bg-gold-light text-[.6rem] tracking-wider uppercase font-heading h-7"
-                        >
-                          <Save size={12} className="mr-1" />
-                          Salvar
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingProfile(null)}
-                          className="text-muted-foreground text-[.6rem] h-7"
-                        >
-                          Cancelar
-                        </Button>
+      {/* EMPRESAS TAB */}
+      {activeTab === "empresas" && <CompanyManagement />}
+
+      {/* MEMBROS TAB */}
+      {activeTab === "membros" && (
+        <div className="space-y-4">
+          {/* Filters & sort bar */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search
+                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar membro..."
+                className="pl-9 bg-secondary border-border text-foreground placeholder:text-muted-foreground text-sm"
+              />
+            </div>
+
+            {/* Filter buttons */}
+            <div className="flex gap-1">
+              {(
+                [
+                  { key: "all", label: "Todos" },
+                  { key: "admin", label: "Admins" },
+                  { key: "user", label: "Usuários" },
+                  { key: "no-company", label: "Sem Empresa" },
+                ] as { key: MemberFilter; label: string }[]
+              ).map((f) => (
+                <Button
+                  key={f.key}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setFilterBy(f.key)}
+                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading ${
+                    filterBy === f.key
+                      ? "bg-gold/15 text-gold border border-gold/30"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {f.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Sort */}
+            <div className="flex gap-1 items-center">
+              {(
+                [
+                  { key: "date", label: "Data" },
+                  { key: "name", label: "Nome" },
+                  { key: "level", label: "Level" },
+                  { key: "xp", label: "XP" },
+                ] as { key: MemberSort; label: string }[]
+              ).map((s) => (
+                <Button
+                  key={s.key}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    if (sortBy === s.key) setSortAsc(!sortAsc);
+                    else {
+                      setSortBy(s.key);
+                      setSortAsc(false);
+                    }
+                  }}
+                  className={`text-[.6rem] h-7 px-2 uppercase tracking-wider font-heading gap-1 ${
+                    sortBy === s.key
+                      ? "bg-gold/15 text-gold border border-gold/30"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {s.label}
+                  {sortBy === s.key &&
+                    (sortAsc ? <SortAsc size={10} /> : <SortDesc size={10} />)}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results count */}
+          <p className="text-muted-foreground text-[.6rem] uppercase tracking-wider font-heading">
+            {filtered?.length ?? 0} resultado{(filtered?.length ?? 0) !== 1 ? "s" : ""}
+          </p>
+
+          {/* Member list */}
+          <div className="space-y-2">
+            {filtered?.map((profile: any) => {
+              const admin = isUserAdmin(profile.user_id);
+              const isEditing = editingProfile === profile.user_id;
+              const isExpanded = expandedMember === profile.user_id;
+              const linkedCompany = getCompanyName(profile.company_id);
+
+              return (
+                <div key={profile.id} className="border border-border">
+                  {/* Member header row */}
+                  <div
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-secondary/50 transition-colors"
+                    onClick={() =>
+                      setExpandedMember(isExpanded ? null : profile.user_id)
+                    }
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {isExpanded ? (
+                        <ChevronDown size={14} className="text-muted-foreground shrink-0" />
+                      ) : (
+                        <ChevronRight size={14} className="text-muted-foreground shrink-0" />
+                      )}
+
+                      {/* Avatar placeholder */}
+                      <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                        <span className="text-gold text-[.65rem] font-bold uppercase">
+                          {(profile.company_name || "U").charAt(0)}
+                        </span>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-foreground text-sm font-medium truncate">
+                            {profile.company_name}
+                          </p>
+                          {admin && (
+                            <span className="text-[.55rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-muted-foreground text-[.6rem]">
+                          <span className="flex items-center gap-1">
+                            <Award size={9} />
+                            Lv.{profile.level}
+                          </span>
+                          <span>{profile.xp} XP</span>
+                          {linkedCompany && (
+                            <span className="flex items-center gap-1">
+                              <Building2 size={9} />
+                              {linkedCompany}
+                            </span>
+                          )}
+                          {!linkedCompany && (
+                            <span className="text-destructive/70">Sem empresa</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <p className="text-foreground text-sm font-medium">
-                          {profile.company_name}
-                        </p>
-                        {admin && (
-                          <span className="text-[.6rem] bg-gold/10 text-gold px-2 py-0.5 uppercase tracking-wider font-heading">
-                            Admin
-                          </span>
-                        )}
+
+                    <div className="flex items-center gap-2 text-muted-foreground text-[.55rem] shrink-0">
+                      <Calendar size={10} />
+                      {new Date(profile.created_at).toLocaleDateString("pt-BR")}
+                    </div>
+                  </div>
+
+                  {/* Expanded details */}
+                  {isExpanded && (
+                    <div className="border-t border-border p-4 space-y-3 bg-secondary/20">
+                      {/* Detail grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {[
+                          { label: "Nome", value: profile.company_name },
+                          { label: "CNPJ", value: profile.cnpj || "—" },
+                          { label: "Empresa", value: linkedCompany || "Nenhuma" },
+                          {
+                            label: "Membro desde",
+                            value: new Date(profile.created_at).toLocaleDateString("pt-BR"),
+                          },
+                          { label: "Nível", value: `${profile.level}` },
+                          { label: "XP Total", value: `${profile.xp}` },
+                          { label: "Papel", value: admin ? "Administrador" : "Usuário" },
+                          { label: "Bio", value: profile.bio || "—" },
+                        ].map((d) => (
+                          <div key={d.label}>
+                            <p className="text-[.55rem] text-muted-foreground uppercase tracking-wider font-heading mb-0.5">
+                              {d.label}
+                            </p>
+                            <p className="text-foreground text-sm truncate">{d.value}</p>
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-muted-foreground text-[.7rem]">
-                        {profile.cnpj || "Sem CNPJ"}
-                      </p>
-                      <p className="text-muted-foreground text-[.6rem]">
-                        Lv.{profile.level} · {profile.xp} XP
-                      </p>
-                    </>
+
+                      {/* Edit form */}
+                      {isEditing ? (
+                        <div className="space-y-2 border-t border-border pt-3">
+                          <Input
+                            value={editValues.company_name}
+                            onChange={(e) =>
+                              setEditValues({ ...editValues, company_name: e.target.value })
+                            }
+                            placeholder="Nome da empresa"
+                            className="bg-secondary border-border text-foreground text-sm"
+                          />
+                          <Input
+                            value={editValues.cnpj}
+                            onChange={(e) =>
+                              setEditValues({ ...editValues, cnpj: e.target.value })
+                            }
+                            placeholder="CNPJ"
+                            className="bg-secondary border-border text-foreground text-sm"
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() =>
+                                updateProfile.mutate({
+                                  userId: profile.user_id,
+                                  company_name: editValues.company_name,
+                                  cnpj: editValues.cnpj,
+                                })
+                              }
+                              disabled={updateProfile.isPending}
+                              className="bg-gold text-background hover:bg-gold-light text-[.6rem] tracking-wider uppercase font-heading h-7"
+                            >
+                              <Save size={12} className="mr-1" />
+                              Salvar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditingProfile(null)}
+                              className="text-muted-foreground text-[.6rem] h-7"
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 border-t border-border pt-3">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingProfile(profile.user_id);
+                              setEditValues({
+                                company_name: profile.company_name,
+                                cnpj: profile.cnpj || "",
+                              });
+                            }}
+                            className="text-muted-foreground hover:text-foreground text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading"
+                          >
+                            <Pencil size={10} />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdmin.mutate({
+                                userId: profile.user_id,
+                                makeAdmin: !admin,
+                              });
+                            }}
+                            disabled={toggleAdmin.isPending}
+                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                              admin
+                                ? "text-destructive hover:text-destructive"
+                                : "text-gold hover:text-gold"
+                            }`}
+                          >
+                            {admin ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {admin ? "Remover admin" : "Tornar admin"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
+              );
+            })}
+          </div>
 
-                {!isEditing && (
-                  <div className="flex gap-1 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setEditingProfile(profile.user_id);
-                        setEditValues({
-                          company_name: profile.company_name,
-                          cnpj: profile.cnpj || "",
-                        });
-                      }}
-                      className="text-muted-foreground hover:text-foreground text-[.6rem] h-7 px-2"
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleAdmin.mutate({
-                        userId: profile.user_id,
-                        makeAdmin: !admin,
-                      })}
-                      disabled={toggleAdmin.isPending}
-                      className={`text-[.6rem] h-7 px-2 ${admin ? "text-destructive hover:text-destructive" : "text-gold hover:text-gold"}`}
-                    >
-                      {admin ? <ShieldOff size={12} /> : <Shield size={12} />}
-                      <span className="ml-1">{admin ? "Remover admin" : "Tornar admin"}</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {(!filtered || filtered.length === 0) && (
-        <p className="text-muted-foreground text-sm text-center py-8">
-          Nenhum membro encontrado.
-        </p>
+          {(!filtered || filtered.length === 0) && (
+            <p className="text-muted-foreground text-sm text-center py-8">
+              Nenhum membro encontrado.
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
