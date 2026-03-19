@@ -26,7 +26,7 @@ import CompanyManagement from "./CompanyManagement";
 
 type AdminTab = "empresas" | "membros";
 type MemberSort = "name" | "level" | "xp" | "date";
-type MemberFilter = "all" | "admin" | "user" | "no-company";
+type MemberFilter = "all" | "admin" | "moderator" | "user" | "no-company";
 
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
