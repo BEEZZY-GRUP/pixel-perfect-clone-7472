@@ -195,7 +195,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         </div>
 
         {/* Reactions bar */}
-        <div className="px-6 py-3 border-t border-border flex items-center justify-between">
+        <div className="px-4 md:px-6 py-3 border-t border-border flex items-center justify-between flex-wrap gap-2">
           <PostReactions postId={post.id} />
           <span className="text-muted-foreground text-[.65rem] font-heading flex items-center gap-1.5">
             <MessageSquare size={13} />
