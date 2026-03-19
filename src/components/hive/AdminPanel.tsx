@@ -332,6 +332,8 @@ const AdminPanel = () => {
           <div className="space-y-2">
             {filtered?.map((profile: any) => {
               const admin = isUserAdmin(profile.user_id);
+              const moderator = isUserModerator(profile.user_id);
+              const role = getUserRole(profile.user_id);
               const isEditing = editingProfile === profile.user_id;
               const isExpanded = expandedMember === profile.user_id;
               const linkedCompany = getCompanyName(profile.company_id);
