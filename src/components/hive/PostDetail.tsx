@@ -165,12 +165,23 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         <div className="space-y-3 mb-6">
           {comments?.map((c: any) => (
             <div key={c.id} className="border border-border p-4">
-              <div className="text-muted-foreground text-[.7rem] mb-2">
-                {c.profiles?.company_name} ·{" "}
-                {formatDistanceToNow(new Date(c.created_at), {
-                  addSuffix: true,
-                  locale: ptBR,
-                })}
+              <div className="flex items-start justify-between">
+                <div className="text-muted-foreground text-[.7rem] mb-2">
+                  {c.profiles?.company_name} ·{" "}
+                  {formatDistanceToNow(new Date(c.created_at), {
+                    addSuffix: true,
+                    locale: ptBR,
+                  })}
+                </div>
+                {(isAdmin || c.user_id === user?.id) && (
+                  <button
+                    onClick={() => deleteComment.mutate(c.id)}
+                    className="text-destructive/50 hover:text-destructive transition-colors"
+                    title="Excluir comentário"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
               <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
                 {c.content}
