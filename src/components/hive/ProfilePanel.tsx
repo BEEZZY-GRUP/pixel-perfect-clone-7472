@@ -140,8 +140,19 @@ const ProfilePanel = () => {
     ? ((profile.xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100
     : 0;
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    // Remove query param
+    searchParams.delete("onboarding");
+    setSearchParams(searchParams, { replace: true });
+    // Auto-open edit mode
+    startEditing();
+  };
+
   return (
     <div className="space-y-8">
+      {showOnboarding && <OnboardingTutorial onComplete={handleOnboardingComplete} />}
+
       {/* Profile header */}
       <div className="border border-border bg-card">
         {/* Cover gradient */}
