@@ -98,6 +98,11 @@ const AdminPanel = () => {
 
       <InvitePanel />
 
+      <div className="my-6" />
+      <CompanyManagement />
+
+      <div className="my-6" />
+
       {/* Search */}
       <div className="relative mb-4">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
