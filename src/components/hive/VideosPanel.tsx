@@ -132,6 +132,14 @@ const VideosPanel = () => {
                       </div>
                     </button>
                   )}
+                  {/* Theater mode button */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setTheaterVideo(video); }}
+                    className="absolute top-2 right-2 bg-background/70 hover:bg-background/90 text-foreground p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-10"
+                    title="Modo Teatro"
+                  >
+                    <Maximize2 size={14} />
+                  </button>
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
@@ -139,7 +147,15 @@ const VideosPanel = () => {
                       <span className="text-[.55rem] font-heading tracking-wider uppercase text-gold/60 bg-gold/5 px-1.5 py-0.5 inline-block mb-1.5">{video.category}</span>
                       <h3 className="text-foreground text-sm font-medium leading-snug line-clamp-2">{video.title}</h3>
                       {video.description && <p className="text-muted-foreground text-[.7rem] mt-1 line-clamp-2 leading-relaxed">{video.description}</p>}
-                      <p className="text-muted-foreground/50 text-[.6rem] mt-2">{formatDistanceToNow(new Date(video.created_at), { addSuffix: true, locale: ptBR })}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <p className="text-muted-foreground/50 text-[.6rem]">{formatDistanceToNow(new Date(video.created_at), { addSuffix: true, locale: ptBR })}</p>
+                        <button
+                          onClick={() => setTheaterVideo(video)}
+                          className="flex items-center gap-1 text-muted-foreground/50 hover:text-gold text-[.6rem] transition-colors"
+                        >
+                          <MessageCircle size={10} /> Comentários
+                        </button>
+                      </div>
                     </div>
                     {isAdmin && (
                       <div className="flex gap-1 shrink-0">
@@ -154,6 +170,17 @@ const VideosPanel = () => {
           })}
         </div>
       )}
+
+      {/* Theater Mode */}
+      <AnimatePresence>
+        {theaterVideo && (
+          <VideoTheater
+            video={theaterVideo}
+            embedUrl={getEmbedUrl(theaterVideo.video_url)}
+            onClose={() => setTheaterVideo(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
