@@ -109,6 +109,30 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          cnpj: string | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       missions: {
         Row: {
           active: boolean
@@ -197,6 +221,7 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           cnpj: string | null
+          company_id: string | null
           company_name: string
           created_at: string
           id: string
@@ -209,6 +234,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           cnpj?: string | null
+          company_id?: string | null
           company_name: string
           created_at?: string
           id?: string
@@ -221,6 +247,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           cnpj?: string | null
+          company_id?: string | null
           company_name?: string
           created_at?: string
           id?: string
@@ -229,7 +256,15 @@ export type Database = {
           user_id?: string
           xp?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_badges: {
         Row: {
