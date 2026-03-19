@@ -6,7 +6,7 @@ const HeroSection = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Three.js liquid gradient
+  // Three.js volumetric smoke shader
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -22,39 +22,118 @@ const HeroSection = () => {
       uTime: { value: 0 },
       uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-      uGrain: { value: 0.04 },
+      uMouseVel: { value: new THREE.Vector2(0, 0) },
     };
 
     const vertShader = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
     const fragShader = `
       precision highp float;
-      uniform float uTime; uniform vec2 uResolution; uniform vec2 uMouse; uniform float uGrain;
+      uniform float uTime;
+      uniform vec2 uResolution;
+      uniform vec2 uMouse;
+      uniform vec2 uMouseVel;
       varying vec2 vUv;
+
       #define PI 3.14159265359
+      #define OCTAVES 6
+
+      // Improved hash
+      vec3 hash33(vec3 p) {
+        p = fract(p * vec3(443.897, 441.423, 437.195));
+        p += dot(p, p.yzx + 19.19);
+        return fract((p.xxy + p.yxx) * p.zyx);
+      }
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-      float noise(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); vec2 u = f*f*(3.0-2.0*f);
-        return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y); }
-      float fbm(vec2 p) { float v=0.; float a=.5; mat2 rot=mat2(cos(.5),sin(.5),-sin(.5),cos(.5));
-        for(int i=0;i<5;i++){v+=a*noise(p);p=rot*p*2.+3.7;a*=.5;} return v; }
-      float grain(vec2 uv,float t){return hash(uv*uResolution*.5+fract(t*37.))*2.-1.;}
+
+      // Simplex-like noise
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(
+          mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+          u.y
+        );
+      }
+
+      // Fractal Brownian Motion — smoke layers
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+        for (int i = 0; i < OCTAVES; i++) {
+          v += a * noise(p);
+          p = rot * p * 2.0 + 3.7;
+          a *= 0.5;
+        }
+        return v;
+      }
+
+      // Warped domain smoke
+      float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
+        // Base warp layers
+        float d1 = fbm(uv * 2.0 + vec2(t * 0.5, t * 0.3));
+        float d2 = fbm(uv * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
+        float d3 = fbm(uv * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
+
+        // Mouse distortion — pushes smoke away
+        vec2 delta = uv - mouse;
+        float dist = length(delta);
+        float mouseForce = smoothstep(0.5, 0.0, dist) * 0.5;
+        float velForce = length(mvel) * smoothstep(0.4, 0.0, dist) * 2.0;
+
+        // Directional swirl from mouse velocity
+        float swirl = atan(delta.y, delta.x) + t * 0.5;
+        float swirlNoise = sin(swirl * 3.0 + d1 * 4.0) * 0.5 + 0.5;
+
+        float field = d3 + mouseForce + velForce * swirlNoise;
+        return field;
+      }
+
+      // Film grain
+      float grain(vec2 uv, float t) {
+        return (hash(uv * uResolution * 0.5 + fract(t * 43.0)) * 2.0 - 1.0) * 0.035;
+      }
+
       void main() {
-        vec2 uv=vUv; float t=uTime*.08;
-        float d1=fbm(uv*2.2+vec2(t*.6,t*.35));
-        float d2=fbm(uv*1.8+vec2(d1*.6-t*.4,d1*.4+t*.25));
-        float d3=fbm(uv*3.+vec2(d2*.5+t*.3,-d2*.3+t*.4));
-        vec2 mDelta=uv-uMouse; float mDist=length(mDelta);
-        float mInfluence=smoothstep(.6,.0,mDist)*.3;
-        float flow=d3+mInfluence;
-        float base=smoothstep(.2,.8,flow);
-        float zone1=smoothstep(.4,.55,d1+d2*.3);
-        float zone2=smoothstep(.3,.7,d2+d3*.25);
-        float lum=mix(.04,.18,base);
-        lum=mix(lum,.32,zone1*.5);
-        lum=mix(lum,.08,zone2*.3);
-        lum+=sin(uv.y*PI*1.2+t)*.025;
-        lum+=grain(uv,uTime)*uGrain;
-        lum=clamp(lum,0.,1.);
-        gl_FragColor=vec4(vec3(lum),.9);
+        vec2 uv = vUv;
+        float t = uTime * 0.07;
+        vec2 mouse = uMouse;
+        vec2 mvel = uMouseVel;
+
+        float smoke = smokeField(uv, t, mouse, mvel);
+
+        // Color mapping — volumetric depth
+        float base = smoothstep(0.25, 0.75, smoke);
+
+        // Layer separation for depth
+        float layer1 = smoothstep(0.35, 0.55, fbm(uv * 1.8 + t * 0.2)) * 0.4;
+        float layer2 = smoothstep(0.4, 0.65, fbm(uv * 3.0 - t * 0.15)) * 0.25;
+
+        // Volumetric light from top-left
+        float lightDir = dot(normalize(uv - vec2(0.2, 0.8)), vec2(0.7, -0.7));
+        float volumeLight = smoothstep(-0.2, 0.6, lightDir) * base * 0.15;
+
+        // Combine luminance
+        float lum = mix(0.03, 0.14, base);
+        lum += layer1;
+        lum -= layer2;
+        lum += volumeLight;
+
+        // Subtle golden tint in bright areas
+        vec3 col = vec3(lum);
+        col += vec3(0.04, 0.025, 0.005) * smoothstep(0.12, 0.25, lum);
+
+        // Edge darkening (vignette)
+        float vig = 1.0 - smoothstep(0.3, 0.85, length(uv - 0.5) * 1.2);
+        col *= mix(0.6, 1.0, vig);
+
+        // Grain
+        col += grain(uv, uTime);
+        col = clamp(col, 0.0, 1.0);
+
+        gl_FragColor = vec4(col, 0.92);
       }
     `;
 
@@ -62,8 +141,13 @@ const HeroSection = () => {
     const mat = new THREE.ShaderMaterial({ uniforms, vertexShader: vertShader, fragmentShader: fragShader, transparent: true });
     scene.add(new THREE.Mesh(geo, mat));
 
+    let prevMouse = { x: 0.5, y: 0.5 };
     const onMouseMove = (e: MouseEvent) => {
-      uniforms.uMouse.value.set(e.clientX / window.innerWidth, 1 - e.clientY / window.innerHeight);
+      const nx = e.clientX / window.innerWidth;
+      const ny = 1 - e.clientY / window.innerHeight;
+      uniforms.uMouseVel.value.set(nx - prevMouse.x, ny - prevMouse.y);
+      uniforms.uMouse.value.set(nx, ny);
+      prevMouse = { x: nx, y: ny };
     };
     document.addEventListener("mousemove", onMouseMove);
 
@@ -78,6 +162,8 @@ const HeroSection = () => {
     const animate = () => {
       raf = requestAnimationFrame(animate);
       uniforms.uTime.value = (performance.now() - startTime) * 0.001;
+      // Dampen velocity
+      uniforms.uMouseVel.value.multiplyScalar(0.92);
       renderer.render(scene, camera);
     };
     raf = requestAnimationFrame(animate);
@@ -90,7 +176,7 @@ const HeroSection = () => {
     };
   }, []);
 
-  // GSAP hero entrance animation
+  // GSAP hero entrance
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -104,7 +190,6 @@ const HeroSection = () => {
 
     const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
-    // Set initial states
     gsap.set([badge, sub, actions, scroll, nav], { opacity: 0 });
     gsap.set(badge, { y: 24, scale: 0.95 });
     gsap.set(headlineInners, { y: "110%" });
@@ -115,23 +200,12 @@ const HeroSection = () => {
 
     tl.to(nav, { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, 0.1)
       .to(badge, { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 0.3)
-      .to(
-        headlineInners,
-        {
-          y: "0%",
-          duration: 1.2,
-          stagger: 0.1,
-          ease: "power4.out",
-        },
-        0.5
-      )
+      .to(headlineInners, { y: "0%", duration: 1.2, stagger: 0.1, ease: "power4.out" }, 0.5)
       .to(sub, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 1.2)
       .to(actions, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 1.35)
       .to(scroll, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 1.6);
 
-    return () => {
-      tl.kill();
-    };
+    return () => { tl.kill(); };
   }, []);
 
   return (
@@ -140,7 +214,7 @@ const HeroSection = () => {
       id="hero"
       className="relative min-h-screen flex flex-col justify-end px-6 pb-14 md:px-[60px] md:pb-20 overflow-hidden"
     >
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-50" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-55" />
       <div className="hero-noise" />
       <div className="absolute bottom-0 left-0 right-0 h-[60%] z-[1] bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
@@ -173,20 +247,8 @@ const HeroSection = () => {
               className="inline-flex items-center gap-3 font-heading text-[.72rem] tracking-[.16em] uppercase font-semibold text-background bg-gold no-underline px-9 py-[18px] hover:bg-gold-light hover:-translate-y-px transition-all group"
             >
               Quero construir meu legado
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                className="transition-transform group-hover:translate-x-1"
-              >
-                <path
-                  d="M3 8h10M9 4l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="transition-transform group-hover:translate-x-1">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
             <a
@@ -201,10 +263,7 @@ const HeroSection = () => {
 
       <div className="hero-scroll-indicator hidden md:flex absolute right-[60px] bottom-[84px] z-[2] [writing-mode:vertical-rl] text-[.6rem] tracking-[.22em] uppercase text-muted-foreground items-center gap-3 font-heading font-medium">
         Scroll
-        <span
-          className="block w-px h-[52px] bg-gradient-to-b from-muted-foreground to-transparent"
-          style={{ animation: "scroll-line 2.2s ease-in-out infinite" }}
-        />
+        <span className="block w-px h-[52px] bg-gradient-to-b from-muted-foreground to-transparent" style={{ animation: "scroll-line 2.2s ease-in-out infinite" }} />
       </div>
     </section>
   );
