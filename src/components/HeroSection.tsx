@@ -169,14 +169,14 @@ const HeroSection = () => {
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-55" />
       <div className="hero-noise" />
       <div className="relative z-[2] max-w-[900px]">
-        <div className="text-[.7rem] tracking-[.25em] uppercase text-muted-foreground mb-7 flex items-center gap-3.5">
-          <span className="block w-8 h-px bg-muted-foreground" />
+        <div className="text-[.7rem] tracking-[.25em] uppercase text-gold mb-7 flex items-center gap-3.5">
+          <span className="block w-8 h-px bg-gold" />
           A empresa do século 22
         </div>
         <h1 className="font-display text-[clamp(3.5rem,8vw,8.5rem)] font-light leading-[1.0] tracking-tight mb-10">
           <span ref={word1Ref} className="inline-block" />
           <br />
-          <em>
+          <em className="text-gold-light">
             <span ref={word2Ref} className="inline-block" />
           </em>
           <br />
@@ -187,7 +187,7 @@ const HeroSection = () => {
         </p>
         <a
           href="#manifesto"
-          className="inline-flex items-center gap-3 text-xs tracking-[.18em] uppercase text-foreground no-underline px-8 py-4 border border-foreground/30 hover:bg-foreground hover:text-background transition-all group"
+          className="inline-flex items-center gap-3 text-xs tracking-[.18em] uppercase text-foreground no-underline px-8 py-4 border border-foreground/30 hover:bg-gold hover:text-background hover:border-gold transition-all group"
         >
           Conhecer a Beezzy
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="transition-transform group-hover:translate-x-1">
