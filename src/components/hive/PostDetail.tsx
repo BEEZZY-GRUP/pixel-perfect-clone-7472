@@ -138,6 +138,22 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         <div className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
           {post.content}
         </div>
+
+        {/* Admin or owner can delete */}
+        {(isAdmin || post.user_id === user?.id) && (
+          <div className="mt-4 pt-4 border-t border-border flex gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => deletePost.mutate()}
+              disabled={deletePost.isPending}
+              className="text-destructive hover:text-destructive text-[.6rem] tracking-wider uppercase font-heading h-7"
+            >
+              <Trash2 size={12} className="mr-1" />
+              Excluir publicação
+            </Button>
+          </div>
+        )}
       </article>
 
       {/* Comments */}
