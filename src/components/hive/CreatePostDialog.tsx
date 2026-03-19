@@ -34,8 +34,8 @@ const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug,
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  // Filter out staff-only categories for non-staff
-  const availableCategories = categories.filter((c) => !c.staff_only);
+  // Filter out staff-only categories for non-admin
+  const availableCategories = categories.filter((c) => !c.staff_only || isAdmin);
 
   const createPost = useMutation({
     mutationFn: async () => {
