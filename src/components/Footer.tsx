@@ -1,6 +1,7 @@
 const Footer = () => (
   <>
-    <footer className="border-t border-border px-6 pt-[72px] pb-14 md:px-[60px] grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 md:gap-12 items-start">
+    <footer className="border-t border-border px-6 pt-[72px] pb-14 md:px-[60px]">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 md:gap-12 items-start">
       <div>
         <div className="font-sans font-extrabold text-[1.1rem] tracking-[.22em] uppercase mb-4">
           Beezzy<span className="text-gold">.</span>
