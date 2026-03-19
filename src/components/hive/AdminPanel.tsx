@@ -371,6 +371,11 @@ const AdminPanel = () => {
                               Admin
                             </span>
                           )}
+                          {moderator && !admin && (
+                            <span className="text-[.55rem] bg-blue-500/10 text-blue-400 px-2 py-0.5 uppercase tracking-wider font-heading shrink-0">
+                              Moderador
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-3 text-muted-foreground text-[.6rem]">
                           <span className="flex items-center gap-1">
