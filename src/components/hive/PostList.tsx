@@ -155,7 +155,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                 </p>
               </button>
 
-              <div className="px-5 pb-4 pt-1 flex items-center justify-between gap-3">
+              <div className="px-4 md:px-5 pb-3 md:pb-4 pt-1 flex items-center justify-between gap-2 flex-wrap">
                 <PostReactions postId={post.id} compact />
                 <button
                   onClick={() => navigate(`/the-hive/community/post/${post.id}`)}
