@@ -310,8 +310,8 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         <form onSubmit={handleSubmitComment} className="border border-border bg-card p-4">
           <div className="flex gap-3">
             <UserAvatar
-              avatarUrl={null}
-              name="Você"
+              avatarUrl={hideAuthor ? null : currentProfile?.avatar_url ?? null}
+              name={hideAuthor ? "A" : currentProfile?.company_name ?? "Você"}
               size="sm"
               className="mt-1"
             />
