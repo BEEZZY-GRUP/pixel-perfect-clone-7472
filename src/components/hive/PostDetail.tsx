@@ -205,7 +205,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
         {/* Admin/owner actions */}
         {(isAdmin || post.user_id === user?.id) && (
-          <div className="px-6 py-3 border-t border-border">
+          <div className="px-4 md:px-6 py-3 border-t border-border">
             <Button
               size="sm"
               variant="ghost"
