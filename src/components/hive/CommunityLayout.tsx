@@ -11,7 +11,7 @@ import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
 import AdminPanel from "./AdminPanel";
-import AchievementTicker from "./AchievementTicker";
+
 import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
 import NotificationsPanel from "./NotificationsPanel";
