@@ -35,14 +35,9 @@ const Navbar = () => {
       >
         <a
           href="#"
-          className="flex flex-col no-underline relative z-[110]"
+          className="font-sans font-extrabold text-[1.25rem] tracking-[.22em] uppercase text-foreground no-underline relative z-[110]"
         >
-          <span className="font-sans font-extrabold text-[1.25rem] tracking-[.22em] uppercase text-foreground leading-none">
-            Beezzy<span className="text-gold">.</span>
-          </span>
-          <span className="font-heading text-[.5rem] tracking-[.18em] uppercase text-muted-foreground font-medium mt-1">
-            A empresa do século 22
-          </span>
+          Beezzy<span className="text-gold">.</span>
         </a>
 
         {/* Desktop links */}
