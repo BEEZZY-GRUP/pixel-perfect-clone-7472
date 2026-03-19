@@ -125,7 +125,6 @@ const ProfilePanel = () => {
     setEditValues({
       company_name: profile.company_name,
       bio: profile.bio || "",
-      cnpj: profile.cnpj || "",
     });
     setEditing(true);
   };
