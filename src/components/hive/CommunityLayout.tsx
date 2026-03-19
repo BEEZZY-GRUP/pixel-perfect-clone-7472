@@ -14,6 +14,7 @@ import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
 import AdminPanel from "./AdminPanel";
+import BadgeUnlockCelebration from "./BadgeUnlockCelebration";
 
 import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
