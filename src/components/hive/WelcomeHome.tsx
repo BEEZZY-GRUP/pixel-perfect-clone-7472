@@ -240,7 +240,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
           </div>
 
           {/* Top 3 ranking */}
-          <div className="border border-border bg-card p-5">
+          <div className="border border-border bg-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Trophy size={14} className="text-gold" />
