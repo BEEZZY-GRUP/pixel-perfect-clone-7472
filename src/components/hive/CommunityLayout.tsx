@@ -112,8 +112,20 @@ const CommunityLayout = () => {
     }
   };
 
+  const notifIcon = (
+    <span className="relative">
+      <Bell size={14} />
+      {(unreadCount ?? 0) > 0 && (
+        <span className="absolute -top-1.5 -right-1.5 bg-gold text-background text-[.5rem] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+          {unreadCount! > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </span>
+  );
+
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
     { key: "feed", label: "Comunidade", icon: <MessageCircle size={14} /> },
+    { key: "notifications", label: "Notificações", icon: notifIcon },
     { key: "videos", label: "Vídeos", icon: <Video size={14} /> },
     { key: "glossary", label: "Sumário", icon: <BookOpen size={14} /> },
     { key: "ranking", label: "Ranking", icon: <Trophy size={14} /> },
