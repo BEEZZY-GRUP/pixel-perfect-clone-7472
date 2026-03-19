@@ -417,7 +417,7 @@ const AdminPanel = () => {
                           },
                           { label: "Nível", value: `${profile.level}` },
                           { label: "XP Total", value: `${profile.xp}` },
-                          { label: "Papel", value: admin ? "Administrador" : "Usuário" },
+                          { label: "Papel", value: admin ? "Administrador" : moderator ? "Moderador" : "Usuário" },
                           { label: "Bio", value: profile.bio || "—" },
                         ].map((d) => (
                           <div key={d.label}>
