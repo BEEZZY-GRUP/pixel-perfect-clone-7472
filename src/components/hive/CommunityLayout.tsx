@@ -237,7 +237,7 @@ const CommunityLayout = () => {
                   <PostDetail
                     postId={params.postId}
                     onBack={() => navigate(-1)}
-                    isAdmin={isAdmin}
+                    isAdmin={isAdmin || isModerator}
                   />
                 )}
 
