@@ -26,15 +26,22 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
         <button
           key={cat.id}
           onClick={() => onSelect(cat.slug)}
-          className={`w-full text-left px-3 py-2 text-xs tracking-wide font-heading transition-colors rounded-sm ${
+          className={`w-full text-left px-3 py-2.5 transition-colors rounded-sm ${
             activeSlug === cat.slug
               ? "bg-gold/10 text-gold"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary"
           }`}
         >
-          {cat.emoji} {cat.name}
-          {cat.staff_only && (
-            <span className="ml-2 text-[.6rem] text-gold/60">STAFF</span>
+          <span className="text-xs tracking-wide font-heading uppercase flex items-center gap-1">
+            {cat.emoji} {cat.name}
+            {cat.staff_only && (
+              <span className="text-[.6rem] text-gold/60">STAFF</span>
+            )}
+          </span>
+          {cat.description && (
+            <span className="block text-[.6rem] leading-tight mt-0.5 opacity-60 normal-case tracking-normal font-sans">
+              {cat.description}
+            </span>
           )}
         </button>
       ))}
