@@ -33,8 +33,7 @@ const ManifestoSection = () => (
       </div>
     </div>
 
-    {/* Right */}
-    <div className="px-6 py-[72px] md:px-[60px] md:py-[120px] flex flex-col justify-between gap-12">
+    <div className="py-[72px] md:py-[120px] pl-0 md:pl-[60px] flex flex-col justify-between gap-12">
       <div>
         <div className="section-eyebrow">Nossa filosofia</div>
         <p className="reveal text-[.9rem] leading-[1.85] text-muted-foreground">
