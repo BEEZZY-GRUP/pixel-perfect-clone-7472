@@ -25,10 +25,19 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("posts")
-        .select("*, profiles!posts_user_id_fkey(company_name, avatar_url), categories!posts_category_id_fkey(name, emoji)")
+        .select("*, categories!posts_category_id_fkey(name, emoji)")
         .eq("id", postId)
-        .single();
-      return data;
+        .maybeSingle();
+      if (!data) return null;
+
+      // Fetch author profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("company_name, avatar_url")
+        .eq("user_id", data.user_id)
+        .maybeSingle();
+
+      return { ...data, profile };
     },
   });
 
@@ -37,10 +46,19 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("comments")
-        .select("*, profiles!comments_user_id_fkey(company_name, avatar_url)")
+        .select("*")
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
-      return data ?? [];
+      if (!data?.length) return [];
+
+      const userIds = [...new Set(data.map((c) => c.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, company_name, avatar_url")
+        .in("user_id", userIds);
+
+      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
+      return data.map((c) => ({ ...c, profile: profileMap.get(c.user_id) ?? null }));
     },
   });
 
