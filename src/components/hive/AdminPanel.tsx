@@ -406,7 +406,7 @@ const AdminPanel = () => {
                   {isExpanded && (
                     <div className="border-t border-border p-5 space-y-4 bg-secondary/20">
                       {/* Detail grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
                           { label: "Nome", value: profile.company_name },
                           { label: "CNPJ", value: profile.cnpj || "—" },
