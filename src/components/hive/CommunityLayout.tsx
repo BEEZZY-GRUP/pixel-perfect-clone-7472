@@ -135,7 +135,12 @@ const CommunityLayout = () => {
         </div>
       </header>
 
-      <div className="flex pt-[57px]">
+      {/* Achievement ticker */}
+      <div className="fixed top-[57px] left-0 right-0 z-40">
+        <AchievementTicker />
+      </div>
+
+      <div className="flex pt-[85px]">
         {/* Sidebar - only show on feed view */}
         {activeView === "feed" && (
           <aside className={`
