@@ -21,9 +21,10 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   categories: Category[];
   defaultCategorySlug: string | null;
+  isAdmin?: boolean;
 }
 
-const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug }: Props) => {
+const CreatePostDialog = ({ open, onOpenChange, categories, defaultCategorySlug, isAdmin }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
