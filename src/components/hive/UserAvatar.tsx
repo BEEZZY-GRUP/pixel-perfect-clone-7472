@@ -47,6 +47,8 @@ const UserAvatar = forwardRef<HTMLElement, Props>(({ avatarUrl, name, size = "md
       {initials}
     </div>
   );
-};
+});
+
+UserAvatar.displayName = "UserAvatar";
 
 export default UserAvatar;

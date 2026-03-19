@@ -57,7 +57,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
   });
 
   // Reset page when category changes
-  const { useEffect } = require("react");
+  useEffect(() => { setPage(1); }, [categorySlug]);
 
 
   if (isLoading) {
