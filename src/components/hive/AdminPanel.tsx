@@ -213,21 +213,21 @@ const AdminPanel = () => {
       </div>
 
       {/* Tab navigation */}
-      <div className="flex border-b border-border mb-5">
+      <div className="flex border-b border-border mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-3 text-[.7rem] uppercase tracking-widest font-heading transition-colors border-b-2 -mb-[1px] ${
+            className={`flex items-center gap-2.5 px-6 py-3.5 text-sm uppercase tracking-widest font-heading transition-colors border-b-2 -mb-[1px] ${
               activeTab === tab.key
                 ? "border-gold text-gold"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            <tab.icon size={14} />
+            <tab.icon size={16} />
             {tab.label}
             <span
-              className={`text-[.55rem] px-1.5 py-0.5 rounded-sm ${
+              className={`text-xs px-2 py-0.5 rounded-sm ${
                 activeTab === tab.key
                   ? "bg-gold/15 text-gold"
                   : "bg-secondary text-muted-foreground"
