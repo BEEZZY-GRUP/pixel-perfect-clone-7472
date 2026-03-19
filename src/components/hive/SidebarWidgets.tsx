@@ -113,14 +113,20 @@ const SidebarWidgets = () => {
         </div>
       )}
 
-      <div className="border border-border bg-secondary/30 p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Flame size={13} className="text-gold" />
-          <p className="text-[.6rem] font-heading tracking-widest uppercase text-gold">Dica do Dia</p>
+      <div className="border border-gold/15 bg-gradient-to-br from-gold/5 via-transparent to-gold/3 p-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles size={13} className="text-gold" />
+            <p className="text-[.6rem] font-heading tracking-widest uppercase text-gold">Insight do Dia</p>
+          </div>
+          <p className="text-foreground/80 text-[.72rem] leading-relaxed italic mb-2">
+            "{getDailyInsight().text}"
+          </p>
+          <p className="text-gold/60 text-[.6rem] font-heading tracking-wide text-right">
+            — {getDailyInsight().author}
+          </p>
         </div>
-        <p className="text-foreground/70 text-[.7rem] leading-relaxed italic">
-          "Publique posts e comente para ganhar XP. Complete missões para subir de nível mais rápido e desbloquear badges exclusivas!"
-        </p>
       </div>
     </div>
   );
