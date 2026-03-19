@@ -128,7 +128,7 @@ const CommunityLayout = () => {
     </span>
   );
 
-  const isHome = activeView === "feed" && !activeCategory && !isPostDetail;
+  const isHome = activeView === "feed" && !activeCategory && !isPostDetail && !isProfileView;
 
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
     { key: "feed", label: "Início", icon: <Home size={14} /> },
@@ -142,8 +142,8 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome;
-  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
+  const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome && !isProfileView;
+  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome && !isProfileView;
 
   if (isDataLoading) {
     return <LoadingScreen />;
