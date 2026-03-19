@@ -272,6 +272,9 @@ const CommunityLayout = () => {
                 {activeView === "ranking" && <RankingPanel />}
                 {activeView === "missions" && <MissionsPanel />}
                 {activeView === "profile" && !isProfileView && <ProfilePanel />}
+                {isProfileView && params.userId && (
+                  <PublicProfileView userId={params.userId} onBack={() => navigate(-1)} />
+                )}
                 {activeView === "admin" && <AdminPanel />}
               </div>
 
