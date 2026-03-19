@@ -21,6 +21,7 @@ interface Props {
 const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigateRouter = useNavigate();
   const [comment, setComment] = useState("");
 
   const { data: post } = useQuery({
