@@ -20,6 +20,11 @@ interface Props {
 const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
+  // Reset selection when category changes
+  useEffect(() => {
+    setSelectedPostId(null);
+  }, [categorySlug]);
+
   const categoryId = categorySlug
     ? categories.find((c) => c.slug === categorySlug)?.id
     : null;
