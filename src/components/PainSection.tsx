@@ -36,6 +36,7 @@ const PainSection = () => {
 
   return (
     <section id="pain" className="bg-[hsl(40_6%_5%)] border-b border-border px-6 py-[72px] md:px-[60px] md:py-[130px]">
+      <div className="max-w-[1200px] mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-20 md:gap-[80px] mb-20 items-end">
         <div>
           <div className="section-eyebrow reveal">O diagnóstico</div>
@@ -118,6 +119,7 @@ const PainSection = () => {
             </svg>
           </a>
         </div>
+      </div>
       </div>
     </section>
   );

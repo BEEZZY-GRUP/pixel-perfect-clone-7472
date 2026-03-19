@@ -180,7 +180,8 @@ const HiveSection = () => {
   }, []);
 
   return (
-    <section id="hive" className="border-t border-border px-6 py-[72px] md:px-[60px] md:py-[130px] grid grid-cols-1 md:grid-cols-2 gap-[60px] md:gap-[100px] items-center">
+    <section id="hive" className="border-t border-border px-6 py-[72px] md:px-[60px] md:py-[130px]">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-[60px] md:gap-[100px] items-center">
       <div
         ref={containerRef}
         className="reveal hive-visual-gsap relative aspect-square max-w-[280px] md:max-w-[460px]"
@@ -217,6 +218,7 @@ const HiveSection = () => {
             <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" />
           </svg>
         </a>
+      </div>
       </div>
     </section>
   );

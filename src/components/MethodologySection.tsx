@@ -26,6 +26,7 @@ const MethodologySection = () => {
 
   return (
     <section id="methodology" className="px-6 py-[72px] md:px-[60px] md:py-[130px]">
+      <div className="max-w-[1200px] mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-8 flex-wrap">
         <div>
           <div className="section-eyebrow reveal">Metodologia Legacy</div>
@@ -116,6 +117,7 @@ const MethodologySection = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

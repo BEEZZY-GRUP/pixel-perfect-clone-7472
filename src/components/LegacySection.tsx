@@ -63,6 +63,7 @@ const LegacySection = () => {
 
   return (
     <section id="legacy" className="bg-foreground text-background px-6 py-[72px] md:px-[60px] md:py-[130px]">
+      <div className="max-w-[1200px] mx-auto">
       <div className="section-eyebrow !text-gold-dark before:!bg-gold-dark">O que entregamos</div>
       <h2 className="section-title reveal !text-background">
         De dependente<br />
@@ -141,6 +142,7 @@ const LegacySection = () => {
             <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </a>
+      </div>
       </div>
     </section>
   );

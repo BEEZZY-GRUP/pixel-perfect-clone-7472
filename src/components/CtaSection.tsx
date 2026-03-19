@@ -5,7 +5,8 @@ const CtaSection = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <section id="cta-section" className="bg-gold px-6 py-[72px] md:px-[60px] md:py-[110px] grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 md:gap-20 items-center">
+    <section id="cta-section" className="bg-gold px-6 py-[72px] md:px-[60px] md:py-[110px]">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 md:gap-20 items-center">
       <div>
         <h2 className="reveal font-display text-[clamp(2.2rem,4.5vw,4.5rem)] font-light leading-[1.08] text-background tracking-[-0.02em]">
           Pronto para construir<br />o <em className="italic">legado</em> da sua empresa?
@@ -30,7 +31,8 @@ const CtaSection = () => {
         </p>
       </div>
 
-      <ContactFormDialog open={open} onOpenChange={setOpen} />
+        <ContactFormDialog open={open} onOpenChange={setOpen} />
+      </div>
     </section>
   );
 };
