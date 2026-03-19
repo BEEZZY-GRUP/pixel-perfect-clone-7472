@@ -153,12 +153,18 @@ const HeroSection = () => {
           <span className="block w-7 h-px bg-gold" />
           A empresa do século 22
         </div>
-        <h1 className="hero-headline font-display text-[clamp(3.8rem,8.5vw,9rem)] font-light leading-[.96] tracking-[-0.015em] mb-9 overflow-hidden">
-          <span className="hero-line block">Construindo</span>
-          <span className="hero-line block">
-            <em className="italic text-gold-light">o legado</em>
+        <h1 className="hero-headline font-display text-[clamp(3.8rem,8.5vw,9rem)] font-light leading-[1.05] tracking-[-0.015em] mb-9">
+          <span className="hero-line block overflow-hidden py-[0.05em]">
+            <span className="hero-line-inner block">Construindo</span>
           </span>
-          <span className="hero-line block">da sua empresa.</span>
+          <span className="hero-line block overflow-hidden py-[0.05em]">
+            <span className="hero-line-inner block">
+              <em className="italic text-gold-light">o legado</em>
+            </span>
+          </span>
+          <span className="hero-line block overflow-hidden py-[0.05em]">
+            <span className="hero-line-inner block">da sua empresa.</span>
+          </span>
         </h1>
         <div className="flex items-end justify-between gap-10 flex-wrap">
           <p className="hero-sub text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
