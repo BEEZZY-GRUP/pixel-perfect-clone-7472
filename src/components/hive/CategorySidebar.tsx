@@ -23,7 +23,7 @@ const CategorySidebar = ({ categories, activeSlug, onSelect }: Props) => {
         <button
           onClick={() => onSelect(null)}
           className={`text-left px-3 py-3 transition-colors rounded-sm ${
-            activeSlug === null
+            activeSlug === null || activeSlug === "todas"
               ? "bg-gold/10 text-gold border-l-2 border-gold"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary border-l-2 border-transparent"
           }`}
