@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import gsap from "gsap";
 
 const HeroSection = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
+  // Three.js liquid gradient
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -87,36 +90,101 @@ const HeroSection = () => {
     };
   }, []);
 
+  // GSAP hero entrance animation
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const badge = section.querySelector(".hero-badge");
+    const headline = section.querySelector(".hero-headline");
+    const headlineLines = headline?.querySelectorAll(".hero-line");
+    const sub = section.querySelector(".hero-sub");
+    const actions = section.querySelector(".hero-actions");
+    const scroll = section.querySelector(".hero-scroll-indicator");
+    const nav = document.querySelector("nav");
+
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    // Set initial states
+    gsap.set([badge, headlineLines, sub, actions, scroll, nav], {
+      opacity: 0,
+    });
+    gsap.set(badge, { y: 20 });
+    gsap.set(headlineLines, { y: 60, clipPath: "inset(0 0 100% 0)" });
+    gsap.set(sub, { y: 30 });
+    gsap.set(actions, { y: 30 });
+    gsap.set(scroll, { y: -20 });
+    gsap.set(nav, { y: -20 });
+
+    tl.to(nav, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
+      .to(badge, { opacity: 1, y: 0, duration: 0.7 }, 0.4)
+      .to(
+        headlineLines,
+        {
+          opacity: 1,
+          y: 0,
+          clipPath: "inset(0 0 0% 0)",
+          duration: 1,
+          stagger: 0.12,
+        },
+        0.6
+      )
+      .to(sub, { opacity: 1, y: 0, duration: 0.8 }, 1.1)
+      .to(actions, { opacity: 1, y: 0, duration: 0.8 }, 1.25)
+      .to(scroll, { opacity: 1, y: 0, duration: 0.6 }, 1.5);
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
+
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col justify-end px-6 pb-14 md:px-[60px] md:pb-20 overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="hero"
+      className="relative min-h-screen flex flex-col justify-end px-6 pb-14 md:px-[60px] md:pb-20 overflow-hidden"
+    >
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-50" />
       <div className="hero-noise" />
-      {/* Vignette */}
       <div className="absolute bottom-0 left-0 right-0 h-[60%] z-[1] bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
       <div className="relative z-[2] max-w-[820px]">
-        <div className="font-heading text-[.68rem] tracking-[.22em] uppercase text-gold mb-8 flex items-center gap-[10px] font-medium">
+        <div className="hero-badge font-heading text-[.68rem] tracking-[.22em] uppercase text-gold mb-8 flex items-center gap-[10px] font-medium">
           <span className="block w-7 h-px bg-gold" />
           A empresa do século 22
         </div>
-        <h1 className="font-display text-[clamp(3.8rem,8.5vw,9rem)] font-light leading-[.96] tracking-[-0.015em] mb-9">
-          Construindo<br />
-          <em className="italic text-gold-light">o legado</em><br />
-          da sua empresa.
+        <h1 className="hero-headline font-display text-[clamp(3.8rem,8.5vw,9rem)] font-light leading-[.96] tracking-[-0.015em] mb-9 overflow-hidden">
+          <span className="hero-line block">Construindo</span>
+          <span className="hero-line block">
+            <em className="italic text-gold-light">o legado</em>
+          </span>
+          <span className="hero-line block">da sua empresa.</span>
         </h1>
         <div className="flex items-end justify-between gap-10 flex-wrap">
-          <p className="text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
-            Não somos mais uma consultoria. Somos o sócio estratégico que 
+          <p className="hero-sub text-[.9rem] leading-[1.75] text-muted-foreground max-w-[400px]">
+            Não somos mais uma consultoria. Somos o sócio estratégico que
             transforma sua empresa em um negócio independente, previsível e escalável.
           </p>
-          <div className="flex items-center gap-5 flex-shrink-0 flex-col sm:flex-row">
+          <div className="hero-actions flex items-center gap-5 flex-shrink-0 flex-col sm:flex-row">
             <a
               href="#cta-section"
               className="inline-flex items-center gap-3 font-heading text-[.72rem] tracking-[.16em] uppercase font-semibold text-background bg-gold no-underline px-9 py-[18px] hover:bg-gold-light hover:-translate-y-px transition-all group"
             >
               Quero construir meu legado
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="transition-transform group-hover:translate-x-1">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="transition-transform group-hover:translate-x-1"
+              >
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </a>
             <a
@@ -129,9 +197,12 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="hidden md:flex absolute right-[60px] bottom-[84px] z-[2] [writing-mode:vertical-rl] text-[.6rem] tracking-[.22em] uppercase text-muted-foreground items-center gap-3 font-heading font-medium">
+      <div className="hero-scroll-indicator hidden md:flex absolute right-[60px] bottom-[84px] z-[2] [writing-mode:vertical-rl] text-[.6rem] tracking-[.22em] uppercase text-muted-foreground items-center gap-3 font-heading font-medium">
         Scroll
-        <span className="block w-px h-[52px] bg-gradient-to-b from-muted-foreground to-transparent" style={{ animation: "scroll-line 2.2s ease-in-out infinite" }} />
+        <span
+          className="block w-px h-[52px] bg-gradient-to-b from-muted-foreground to-transparent"
+          style={{ animation: "scroll-line 2.2s ease-in-out infinite" }}
+        />
       </div>
     </section>
   );
