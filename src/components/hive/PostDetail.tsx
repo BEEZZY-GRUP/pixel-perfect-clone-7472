@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,9 +12,10 @@ import { toast } from "sonner";
 interface Props {
   postId: string;
   onBack: () => void;
+  isAdmin?: boolean;
 }
 
-const PostDetail = ({ postId, onBack }: Props) => {
+const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
