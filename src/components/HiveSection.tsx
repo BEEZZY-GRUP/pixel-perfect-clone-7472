@@ -19,8 +19,8 @@ const HiveSection = () => {
       x: (e.clientX - rect.left) / rect.width,
       y: (e.clientY - rect.top) / rect.height,
     };
-    // 3D tilt — max ±15deg
-    tiltRef.current = { rx: -dy * 12, ry: dx * 12 };
+    // 3D tilt — max ±4deg
+    tiltRef.current = { rx: -dy * 4, ry: dx * 4 };
   }, []);
 
   const handleMouseLeave = useCallback(() => {
