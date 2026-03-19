@@ -477,7 +477,7 @@ const AdminPanel = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-2.5 border-t border-border pt-4">
+                        <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
                           <Button
                             size="sm"
                             variant="ghost"
@@ -494,48 +494,24 @@ const AdminPanel = () => {
                             <Pencil size={13} />
                             Editar
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleRole.mutate({
-                                userId: profile.user_id,
-                                role: "admin",
-                                add: !admin,
-                              });
-                            }}
-                            disabled={toggleRole.isPending}
-                            className={`text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading ${
-                              admin
-                                ? "text-destructive hover:text-destructive"
-                                : "text-gold hover:text-gold"
-                            }`}
-                          >
-                            {admin ? <ShieldOff size={13} /> : <Shield size={13} />}
-                            {admin ? "Remover admin" : "Tornar admin"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleRole.mutate({
-                                userId: profile.user_id,
-                                role: "moderator",
-                                add: !moderator,
-                              });
-                            }}
-                            disabled={toggleRole.isPending}
-                            className={`text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading ${
-                              moderator
-                                ? "text-destructive hover:text-destructive"
-                                : "text-blue-400 hover:text-blue-400"
-                            }`}
-                          >
-                            {moderator ? <ShieldOff size={13} /> : <Shield size={13} />}
-                            {moderator ? "Remover moderador" : "Tornar moderador"}
-                          </Button>
+
+                          {/* Role selector */}
+                          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-heading">Cargo:</span>
+                            <select
+                              value={role}
+                              onChange={(e) => {
+                                const newRole = e.target.value as "admin" | "moderator" | "user";
+                                setRole.mutate({ userId: profile.user_id, newRole });
+                              }}
+                              disabled={setRole.isPending}
+                              className="bg-secondary border border-border text-foreground text-sm h-9 px-3 rounded-sm focus:outline-none focus:ring-1 focus:ring-gold/50"
+                            >
+                              <option value="user">Usuário</option>
+                              <option value="moderator">Moderador</option>
+                              <option value="admin">Administrador</option>
+                            </select>
+                          </div>
                         </div>
                       )}
                     </div>
