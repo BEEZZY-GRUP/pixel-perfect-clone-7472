@@ -147,6 +147,10 @@ const CommunityLayout = () => {
   const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome;
   const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
 
+  if (isDataLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="min-h-screen bg-background community-zoom">
       {/* Top bar */}
