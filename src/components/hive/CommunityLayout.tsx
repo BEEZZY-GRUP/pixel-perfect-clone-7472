@@ -67,7 +67,7 @@ const CommunityLayout = () => {
     enabled: !!user,
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await supabase
@@ -77,6 +77,8 @@ const CommunityLayout = () => {
       return data ?? [];
     },
   });
+
+  const isDataLoading = profileLoading || categoriesLoading;
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unread_notifications", user?.id],
