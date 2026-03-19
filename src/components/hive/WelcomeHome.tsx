@@ -200,7 +200,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
         {/* Right column: missions + ranking */}
         <div className="space-y-6">
           {/* Active missions */}
-          <div className="border border-border bg-card p-5">
+          <div className="border border-border bg-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Target size={14} className="text-gold" />
