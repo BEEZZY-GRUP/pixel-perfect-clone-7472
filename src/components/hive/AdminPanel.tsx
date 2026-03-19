@@ -20,6 +20,7 @@ import {
   Calendar,
   Award,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import CompanyManagement from "./CompanyManagement";
