@@ -475,7 +475,7 @@ const AdminPanel = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex gap-2 border-t border-border pt-3">
+                        <div className="flex flex-wrap gap-2 border-t border-border pt-3">
                           <Button
                             size="sm"
                             variant="ghost"
@@ -497,12 +497,13 @@ const AdminPanel = () => {
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleAdmin.mutate({
+                              toggleRole.mutate({
                                 userId: profile.user_id,
-                                makeAdmin: !admin,
+                                role: "admin",
+                                add: !admin,
                               });
                             }}
-                            disabled={toggleAdmin.isPending}
+                            disabled={toggleRole.isPending}
                             className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
                               admin
                                 ? "text-destructive hover:text-destructive"
@@ -511,6 +512,27 @@ const AdminPanel = () => {
                           >
                             {admin ? <ShieldOff size={10} /> : <Shield size={10} />}
                             {admin ? "Remover admin" : "Tornar admin"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleRole.mutate({
+                                userId: profile.user_id,
+                                role: "moderator",
+                                add: !moderator,
+                              });
+                            }}
+                            disabled={toggleRole.isPending}
+                            className={`text-[.6rem] h-7 px-3 gap-1 uppercase tracking-wider font-heading ${
+                              moderator
+                                ? "text-destructive hover:text-destructive"
+                                : "text-blue-400 hover:text-blue-400"
+                            }`}
+                          >
+                            {moderator ? <ShieldOff size={10} /> : <Shield size={10} />}
+                            {moderator ? "Remover moderador" : "Tornar moderador"}
                           </Button>
                         </div>
                       )}
