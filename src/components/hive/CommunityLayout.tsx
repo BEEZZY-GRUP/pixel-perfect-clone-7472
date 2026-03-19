@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -9,13 +10,15 @@ import CreatePostDialog from "./CreatePostDialog";
 import RankingPanel from "./RankingPanel";
 import MissionsPanel from "./MissionsPanel";
 import ProfilePanel from "./ProfilePanel";
+import AdminPanel from "./AdminPanel";
 import { Button } from "@/components/ui/button";
-import { LogOut, Plus, Menu, X, Trophy, Target, User } from "lucide-react";
+import { LogOut, Plus, Menu, X, Trophy, Target, User, Shield } from "lucide-react";
 
-type View = "feed" | "ranking" | "missions" | "profile";
+type View = "feed" | "ranking" | "missions" | "profile" | "admin";
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showCreate, setShowCreate] = useState(false);
@@ -67,6 +70,7 @@ const CommunityLayout = () => {
     { key: "ranking", label: "Ranking", icon: <Trophy size={14} /> },
     { key: "missions", label: "Missões", icon: <Target size={14} /> },
     { key: "profile", label: "Perfil", icon: <User size={14} /> },
+    ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
   return (
@@ -174,13 +178,14 @@ const CommunityLayout = () => {
                     Publicar
                   </Button>
                 </div>
-                <PostList categorySlug={activeCategory} categories={categories ?? []} />
+                <PostList categorySlug={activeCategory} categories={categories ?? []} isAdmin={isAdmin} />
               </>
             )}
 
             {activeView === "ranking" && <RankingPanel />}
             {activeView === "missions" && <MissionsPanel />}
             {activeView === "profile" && <ProfilePanel />}
+            {activeView === "admin" && <AdminPanel />}
           </div>
         </main>
       </div>
@@ -190,6 +195,7 @@ const CommunityLayout = () => {
         onOpenChange={setShowCreate}
         categories={categories ?? []}
         defaultCategorySlug={activeCategory}
+        isAdmin={isAdmin}
       />
     </div>
   );

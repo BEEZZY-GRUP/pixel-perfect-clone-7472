@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,9 +12,10 @@ import { toast } from "sonner";
 interface Props {
   postId: string;
   onBack: () => void;
+  isAdmin?: boolean;
 }
 
-const PostDetail = ({ postId, onBack }: Props) => {
+const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
@@ -59,6 +60,31 @@ const PostDetail = ({ postId, onBack }: Props) => {
       toast.success("Comentário adicionado!");
     },
     onError: () => toast.error("Erro ao comentar."),
+  });
+
+  const deletePost = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("posts").delete().eq("id", postId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Publicação excluída!");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      onBack();
+    },
+    onError: () => toast.error("Erro ao excluir."),
+  });
+
+  const deleteComment = useMutation({
+    mutationFn: async (commentId: string) => {
+      const { error } = await supabase.from("comments").delete().eq("id", commentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      toast.success("Comentário excluído!");
+    },
+    onError: () => toast.error("Erro ao excluir comentário."),
   });
 
   const handleSubmitComment = (e: React.FormEvent) => {
@@ -112,6 +138,22 @@ const PostDetail = ({ postId, onBack }: Props) => {
         <div className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
           {post.content}
         </div>
+
+        {/* Admin or owner can delete */}
+        {(isAdmin || post.user_id === user?.id) && (
+          <div className="mt-4 pt-4 border-t border-border flex gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => deletePost.mutate()}
+              disabled={deletePost.isPending}
+              className="text-destructive hover:text-destructive text-[.6rem] tracking-wider uppercase font-heading h-7"
+            >
+              <Trash2 size={12} className="mr-1" />
+              Excluir publicação
+            </Button>
+          </div>
+        )}
       </article>
 
       {/* Comments */}
@@ -123,12 +165,23 @@ const PostDetail = ({ postId, onBack }: Props) => {
         <div className="space-y-3 mb-6">
           {comments?.map((c: any) => (
             <div key={c.id} className="border border-border p-4">
-              <div className="text-muted-foreground text-[.7rem] mb-2">
-                {c.profiles?.company_name} ·{" "}
-                {formatDistanceToNow(new Date(c.created_at), {
-                  addSuffix: true,
-                  locale: ptBR,
-                })}
+              <div className="flex items-start justify-between">
+                <div className="text-muted-foreground text-[.7rem] mb-2">
+                  {c.profiles?.company_name} ·{" "}
+                  {formatDistanceToNow(new Date(c.created_at), {
+                    addSuffix: true,
+                    locale: ptBR,
+                  })}
+                </div>
+                {(isAdmin || c.user_id === user?.id) && (
+                  <button
+                    onClick={() => deleteComment.mutate(c.id)}
+                    className="text-destructive/50 hover:text-destructive transition-colors"
+                    title="Excluir comentário"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
               <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
                 {c.content}

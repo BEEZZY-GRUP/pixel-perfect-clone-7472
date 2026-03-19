@@ -12,9 +12,10 @@ type Category = Tables<"categories">;
 interface Props {
   categorySlug: string | null;
   categories: Category[];
+  isAdmin?: boolean;
 }
 
-const PostList = ({ categorySlug, categories }: Props) => {
+const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const categoryId = categorySlug
@@ -44,6 +45,7 @@ const PostList = ({ categorySlug, categories }: Props) => {
       <PostDetail
         postId={selectedPostId}
         onBack={() => setSelectedPostId(null)}
+        isAdmin={isAdmin}
       />
     );
   }
