@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award, Sparkles } from "lucide-react";
 import { getDailyInsight } from "./dailyInsights";
 
 const SidebarWidgets = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data: stats } = useQuery({
@@ -24,7 +26,7 @@ const SidebarWidgets = () => {
   const { data: topMembers } = useQuery({
     queryKey: ["top_3_members"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,
@@ -120,11 +122,15 @@ const SidebarWidgets = () => {
           </div>
           <div className="space-y-2">
             {topMembers.map((member: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-2">
+              <button
+                key={idx}
+                onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
+                className="flex items-center gap-2 w-full text-left hover:bg-secondary/50 rounded-sm p-1 -m-1 transition-colors"
+              >
                 <span className={`text-[.6rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>#{idx + 1}</span>
-                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate">{member.company_name}</p></div>
+                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{member.company_name}</p></div>
                 <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
