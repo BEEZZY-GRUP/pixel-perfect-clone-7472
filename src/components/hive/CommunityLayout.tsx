@@ -304,6 +304,7 @@ const CommunityLayout = () => {
         categories={categories ?? []}
         defaultCategorySlug={activeCategory}
         isAdmin={isAdmin}
+        isModerator={isModerator}
       />
     </div>
   );
