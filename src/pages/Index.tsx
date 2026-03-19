@@ -17,7 +17,7 @@ const Index = () => {
 
   return (
     <>
-      <CustomCursor />
+      
       <Navbar />
       <HeroSection />
       <ProofBar />
