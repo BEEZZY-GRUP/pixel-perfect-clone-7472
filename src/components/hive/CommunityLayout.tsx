@@ -14,15 +14,16 @@ import AdminPanel from "./AdminPanel";
 import AchievementTicker from "./AchievementTicker";
 import VideosPanel from "./VideosPanel";
 import GlossaryPanel from "./GlossaryPanel";
+import NotificationsPanel from "./NotificationsPanel";
 import SidebarWidgets from "./SidebarWidgets";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
 import {
   LogOut, Plus, Menu, X, Trophy, Target, User, Shield,
-  Video, BookOpen, MessageCircle,
+  Video, BookOpen, MessageCircle, Bell,
 } from "lucide-react";
 
-type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin";
+type View = "feed" | "videos" | "glossary" | "ranking" | "missions" | "profile" | "admin" | "notifications";
 
 const VIEW_MAP: Record<string, View> = {
   videos: "videos",
@@ -31,6 +32,7 @@ const VIEW_MAP: Record<string, View> = {
   missions: "missions",
   profile: "profile",
   admin: "admin",
+  notifications: "notifications",
 };
 
 const CommunityLayout = () => {
@@ -74,6 +76,20 @@ const CommunityLayout = () => {
     },
   });
 
+  const { data: unreadCount } = useQuery({
+    queryKey: ["unread_notifications", user?.id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("read", false);
+      return count ?? 0;
+    },
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/the-hive");
@@ -96,8 +112,20 @@ const CommunityLayout = () => {
     }
   };
 
+  const notifIcon = (
+    <span className="relative">
+      <Bell size={14} />
+      {(unreadCount ?? 0) > 0 && (
+        <span className="absolute -top-1.5 -right-1.5 bg-gold text-background text-[.5rem] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+          {unreadCount! > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </span>
+  );
+
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
     { key: "feed", label: "Comunidade", icon: <MessageCircle size={14} /> },
+    { key: "notifications", label: "Notificações", icon: notifIcon },
     { key: "videos", label: "Vídeos", icon: <Video size={14} /> },
     { key: "glossary", label: "Sumário", icon: <BookOpen size={14} /> },
     { key: "ranking", label: "Ranking", icon: <Trophy size={14} /> },
@@ -243,6 +271,7 @@ const CommunityLayout = () => {
                   </>
                 )}
 
+                {activeView === "notifications" && <NotificationsPanel />}
                 {activeView === "videos" && <VideosPanel />}
                 {activeView === "glossary" && <GlossaryPanel />}
                 {activeView === "ranking" && <RankingPanel />}
