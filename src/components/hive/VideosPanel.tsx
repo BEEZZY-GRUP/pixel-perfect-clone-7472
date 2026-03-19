@@ -15,8 +15,8 @@ import VideoTheater from "./VideoTheater";
 
 const VideosPanel = () => {
   const { user } = useAuth();
-  const { canManageVideos, isModerator } = useIsAdmin();
-  const canManageVideos = canManageVideos || isModerator;
+  const { isAdmin, isModerator } = useIsAdmin();
+  const canManageVideos = isAdmin || isModerator;
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
