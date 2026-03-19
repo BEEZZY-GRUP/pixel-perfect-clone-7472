@@ -91,7 +91,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     onSuccess: () => {
       toast.success("Publicação excluída!");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      onBack();
+      navigateRouter("/the-hive/community");
     },
     onError: () => toast.error("Erro ao excluir."),
   });
