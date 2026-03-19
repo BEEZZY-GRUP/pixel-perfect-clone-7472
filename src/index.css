@@ -126,7 +126,7 @@
 body:has(a:hover) #cursor-ring,
 body:has(button:hover) #cursor-ring {
   width: 52px; height: 52px;
-  border-color: hsl(var(--foreground) / 0.7);
+  border-color: hsl(var(--gold) / 0.8);
 }
 
 /* ─── REVEAL — GSAP handles all animation ────────── */
