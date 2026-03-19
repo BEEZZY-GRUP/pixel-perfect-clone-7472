@@ -140,15 +140,15 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3">
         {quickLinks.map((link) => (
           <button
             key={link.label}
             onClick={() => navigate(link.path)}
-            className="border border-border bg-card hover:border-gold/25 transition-all p-4 flex flex-col items-center gap-2 group"
+            className="border border-border bg-card hover:border-gold/25 transition-all p-3 md:p-4 flex flex-col items-center gap-1.5 md:gap-2 group"
           >
             <span className="text-muted-foreground group-hover:text-gold transition-colors">{link.icon}</span>
-            <span className="text-[.6rem] font-heading tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors">
+            <span className="text-[.5rem] md:text-[.6rem] font-heading tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors text-center leading-tight">
               {link.label}
             </span>
           </button>
