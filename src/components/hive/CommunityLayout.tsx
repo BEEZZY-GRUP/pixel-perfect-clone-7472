@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PublicProfileView from "./PublicProfileView";
 import CategorySidebar from "./CategorySidebar";
+import WelcomeHome from "./WelcomeHome";
 import PostList from "./PostList";
 import CreatePostDialog from "./CreatePostDialog";
 import RankingPanel from "./RankingPanel";
@@ -124,8 +125,10 @@ const CommunityLayout = () => {
     </span>
   );
 
+  const isHome = activeView === "feed" && !activeCategory && !isPostDetail;
+
   const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
-    { key: "feed", label: "Comunidade", icon: <MessageCircle size={14} /> },
+    { key: "feed", label: "Início", icon: <MessageCircle size={14} /> },
     { key: "notifications", label: "Notificações", icon: notifIcon },
     { key: "videos", label: "Vídeos", icon: <Video size={14} /> },
     { key: "glossary", label: "Sumário", icon: <BookOpen size={14} /> },
@@ -135,8 +138,8 @@ const CommunityLayout = () => {
     ...(isAdmin ? [{ key: "admin" as View, label: "Admin", icon: <Shield size={14} /> }] : []),
   ];
 
-  const showLeftSidebar = activeView === "feed" && !isPostDetail;
-  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail;
+  const showLeftSidebar = activeView === "feed" && !isPostDetail && !isHome;
+  const showRightSidebar = ["feed", "videos", "glossary"].includes(activeView) && !isPostDetail && !isHome;
 
   return (
     <div className="min-h-screen bg-background" style={{ zoom: 1.25 }}>
@@ -233,18 +236,21 @@ const CommunityLayout = () => {
                   />
                 )}
 
-                {/* Feed view */}
-                {activeView === "feed" && !isPostDetail && (
+                {/* Home welcome view */}
+                {isHome && (
+                  <WelcomeHome onCreatePost={() => setShowCreate(true)} />
+                )}
+
+                {/* Feed view (when category selected) */}
+                {activeView === "feed" && !isPostDetail && activeCategory && (
                   <>
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
-                          {activeCategory
-                            ? (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
-                              (categories?.find((c) => c.slug === activeCategory)?.name ?? "")
-                            : "Todas as publicações"}
+                          {(categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
+                            (categories?.find((c) => c.slug === activeCategory)?.name ?? "")}
                         </h1>
-                        {activeCategory && (() => {
+                        {(() => {
                           const cat = categories?.find((c) => c.slug === activeCategory);
                           return cat?.description ? (
                             <p className="text-muted-foreground text-[.75rem] leading-relaxed mt-1 max-w-lg">
