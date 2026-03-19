@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Shield, ShieldOff, Save, Search } from "lucide-react";
 import { useState } from "react";
 import InvitePanel from "./InvitePanel";
+import CompanyManagement from "./CompanyManagement";
 
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
@@ -96,6 +97,11 @@ const AdminPanel = () => {
       </div>
 
       <InvitePanel />
+
+      <div className="my-6" />
+      <CompanyManagement />
+
+      <div className="my-6" />
 
       {/* Search */}
       <div className="relative mb-4">
