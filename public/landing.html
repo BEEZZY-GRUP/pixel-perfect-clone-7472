@@ -2692,8 +2692,7 @@ function startHero(){
     .to('#heroMetrics',{opacity:1,duration:.85,ease:'power3.out'},'<.1')
     .to('#si',{opacity:1,duration:.5},'<.3');
   [{id:'mv1',end:5},{id:'mv2',end:3}].forEach(({id,end})=>{const el=document.getElementById(id),o={v:0};gsap.to(o,{v:end,duration:1.6,ease:'power2.out',delay:1.0,onUpdate(){el.textContent=Math.round(o.v);}});});
-  function glitch(){const w=document.querySelector('.h1-y');if(!w)return;gsap.to(w,{x:-3,duration:.05,yoyo:true,repeat:5,ease:'none',onComplete(){gsap.set(w,{x:0});}});setTimeout(glitch,5000+Math.random()*4000);}
-  setTimeout(glitch,4000);
+  /* glitch effect removed */
 }
 
 /* ═══ NAV ═══ */
