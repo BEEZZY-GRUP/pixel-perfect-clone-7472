@@ -31,6 +31,8 @@ const App = () => (
           <Route path="/the-hive/community/:view" element={<HiveCommunity />} />
           <Route path="/the-hive/community/post/:postId" element={<HiveCommunity />} />
           <Route path="/the-hive/community/profile/:userId" element={<HiveCommunity />} />
+          <Route path="/adminconsole/login" element={<AdminLogin />} />
+          <Route path="/adminconsole" element={<AdminConsole />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
