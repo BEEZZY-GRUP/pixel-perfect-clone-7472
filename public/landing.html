@@ -1201,7 +1201,7 @@ footer{
 }
 .cli-item{
   flex-shrink:0;
-  width:clamp(100px,14vw,160px);
+  width:clamp(120px,16vw,180px);
   height:clamp(60px,8vw,80px);
   display:flex;align-items:center;justify-content:center;
   background:rgba(232,233,235,.04);
@@ -1216,15 +1216,14 @@ footer{
   transform:translateY(-3px);
 }
 .cli-item img{
-  max-width:100%;max-height:100%;
+  max-width:100%;max-height:48px;
+  width:auto;height:auto;
   object-fit:contain;
-  filter:brightness(0) invert(1);
-  opacity:.55;
-  transition:opacity .3s,filter .3s;
+  opacity:.65;
+  transition:opacity .3s;
 }
 .cli-item:hover img{
-  opacity:.9;
-  filter:brightness(0) invert(1);
+  opacity:.95;
 }
 /* Placeholder for missing logos */
 .cli-placeholder{
