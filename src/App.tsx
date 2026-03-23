@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import HomePage from "./pages/HomePage.tsx";
+
 import NotFound from "./pages/NotFound.tsx";
 import HiveLogin from "./pages/HiveLogin.tsx";
 import HiveCommunity from "./pages/HiveCommunity.tsx";
@@ -21,7 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* Route "/" available for new page */}
           <Route path="/old-version" element={<Index />} />
           <Route path="/the-hive" element={<HiveLogin />} />
           <Route path="/the-hive/setup-password" element={<SetupPassword />} />
