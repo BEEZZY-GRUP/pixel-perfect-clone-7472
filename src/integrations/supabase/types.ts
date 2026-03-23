@@ -201,39 +201,63 @@ export type Database = {
       }
       leads: {
         Row: {
+          archived: boolean
+          archived_at: string | null
+          challenge: string | null
           cnpj: string
           company: string
           created_at: string
           email: string
           id: string
+          last_contact_at: string | null
           message: string | null
           name: string
+          notes: string | null
           phone: string | null
+          priority: string | null
+          source: string | null
           status: string
+          tags: string[] | null
           updated_at: string
         }
         Insert: {
+          archived?: boolean
+          archived_at?: string | null
+          challenge?: string | null
           cnpj: string
           company: string
           created_at?: string
           email: string
           id?: string
+          last_contact_at?: string | null
           message?: string | null
           name: string
+          notes?: string | null
           phone?: string | null
+          priority?: string | null
+          source?: string | null
           status?: string
+          tags?: string[] | null
           updated_at?: string
         }
         Update: {
+          archived?: boolean
+          archived_at?: string | null
+          challenge?: string | null
           cnpj?: string
           company?: string
           created_at?: string
           email?: string
           id?: string
+          last_contact_at?: string | null
           message?: string | null
           name?: string
+          notes?: string | null
           phone?: string | null
+          priority?: string | null
+          source?: string | null
           status?: string
+          tags?: string[] | null
           updated_at?: string
         }
         Relationships: []
