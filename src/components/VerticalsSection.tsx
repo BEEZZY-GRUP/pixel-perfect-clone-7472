@@ -11,12 +11,6 @@ const verticals = [
     tag: "Tecnologia",
     desc: "Marketing + Tecnologia integrados. As empresas precisam de resultado através de tecnologia — ela deve servir como facilitadora do processo, reduzindo tempo e aumentando o lucro real.",
   },
-  {
-    index: "03",
-    name: <><em className="text-gold-light italic">The Hive</em> — O ecossistema</>,
-    tag: "Comunidade",
-    desc: "Um ecossistema de pessoas criativas, inovadoras e empreendedoras. O próximo cliente Beezzy pode precisar de você — ou você dele.",
-  },
 ];
 
 const ArrowIcon = () => (
