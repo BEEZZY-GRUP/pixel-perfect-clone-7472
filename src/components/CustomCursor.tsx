@@ -43,8 +43,8 @@ const CustomCursor = () => {
 
   return (
     <>
-      <div id="cursor-dot" ref={dotRef} />
-      <div id="cursor-ring" ref={ringRef} />
+      <div id="cursor-dot" ref={dotRef} style={{ opacity: 0 }} />
+      <div id="cursor-ring" ref={ringRef} style={{ opacity: 0 }} />
     </>
   );
 };
