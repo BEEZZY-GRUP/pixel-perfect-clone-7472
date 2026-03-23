@@ -21,7 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* Route "/" available for new page */}
           <Route path="/old-version" element={<Index />} />
           <Route path="/the-hive" element={<HiveLogin />} />
           <Route path="/the-hive/setup-password" element={<SetupPassword />} />
