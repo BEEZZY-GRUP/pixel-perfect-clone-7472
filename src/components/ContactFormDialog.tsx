@@ -8,11 +8,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório").max(100),
   email: z.string().trim().email("E-mail inválido").max(255),
   company: z.string().trim().min(1, "Empresa é obrigatória").max(100),
+  cnpj: z.string().trim().min(1, "CNPJ é obrigatório").max(20),
   phone: z.string().trim().max(20).optional(),
   message: z.string().trim().max(1000).optional(),
 });
@@ -29,6 +31,7 @@ const ContactFormDialog = ({ open, onOpenChange }: Props) => {
     name: "",
     email: "",
     company: "",
+    cnpj: "",
     phone: "",
     message: "",
   });
@@ -40,7 +43,7 @@ const ContactFormDialog = ({ open, onOpenChange }: Props) => {
     if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = contactSchema.safeParse(form);
     if (!result.success) {
@@ -53,15 +56,26 @@ const ContactFormDialog = ({ open, onOpenChange }: Props) => {
       return;
     }
     setSubmitting(true);
-    // Simulate submission
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const { error } = await supabase.from("leads").insert({
+        name: result.data.name,
+        email: result.data.email,
+        company: result.data.company,
+        cnpj: result.data.cnpj,
+        phone: result.data.phone || null,
+        message: result.data.message || null,
+      });
+      if (error) throw error;
       onOpenChange(false);
-      setForm({ name: "", email: "", company: "", phone: "", message: "" });
+      setForm({ name: "", email: "", company: "", cnpj: "", phone: "", message: "" });
       toast.success("Mensagem enviada!", {
         description: "Entraremos em contato em até 24 horas.",
       });
-    }, 1200);
+    } catch {
+      toast.error("Erro ao enviar. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass =
@@ -115,6 +129,18 @@ const ContactFormDialog = ({ open, onOpenChange }: Props) => {
               maxLength={100}
             />
             {errors.company && <p className={errorClass}>{errors.company}</p>}
+          </div>
+
+          <div>
+            <input
+              type="text"
+              placeholder="CNPJ *"
+              value={form.cnpj}
+              onChange={(e) => update("cnpj", e.target.value)}
+              className={inputClass}
+              maxLength={20}
+            />
+            {errors.cnpj && <p className={errorClass}>{errors.cnpj}</p>}
           </div>
 
           <div>
