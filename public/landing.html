@@ -3268,16 +3268,22 @@ window.closePopup=function(){
         </div>
         <div class="cb-field">
           <label>E-mail</label>
-          <input type="email" placeholder="joao@empresa.com.br" required>
+          <input type="email" id="cf-email" placeholder="joao@empresa.com.br" required>
         </div>
         <div class="cb-row">
           <div class="cb-field">
             <label>Nome da empresa</label>
-            <input type="text" placeholder="Minha Empresa">
+            <input type="text" id="cf-company" placeholder="Minha Empresa" required>
           </div>
           <div class="cb-field">
+            <label>CNPJ *</label>
+            <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" required maxlength="20">
+          </div>
+        </div>
+        <div class="cb-row">
+          <div class="cb-field">
             <label>Qual o seu desafio?</label>
-            <select required>
+            <select id="cf-challenge" required>
               <option value="" disabled selected>Selecione</option>
               <option>Crescer o faturamento</option>
               <option>Organizar processos</option>
