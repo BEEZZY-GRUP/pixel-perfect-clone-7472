@@ -11,12 +11,6 @@ const verticals = [
     tag: "Tecnologia",
     desc: "Marketing + Tecnologia integrados. As empresas precisam de resultado através de tecnologia — ela deve servir como facilitadora do processo, reduzindo tempo e aumentando o lucro real.",
   },
-  {
-    index: "03",
-    name: <><em className="text-gold-light italic">The Hive</em> — O ecossistema</>,
-    tag: "Comunidade",
-    desc: "Um ecossistema de pessoas criativas, inovadoras e empreendedoras. O próximo cliente Beezzy pode precisar de você — ou você dele.",
-  },
 ];
 
 const ArrowIcon = () => (
@@ -37,7 +31,7 @@ const VerticalsSection = () => (
         </h2>
       </div>
       <p className="reveal reveal-delay-1 text-[.875rem] leading-[1.85] text-muted-foreground max-w-[360px]">
-        Três frentes complementares que cobrem toda a jornada do empresário — da estratégia à tecnologia, do negócio à comunidade.
+        Duas frentes complementares que cobrem a jornada do empresário — da estratégia à tecnologia.
       </p>
     </div>
 
