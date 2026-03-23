@@ -45,7 +45,7 @@ export default function AddLeadModal({ open, onClose }: Props) {
     onClose();
   };
 
-  const inputClass = "w-full bg-transparent border border-border px-3 py-2.5 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors";
+  const inputClass = "w-full bg-card border border-border px-3 py-2.5 text-sm font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors";
   const labelClass = "font-mono text-[10px] tracking-[0.15em] text-muted-foreground mb-1.5 block";
 
   if (!open) return null;
