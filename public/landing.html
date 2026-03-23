@@ -1184,20 +1184,13 @@ footer{
 .cli-title em{color:#FFD600;font-style:normal}
 /* Infinite scroll track */
 .cli-track-wrap{
-  overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,black 8%,black 92%,transparent 100%);
-  mask-image:linear-gradient(90deg,transparent 0%,black 8%,black 92%,transparent 100%);
+  overflow:visible;
 }
 .cli-track{
   display:flex;
   gap:2.5rem;
-  width:max-content;
-  animation:cliScroll 28s linear infinite;
-}
-.cli-track:hover{animation-play-state:paused}
-@keyframes cliScroll{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
+  justify-content:center;
+  flex-wrap:wrap;
 }
 .cli-item{
   flex-shrink:0;
