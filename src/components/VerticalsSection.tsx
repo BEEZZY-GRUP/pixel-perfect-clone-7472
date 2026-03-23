@@ -31,7 +31,7 @@ const VerticalsSection = () => (
         </h2>
       </div>
       <p className="reveal reveal-delay-1 text-[.875rem] leading-[1.85] text-muted-foreground max-w-[360px]">
-        Três frentes complementares que cobrem toda a jornada do empresário — da estratégia à tecnologia, do negócio à comunidade.
+        Duas frentes complementares que cobrem a jornada do empresário — da estratégia à tecnologia.
       </p>
     </div>
 
