@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound.tsx";
 import HiveLogin from "./pages/HiveLogin.tsx";
 import HiveCommunity from "./pages/HiveCommunity.tsx";
 import SetupPassword from "./pages/SetupPassword.tsx";
+import AdminLogin from "./pages/AdminLogin.tsx";
+import AdminConsole from "./pages/AdminConsole.tsx";
 import CustomCursor from "./components/CustomCursor.tsx";
 
 const queryClient = new QueryClient();
