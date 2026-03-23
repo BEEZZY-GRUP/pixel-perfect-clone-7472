@@ -6,7 +6,17 @@ const CustomCursor = () => {
 
   useEffect(() => {
     let mx = 0, my = 0, rx = 0, ry = 0;
-    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
+    let hasMoved = false;
+
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX; my = e.clientY;
+      if (!hasMoved) {
+        hasMoved = true;
+        rx = mx; ry = my;
+        if (dotRef.current) dotRef.current.style.opacity = "1";
+        if (ringRef.current) ringRef.current.style.opacity = "1";
+      }
+    };
     document.addEventListener("mousemove", onMove);
 
     let raf: number;
