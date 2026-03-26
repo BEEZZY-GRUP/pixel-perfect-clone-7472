@@ -2891,11 +2891,13 @@ ScrollTrigger.create({
   }
 });
 
-/* Contar números */
+/* Contar números — start at 70% of target */
 function animNum(id,end,suffix){
   const el=document.getElementById(id);
   if(!el)return;
-  const o={v:0};
+  const startVal=Math.floor(end*0.7);
+  const o={v:startVal};
+  el.innerHTML=startVal+'<span>'+suffix+'</span>';
   ScrollTrigger.create({trigger:el,start:'top 85%',once:true,
     onEnter(){
       gsap.to(o,{v:end,duration:1.8,ease:'power2.out',
