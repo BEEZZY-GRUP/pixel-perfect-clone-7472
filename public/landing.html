@@ -1091,10 +1091,10 @@ ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('na
 
 /* ═══ SCROLL ANIMATIONS ═══ */
 /* Solutions */
-ScrollTrigger.create({trigger:'#solutions',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
   onEnter(){
-    gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3});
+    gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out',clearProps:'all'});
+    gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
   }
 });
 
