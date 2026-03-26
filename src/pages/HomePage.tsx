@@ -11,6 +11,8 @@ const HomePage = () => {
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
       document.body.style.margin = "";
+      document.documentElement.style.scrollbarWidth = "";
+      document.body.style.scrollbarWidth = "";
     };
   }, []);
 
