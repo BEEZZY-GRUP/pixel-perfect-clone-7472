@@ -121,8 +121,8 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   background-image:url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iQ2FtYWRhXzIiIGRhdGEtbmFtZT0iQ2FtYWRhIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCAzODY0IDIxNzMuNSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiB1cmwoI05vdm9fcGFkcsOjbyk7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogIzA2MDYwNDsKICAgICAgfQogICAgPC9zdHlsZT4KICAgIDxwYXR0ZXJuIGlkPSJOb3ZvX3BhZHLDo28iIGRhdGEtbmFtZT0iTm92byBwYWRyw6NvIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIgcGF0dGVyblRyYW5zZm9ybT0idHJhbnNsYXRlKDIwMjAuNDMgNjY2MS43MSkiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHZpZXdCb3g9IjAgMCAyNjYuMjggMjQxLjE0Ij4KICAgICAgPGc+CiAgICAgICAgPHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIvPgogICAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTI2Ni4yOCwyNjcuNXYzMy45Mkgwdi0zMy45MmguNzZsNzQuMjQtODYuNTRINi4xNnYtLjExSDB2LTMzLjkyaDI2Ni4yOHYzMy45MmgtLjQ5bC03NC4yNCw4Ni42NWg3NC43M1pNMTI0LjI2LDI2Ny41aDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDE0Ni45M3YzMy45Mkgwdi0zMy45MmguNzZMNzQuOTksNjAuMzlINi4xNnYtLjExSDBWMjYuMzdoMjY2LjI4djMzLjkyaC0uNDlsLTc0LjI0LDg2LjY1aDc0LjczWk0xMjQuMjYsMTQ2LjkzaDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDI2LjM3djMzLjkySDBWMjYuMzdoLjc2TDc0Ljk5LTYwLjE4SDYuMTZ2LS4xMUgwdi0zMy45MmgyNjYuMjh2MzMuOTJoLS40OUwxOTEuNTUsMjYuMzdoNzQuNzNaTTEyNC4yNiwyNi4zN2gxOS4wMWw3NC4yNC04Ni41NGgtNjguODR2LS4xMWgtMjUuMzhMNDkuMDQsMjYuMzdoNzUuMjJaIi8+CiAgICAgIDwvZz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPGcgaWQ9IkNhbWFkYV8xLTIiIGRhdGEtbmFtZT0iQ2FtYWRhIDEiPgogICAgPHJlY3QgY2xhc3M9ImNscy0yIiB5PSIwIiB3aWR0aD0iMzg2NCIgaGVpZ2h0PSIyMTczLjUiLz4KICA8L2c+Cjwvc3ZnPg==');
   background-size:200px;opacity:.06;pointer-events:none;z-index:0;
 }
-.hero-main{position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.hero-content{display:flex;flex-direction:column;gap:2rem}
+.hero-main{position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;align-items:flex-start}
+.hero-content{display:flex;flex-direction:column;gap:1.8rem}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:.8rem;
   padding:.4rem 1rem;border-radius:30px;
@@ -134,17 +134,44 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 .hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#FFD600;box-shadow:0 0 8px rgba(255,214,0,.6)}
 .hero-h1{
   font-family:'Montserrat',sans-serif;
-  font-size:clamp(2.8rem,5.5vw,5rem);
-  font-weight:900;line-height:1.1;letter-spacing:-.03em;
+  font-size:clamp(3.5rem,7vw,7rem);
+  font-weight:900;line-height:1.08;letter-spacing:-.03em;
 }
 .h1-line{display:block;overflow:hidden;padding-bottom:.08em}
 .h1-word{display:inline-block;transform:translateY(115%);will-change:transform}
 .h1-y{color:#FFD600}
 .h1-stroke{-webkit-text-stroke:1.5px rgba(232,233,235,.5);color:transparent}
 .hero-desc{
-  font-size:1.05rem;line-height:1.85;color:rgba(232,233,235,.7);
-  max-width:440px;font-weight:400;
+  font-size:.88rem;line-height:1.75;color:rgba(232,233,235,.65);
+  max-width:400px;font-weight:400;
 }
+/* ═══ STATS BAR ═══ */
+#stats-bar{
+  background:#0a0a08;border-bottom:1px solid rgba(232,233,235,.06);
+  padding:2.5rem clamp(1.5rem,5vw,5rem);position:relative;z-index:2;
+}
+.stats-bar-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;
+}
+.stats-bar-item{
+  display:flex;align-items:center;gap:1rem;
+  padding:1.2rem 1.5rem;
+  background:rgba(255,214,0,.04);border:1px solid rgba(255,214,0,.08);
+  border-radius:var(--radius);transition:all .35s;
+}
+.stats-bar-item:hover{background:rgba(255,214,0,.08);border-color:rgba(255,214,0,.18)}
+.stats-bar-val{font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:#FFD600;line-height:1}
+.stats-bar-val span{font-size:.55em}
+.stats-bar-lbl{font-size:.72rem;color:rgba(232,233,235,.5);line-height:1.4;font-weight:500}
+.stats-bar-badge{
+  grid-column:1/-1;text-align:center;
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:.65rem;
+  letter-spacing:.15em;text-transform:uppercase;color:rgba(255,214,0,.5);
+  padding-top:.5rem;
+}
+@media(max-width:899px){.stats-bar-inner{grid-template-columns:1fr 1fr}}
+@media(max-width:479px){.stats-bar-inner{grid-template-columns:1fr}}
 .hero-cta-wrap{display:flex;gap:1rem;flex-wrap:wrap}
 .hero-visual{position:relative;display:flex;align-items:center;justify-content:center}
 .hero-visual-card{
@@ -512,8 +539,7 @@ footer{
   font-family:'Montserrat',sans-serif;font-size:.63rem;font-weight:500;letter-spacing:.1em;color:rgba(232,233,235,.16);
 }
 @media(max-width:899px){
-  .hero-main{grid-template-columns:1fr}
-  .hero-visual{display:none}
+  .hero-main{display:flex;flex-direction:column}
   .ft-grid{grid-template-columns:1fr;gap:2.5rem}
   .ft-bottom{flex-direction:column;gap:.5rem;align-items:center;text-align:center}
   .nav-menu{display:none}.nav-btn{display:none}
@@ -690,32 +716,43 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
       </h1>
 
       <p class="hero-desc" id="heroDesc" style="opacity:0">
-        Num mundo cheio de metodologias óbvias, a Beezzy enxerga o que outros não conseguem ver — e transforma isso em resultado real, cultura sólida e legado duradouro.
+        A Beezzy enxerga o que outros não conseguem ver — e transforma isso em resultado real e legado duradouro.
       </p>
 
       <div class="hero-cta-wrap" id="heroCta" style="opacity:0">
         <button type="button" class="btn-primary" onclick="openContact()" style="cursor:none"><span>Falar com a Beezzy</span><span>→</span></button>
-        <a href="#solutions" class="btn-outline" style="cursor:none"><span>O que fazemos</span></a>
       </div>
     </div>
 
-    <div class="hero-visual" id="heroVisual" style="opacity:0">
-      <div class="hero-visual-card">
-        <div class="hvc-stats">
-          <div class="hvc-stat"><div class="hvc-stat-val" id="mv1">5</div><div class="hvc-stat-lbl">Pilares<br>Metodológicos</div></div>
-          <div class="hvc-stat"><div class="hvc-stat-val" id="mv2">2</div><div class="hvc-stat-lbl">Verticais<br>de Negócio</div></div>
-          <div class="hvc-divider"></div>
-          <div class="hvc-stat"><div class="hvc-stat-val">∞</div><div class="hvc-stat-lbl">Potencial<br>de Legado</div></div>
-          <div class="hvc-stat"><div class="hvc-stat-val">47<span style="font-size:.6em;color:#FFD600">+</span></div><div class="hvc-stat-lbl">Empresas<br>Transformadas</div></div>
-          <div class="hvc-badge">Para empresas com ambição de crescer com método</div>
-        </div>
-      </div>
     </div>
   </div>
 
   <div class="si" id="si">
     <svg class="si-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 7l5 5 5-5" stroke="rgba(255,214,0,.5)" stroke-width="1.5" stroke-linecap="round"/></svg>
     <span class="si-text">Role para descobrir</span>
+  </div>
+</section>
+
+<!-- ═══ STATS BAR ═══ -->
+<section id="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stats-bar-item">
+      <div class="stats-bar-val">5</div>
+      <div class="stats-bar-lbl">Pilares<br>Metodológicos</div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="stats-bar-val">2</div>
+      <div class="stats-bar-lbl">Verticais<br>de Negócio</div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="stats-bar-val">∞</div>
+      <div class="stats-bar-lbl">Potencial<br>de Legado</div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="stats-bar-val">47<span>+</span></div>
+      <div class="stats-bar-lbl">Empresas<br>Transformadas</div>
+    </div>
+    <div class="stats-bar-badge">Para empresas com ambição de crescer com método</div>
   </div>
 </section>
 
@@ -1044,8 +1081,9 @@ function startHero(){
     .to('#heroEyebrow',{opacity:1,duration:.5},'<.3')
     .to('#heroDesc',{opacity:1,duration:.85,ease:'power3.out'},'<.3')
     .to('#heroCta',{opacity:1,duration:.85,ease:'power3.out'},'<.2')
-    .to('#heroVisual',{opacity:1,duration:1,ease:'power3.out'},'<.3')
-    .to('#si',{opacity:1,duration:.5},'<.3');
+    .to('#si',{opacity:1,duration:.5},'<.3')
+    .from('.stats-bar-item',{opacity:0,y:20,stagger:.08,duration:.6,ease:'power3.out'},'<.4')
+    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.3');
 }
 
 /* ═══ NAV SCROLL ═══ */
@@ -1053,10 +1091,10 @@ ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('na
 
 /* ═══ SCROLL ANIMATIONS ═══ */
 /* Solutions */
-ScrollTrigger.create({trigger:'#solutions',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
   onEnter(){
-    gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3});
+    gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out',clearProps:'all'});
+    gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
   }
 });
 
