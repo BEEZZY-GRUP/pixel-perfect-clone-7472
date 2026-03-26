@@ -1171,22 +1171,6 @@ if(curDot&&curRing){
     el.addEventListener('mouseleave',()=>{gsap.to(curDot,{scale:1,duration:.25});gsap.to(curRing,{scale:1,borderColor:'rgba(255,214,0,.45)',duration:.35})});
   });
 
-  /* Cursor color inversion on yellow backgrounds */
-  const yellowSections=document.querySelectorAll('#nav,.stats-bar,[style*="background:#FFD600"],[style*="background: #FFD600"]');
-  document.addEventListener('mousemove',e=>{
-    let onYellow=false;
-    yellowSections.forEach(sec=>{
-      const r=sec.getBoundingClientRect();
-      if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom) onYellow=true;
-    });
-    if(onYellow){
-      curDot.style.background='#060604';
-      curRing.style.borderColor='rgba(6,6,4,.45)';
-    }else{
-      curDot.style.background='#FFD600';
-      curRing.style.borderColor='rgba(255,214,0,.45)';
-    }
-  });
 }
 
 /* ═══ LOADER ═══ */
