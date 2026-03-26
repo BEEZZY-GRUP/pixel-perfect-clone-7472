@@ -3133,6 +3133,11 @@ function pmfSetPilar(idx){
   }
   if(prog) prog.style.width=((idx+1)/5*100)+'%';
   document.querySelectorAll('.pmf-nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  /* Update prev/next buttons */
+  var prevBtn=document.getElementById('pmfPrevBtn');
+  var nextBtn=document.getElementById('pmfNextBtn');
+  if(prevBtn) prevBtn.style.opacity=idx===0?'.3':'1';
+  if(nextBtn) nextBtn.innerHTML=idx===4?'Falar com a Beezzy →':'Próximo →';
 }
 
 function pmfInitCanvas(){
