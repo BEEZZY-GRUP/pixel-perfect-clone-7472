@@ -444,13 +444,19 @@ body{
   border-radius:var(--radius-lg);padding:3rem 2.5rem;
   position:relative;overflow:hidden;transition:all .4s;
 }
-.vert-card:hover{background:#161614;border-color:rgba(255,214,0,.2);transform:translateY(-4px)}
+.vert-card:hover{background:#161614;border-color:rgba(255,214,0,.35);transform:translateY(-4px);box-shadow:0 0 30px rgba(255,214,0,.08)}
 .vert-card::before{
-  content:'';position:absolute;top:0;left:0;width:0;height:3px;
+  content:'';position:absolute;top:0;left:0;width:0;height:4px;
   background:#FFD600;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
   transition:width .55s cubic-bezier(.77,0,.175,1);
 }
 .vert-card:hover::before{width:100%}
+.vert-card::after{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  border:2px solid transparent;pointer-events:none;
+  transition:border-color .4s;
+}
+.vert-card:hover::after{border-color:rgba(255,214,0,.3)}
 .vert-card-badge{
   display:inline-flex;align-items:center;gap:.6rem;
   padding:.35rem .9rem;border-radius:20px;
