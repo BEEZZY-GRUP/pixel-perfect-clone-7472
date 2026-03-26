@@ -10,15 +10,12 @@
 <style>
 /* ═══ RESET & BASE ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
-html::-webkit-scrollbar{display:none;width:0;height:0}
+html{overflow-x:hidden}
 body{
   background:#060604;color:#E8E9EB;
   font-family:'DM Sans',sans-serif;font-weight:400;
   overflow-x:hidden;cursor:none;
-  scrollbar-width:none;-ms-overflow-style:none;
 }
-body::-webkit-scrollbar{display:none;width:0;height:0}
 @media(pointer:coarse){body{cursor:auto!important}#cur-dot,#cur-ring{display:none!important}}
 
 /* ═══ VARIABLES ═══ */
@@ -121,7 +118,10 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   background-image:url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iQ2FtYWRhXzIiIGRhdGEtbmFtZT0iQ2FtYWRhIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCAzODY0IDIxNzMuNSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiB1cmwoI05vdm9fcGFkcsOjbyk7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogIzA2MDYwNDsKICAgICAgfQogICAgPC9zdHlsZT4KICAgIDxwYXR0ZXJuIGlkPSJOb3ZvX3BhZHLDo28iIGRhdGEtbmFtZT0iTm92byBwYWRyw6NvIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIgcGF0dGVyblRyYW5zZm9ybT0idHJhbnNsYXRlKDIwMjAuNDMgNjY2MS43MSkiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHZpZXdCb3g9IjAgMCAyNjYuMjggMjQxLjE0Ij4KICAgICAgPGc+CiAgICAgICAgPHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIvPgogICAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTI2Ni4yOCwyNjcuNXYzMy45Mkgwdi0zMy45MmguNzZsNzQuMjQtODYuNTRINi4xNnYtLjExSDB2LTMzLjkyaDI2Ni4yOHYzMy45MmgtLjQ5bC03NC4yNCw4Ni42NWg3NC43M1pNMTI0LjI2LDI2Ny41aDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDE0Ni45M3YzMy45Mkgwdi0zMy45MmguNzZMNzQuOTksNjAuMzlINi4xNnYtLjExSDBWMjYuMzdoMjY2LjI4djMzLjkyaC0uNDlsLTc0LjI0LDg2LjY1aDc0LjczWk0xMjQuMjYsMTQ2LjkzaDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDI2LjM3djMzLjkySDBWMjYuMzdoLjc2TDc0Ljk5LTYwLjE4SDYuMTZ2LS4xMUgwdi0zMy45MmgyNjYuMjh2MzMuOTJoLS40OUwxOTEuNTUsMjYuMzdoNzQuNzNaTTEyNC4yNiwyNi4zN2gxOS4wMWw3NC4yNC04Ni41NGgtNjguODR2LS4xMWgtMjUuMzhMNDkuMDQsMjYuMzdoNzUuMjJaIi8+CiAgICAgIDwvZz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPGcgaWQ9IkNhbWFkYV8xLTIiIGRhdGEtbmFtZT0iQ2FtYWRhIDEiPgogICAgPHJlY3QgY2xhc3M9ImNscy0yIiB5PSIwIiB3aWR0aD0iMzg2NCIgaGVpZ2h0PSIyMTczLjUiLz4KICA8L2c+Cjwvc3ZnPg==');
   background-size:200px;opacity:.06;pointer-events:none;z-index:0;
 }
-.hero-main{position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:2rem;align-items:flex-start}
+.hero-main{
+  position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;
+}
 .hero-content{display:flex;flex-direction:column;gap:1.8rem}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:.8rem;
@@ -145,6 +145,59 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   font-size:.88rem;line-height:1.75;color:rgba(232,233,235,.65);
   max-width:400px;font-weight:400;
 }
+.hero-cta-wrap{display:flex;gap:1rem;flex-wrap:wrap}
+
+/* ═══ HERO VISUAL — Astronaut + Planets ═══ */
+.hero-visual{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  height:100%;min-height:400px;
+}
+.hero-astronaut{
+  position:relative;z-index:2;
+  max-width:420px;width:100%;
+  filter:drop-shadow(0 0 60px rgba(255,214,0,.15));
+  transition:transform .3s;
+}
+.hero-astronaut img{width:100%;height:auto;display:block}
+/* Planets */
+.hero-planet{
+  position:absolute;border-radius:50%;z-index:1;
+  will-change:transform;
+}
+.hero-planet-1{
+  width:120px;height:120px;top:5%;right:-10%;
+  background:radial-gradient(circle at 35% 35%, #FFD600 0%, #b89a00 60%, #3a3000 100%);
+  box-shadow:0 0 40px rgba(255,214,0,.2), inset -10px -10px 30px rgba(0,0,0,.4);
+}
+.hero-planet-2{
+  width:60px;height:60px;bottom:20%;right:5%;
+  background:radial-gradient(circle at 35% 35%, #8a8a8a 0%, #4a4a4a 60%, #1a1a1a 100%);
+  box-shadow:0 0 20px rgba(255,255,255,.05), inset -5px -5px 15px rgba(0,0,0,.5);
+}
+.hero-planet-3{
+  width:35px;height:35px;top:30%;right:-20%;
+  background:radial-gradient(circle at 35% 35%, #ffa726 0%, #8a5000 60%, #2a1800 100%);
+  box-shadow:0 0 15px rgba(255,167,38,.15), inset -3px -3px 10px rgba(0,0,0,.4);
+}
+.hero-planet-ring{
+  width:160px;height:160px;top:60%;left:-5%;z-index:0;
+  background:transparent;border-radius:50%;
+  border:2px solid rgba(255,214,0,.08);
+  box-shadow:0 0 30px rgba(255,214,0,.03);
+}
+/* Stars */
+.hero-star{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:#FFD600;z-index:0;
+  animation:starTwinkle 2s ease-in-out infinite;
+}
+.hero-star:nth-child(1){top:10%;right:15%;animation-delay:0s;opacity:.3}
+.hero-star:nth-child(2){top:50%;right:-5%;animation-delay:.6s;opacity:.2}
+.hero-star:nth-child(3){bottom:15%;right:20%;animation-delay:1.2s;opacity:.4}
+.hero-star:nth-child(4){top:25%;right:40%;animation-delay:.3s;opacity:.15;width:2px;height:2px}
+.hero-star:nth-child(5){bottom:35%;left:10%;animation-delay:.9s;opacity:.25;width:2px;height:2px}
+@keyframes starTwinkle{0%,100%{opacity:.1;transform:scale(.8)}50%{opacity:.5;transform:scale(1.2)}}
+
 /* ═══ STATS BAR ═══ */
 #stats-bar{
   background:#0a0a08;border-bottom:1px solid rgba(232,233,235,.06);
@@ -170,33 +223,12 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   letter-spacing:.15em;text-transform:uppercase;color:rgba(255,214,0,.5);
   padding-top:.5rem;
 }
-@media(max-width:899px){.stats-bar-inner{grid-template-columns:1fr 1fr}}
+@media(max-width:899px){
+  .hero-main{grid-template-columns:1fr!important}
+  .hero-visual{display:none}
+  .stats-bar-inner{grid-template-columns:1fr 1fr}
+}
 @media(max-width:479px){.stats-bar-inner{grid-template-columns:1fr}}
-.hero-cta-wrap{display:flex;gap:1rem;flex-wrap:wrap}
-.hero-visual{position:relative;display:flex;align-items:center;justify-content:center}
-.hero-visual-card{
-  background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.15);
-  border-radius:var(--radius-lg);padding:2.5rem;
-  backdrop-filter:blur(20px);position:relative;overflow:hidden;
-  width:100%;max-width:420px;
-}
-.hero-visual-card::before{
-  content:'';position:absolute;top:-50%;right:-50%;
-  width:200%;height:200%;
-  background:radial-gradient(circle at 30% 30%,rgba(255,214,0,.08) 0%,transparent 50%);
-  pointer-events:none;
-}
-.hvc-stats{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.hvc-stat{text-align:center;padding:1.2rem;background:rgba(6,6,4,.4);border-radius:var(--radius);border:1px solid rgba(255,214,0,.08)}
-.hvc-stat-val{font-family:'Montserrat',sans-serif;font-size:2.2rem;font-weight:900;color:#FFD600;line-height:1}
-.hvc-stat-lbl{font-size:.72rem;color:rgba(232,233,235,.5);margin-top:.4rem;letter-spacing:.05em;font-weight:500}
-.hvc-divider{grid-column:1/-1;height:1px;background:rgba(255,214,0,.1)}
-.hvc-badge{
-  grid-column:1/-1;text-align:center;
-  font-family:'Montserrat',sans-serif;font-weight:700;font-size:.75rem;
-  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,214,0,.6);
-  padding-top:.5rem;
-}
 
 .si{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;opacity:0;z-index:1}
 .si-arrow{animation:scrollBounce 1.8s ease infinite}
@@ -220,7 +252,7 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 /* ═══ SOLUTIONS — replaces manifesto ═══ */
 #solutions{
   background:#FFD600;color:#060604;
-  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  padding:clamp(4rem,8vw,6rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
 #solutions::before{
@@ -259,8 +291,8 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* ═══ NÚMEROS ═══ */
 #numeros{
-  background:#0a0a08;color:#E8E9EB;
-  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  background:#060604;color:#E8E9EB;
+  padding:clamp(4rem,8vw,6rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
 .nums-header{max-width:1200px;margin:0 auto 3.5rem}
@@ -276,19 +308,45 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   max-width:1200px;margin:0 auto;
   display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;
 }
+/* ═══ CARD STYLE — Yellow outline gradient ═══ */
 .num-card{
-  background:#111110;border:1px solid rgba(232,233,235,.08);
-  border-radius:var(--radius-lg);padding:2.5rem 2rem;
+  background:#060604;
+  border:2px solid transparent;
+  border-image:linear-gradient(135deg, #FFD600 0%, rgba(255,214,0,.3) 50%, rgba(255,214,0,.6) 100%) 1;
+  border-radius:0;/* border-image doesn't support border-radius, use outline trick */
+  padding:2.5rem 2rem;
   position:relative;overflow:hidden;transition:all .4s;text-align:center;
 }
-.num-card:hover{background:#161614;border-color:rgba(255,214,0,.2);transform:translateY(-4px)}
+/* Use a pseudo-element for the gradient border + rounded corners */
+.num-card{
+  border:none;border-radius:var(--radius-lg);
+  background:#060604;position:relative;
+}
+.num-card::before{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  padding:2px;
+  background:linear-gradient(135deg, #FFD600 0%, rgba(255,214,0,.25) 50%, #FFD600 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;transition:all .4s;
+}
+.num-card::after{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  background:radial-gradient(ellipse at 50% 0%, rgba(255,214,0,.06) 0%, transparent 60%);
+  pointer-events:none;
+}
+.num-card:hover{transform:translateY(-4px)}
+.num-card:hover::before{
+  background:linear-gradient(135deg, #FFD600 0%, rgba(255,214,0,.5) 50%, #FFD600 100%);
+}
 .nc-val{
   font-family:'Montserrat',sans-serif;font-size:clamp(2.8rem,5vw,4rem);
   font-weight:900;letter-spacing:-.04em;color:#E8E9EB;line-height:1;transition:color .4s;
+  position:relative;z-index:1;
 }
 .nc-val span{color:#FFD600;font-size:.6em}
 .num-card:hover .nc-val{color:#FFD600}
-.nc-label{font-size:.88rem;line-height:1.7;color:rgba(232,233,235,.6);margin-top:1rem;font-weight:400;transition:color .4s}
+.nc-label{font-size:.88rem;line-height:1.7;color:rgba(232,233,235,.6);margin-top:1rem;font-weight:400;transition:color .4s;position:relative;z-index:1}
 .num-card:hover .nc-label{color:rgba(232,233,235,.8)}
 @media(max-width:899px){.nums-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:479px){.nums-grid{grid-template-columns:1fr}}
@@ -296,7 +354,7 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 /* ═══ METHODOLOGY TIMELINE ═══ */
 #metodologia{
   background:#060604;
-  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  padding:clamp(4rem,8vw,6rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
 .met-header{max-width:1200px;margin:0 auto 4rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
@@ -330,16 +388,34 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   transition:all .4s;
 }
 .met-card:hover .met-card-dot{background:#FFD600;color:#060604;border-color:#FFD600;transform:scale(1.1)}
+/* Met card body — gradient border like num-card */
 .met-card-body{
-  background:#111110;border:1px solid rgba(232,233,235,.08);
-  border-radius:var(--radius-lg);padding:2.5rem;
+  background:#060604;
+  border:none;border-radius:var(--radius-lg);
+  padding:2.5rem;position:relative;overflow:hidden;
   transition:all .4s;
 }
-.met-card:hover .met-card-body{background:#161614;border-color:rgba(255,214,0,.2);transform:translateX(8px)}
-.met-card-step{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:#FFD600;margin-bottom:.6rem}
-.met-card-title{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:800;color:#E8E9EB;margin-bottom:.8rem;letter-spacing:-.02em}
-.met-card-desc{font-size:.9rem;line-height:1.85;color:rgba(232,233,235,.55)}
-.met-card-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.2rem}
+.met-card-body::before{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  padding:2px;
+  background:linear-gradient(135deg, #FFD600 0%, rgba(255,214,0,.2) 50%, #FFD600 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;transition:all .4s;
+}
+.met-card-body::after{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  background:radial-gradient(ellipse at 50% 0%, rgba(255,214,0,.05) 0%, transparent 60%);
+  pointer-events:none;
+}
+.met-card:hover .met-card-body{transform:translateX(8px)}
+.met-card:hover .met-card-body::before{
+  background:linear-gradient(135deg, #FFD600 0%, rgba(255,214,0,.45) 50%, #FFD600 100%);
+}
+.met-card-step{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:#FFD600;margin-bottom:.6rem;position:relative;z-index:1}
+.met-card-title{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:800;color:#E8E9EB;margin-bottom:.8rem;letter-spacing:-.02em;position:relative;z-index:1}
+.met-card-desc{font-size:.9rem;line-height:1.85;color:rgba(232,233,235,.55);position:relative;z-index:1}
+.met-card-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.2rem;position:relative;z-index:1}
 .met-card-tag{
   padding:.3rem .8rem;border-radius:20px;
   background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.15);
@@ -351,7 +427,7 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 /* ═══ VERTICAIS ═══ */
 #verticais{
   background:#0a0a08;
-  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  padding:clamp(4rem,8vw,6rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
 .vert-header{max-width:1200px;margin:0 auto 3.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
@@ -430,10 +506,10 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
 .cli-item img{max-width:100%;max-height:60px;width:auto;height:auto;object-fit:contain;opacity:.9;transition:opacity .3s}
 .cli-item:hover img{opacity:1}
 
-/* ═══ TESTIMONIALS — replaces legado ═══ */
+/* ═══ TESTIMONIALS ═══ */
 #testimonials{
   background:#0a0a08;
-  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  padding:clamp(4rem,8vw,6rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
 .test-header{max-width:1200px;margin:0 auto 3.5rem}
@@ -475,6 +551,16 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   padding:clamp(6rem,12vw,12rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;text-align:center;background:#060604;
 }
+.cta-bg-img{
+  position:absolute;inset:0;z-index:0;
+  background:url('images/mulher.png') center center / cover no-repeat;
+  opacity:.15;
+  filter:grayscale(.3);
+}
+.cta-bg-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(6,6,4,.7) 0%, rgba(6,6,4,.4) 40%, rgba(6,6,4,.8) 100%);
+}
 .cta-orb{
   position:absolute;border-radius:50%;
   border:1px solid rgba(255,214,0,.08);pointer-events:none;
@@ -484,13 +570,15 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   font-family:'Montserrat',sans-serif;font-size:clamp(2.5rem,6vw,5rem);
   font-weight:900;letter-spacing:-.04em;line-height:1.08;
   position:relative;z-index:1;
+  text-shadow:0 2px 30px rgba(0,0,0,.5);
 }
 .cta-title em{display:block;font-style:normal;font-weight:400;color:rgba(232,233,235,.4);font-size:.5em;margin-bottom:.3em;letter-spacing:0}
 .cta-title strong{color:#FFD600;display:block}
 .cta-sub{
   margin:2rem auto 3.5rem;max-width:480px;
-  font-size:1rem;line-height:1.9;color:rgba(232,233,235,.6);
+  font-size:1rem;line-height:1.9;color:rgba(232,233,235,.7);
   position:relative;z-index:1;
+  text-shadow:0 1px 10px rgba(0,0,0,.4);
 }
 .cta-btns{display:flex;justify-content:center;gap:1.5rem;position:relative;z-index:10}
 
@@ -539,7 +627,6 @@ footer{
   font-family:'Montserrat',sans-serif;font-size:.63rem;font-weight:500;letter-spacing:.1em;color:rgba(232,233,235,.16);
 }
 @media(max-width:899px){
-  .hero-main{display:flex;flex-direction:column}
   .ft-grid{grid-template-columns:1fr;gap:2.5rem}
   .ft-bottom{flex-direction:column;gap:.5rem;align-items:center;text-align:center}
   .nav-menu{display:none}.nav-btn{display:none}
@@ -642,11 +729,6 @@ footer{
 }
 .portal-btn-back:hover{color:#FFD600;border-color:#FFD600}
 
-/* ═══ GLOBAL ═══ */
-*,*::before,*::after{scrollbar-width:none;-ms-overflow-style:none}
-*::-webkit-scrollbar{display:none;width:0;height:0}
-html,body{overflow-x:hidden}
-
 /* ═══ NOISE TEXTURE OVERLAY ═══ */
 .noise-overlay{
   position:fixed;inset:0;z-index:9990;pointer-events:none;
@@ -670,9 +752,9 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 <!-- ═══ LOADER ═══ -->
 <div id="loader">
   <div class="ld-logo">
-    <div class="ld-logo-svg"><svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2414.38 439.16"><defs><style>.cls-1{fill:#E8E9EB}</style></defs><g id="Camada_1-2" data-name="Camada 1"><g><path class="cls-1" d="M365.98,306.77c0,82.11-66.83,122.85-126.02,129.84-22.28,2.55-36.92,2.55-64.92,2.55H0V0h180.12C203.67,0,213.86,0,236.14,2.55c72.56,8.9,113.29,54.73,113.29,112.02,0,40.09-21,70.65-64.29,85.92,55.38,15.9,80.84,52.83,80.84,106.28ZM114.57,173.12h51.56c10.18,0,19.73-.64,28-1.91,21-3.19,35.64-14.01,35.64-40.1s-13.37-36.91-35-40.1c-8.27-1.27-18.46-1.91-28.64-1.91h-51.56v84.02ZM246.32,302.96c0-29.28-21-44.56-44.55-46.46-8.27-.64-18.46-.64-28.64-.64h-58.56v94.21h61.74c10.19,0,20.37,0,28.64-.64,20.37-1.27,41.37-17.82,41.37-46.46Z"/><path class="cls-1" d="M1199.06,439.16h-356.51V0h349.77v96.42h-228.46v77.96h214.99v89.11h-214.99v79.24h235.2v96.42Z"/><path class="cls-1" d="M2296.77,0l-88.78,185.31h-28.28L2090.92,0h-825.94v96.42h17.5v.31h195.69l-211.04,246.01h-2.15v96.42h756.96v-96.42h-212.43l211.05-246.32h1.34l94.72,187.96h24.67v154.78h105.11v-154.78h24.67L2414.38,0h-117.61ZM1672.24,342.74h-267.84l211.05-246.32h72.15v.31h195.68l-211.04,246.01Z"/><g><rect class="cls-1" x="417.86" y="0" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="171.37" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="342.74" width="358.77" height="96.42"/></g></g></g></svg></div>
+    <div class="ld-logo-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2414.38 439.16"><defs><style>.cls-1{fill:#fff}</style></defs><g><path class="cls-1" d="M365.98,306.77c0,82.11-66.83,122.85-126.02,129.84-22.28,2.55-36.92,2.55-64.92,2.55H0V0h180.12C203.67,0,213.86,0,236.14,2.55c72.56,8.9,113.29,54.73,113.29,112.02,0,40.09-21,70.65-64.29,85.92,55.38,15.9,80.84,52.83,80.84,106.28ZM114.57,173.12h51.56c10.18,0,19.73-.64,28-1.91,21-3.19,35.64-14.01,35.64-40.1s-13.37-36.91-35-40.1c-8.27-1.27-18.46-1.91-28.64-1.91h-51.56v84.02ZM246.32,302.96c0-29.28-21-44.56-44.55-46.46-8.27-.64-18.46-.64-28.64-.64h-58.56v94.21h61.74c10.19,0,20.37,0,28.64-.64,20.37-1.27,41.37-17.82,41.37-46.46Z"/><path class="cls-1" d="M1199.06,439.16h-356.51V0h349.77v96.42h-228.46v77.96h214.99v89.11h-214.99v79.24h235.2v96.42Z"/><path class="cls-1" d="M2296.77,0l-88.78,185.31h-28.28L2090.92,0h-825.94v96.42h17.5v.31h195.69l-211.04,246.01h-2.15v96.42h756.96v-96.42h-212.43l211.05-246.32h1.34l94.72,187.96h24.67v154.78h105.11v-154.78h24.67L2414.38,0h-117.61ZM1672.24,342.74h-267.84l211.05-246.32h72.15v.31h195.68l-211.04,246.01Z"/><g><rect class="cls-1" x="417.86" y="0" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="171.37" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="342.74" width="358.77" height="96.42"/></g></g></svg></div>
   </div>
-  <span class="ld-count" id="ld-count">0</span>
+  <p class="ld-count" id="ld-count">0</p>
   <div class="ld-bar-wrap"><div class="ld-bar" id="ld-bar"></div></div>
 </div>
 
@@ -682,16 +764,17 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 
 <!-- ═══ NAV ═══ -->
 <nav id="nav">
-  <a href="#" class="nav-logo">
-    <div class="nav-logo-svg"><svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2414.38 439.16"><defs><style>.cls-1{fill:#060604}</style></defs><g id="Camada_1-2" data-name="Camada 1"><g><path class="cls-1" d="M365.98,306.77c0,82.11-66.83,122.85-126.02,129.84-22.28,2.55-36.92,2.55-64.92,2.55H0V0h180.12C203.67,0,213.86,0,236.14,2.55c72.56,8.9,113.29,54.73,113.29,112.02,0,40.09-21,70.65-64.29,85.92,55.38,15.9,80.84,52.83,80.84,106.28ZM114.57,173.12h51.56c10.18,0,19.73-.64,28-1.91,21-3.19,35.64-14.01,35.64-40.1s-13.37-36.91-35-40.1c-8.27-1.27-18.46-1.91-28.64-1.91h-51.56v84.02ZM246.32,302.96c0-29.28-21-44.56-44.55-46.46-8.27-.64-18.46-.64-28.64-.64h-58.56v94.21h61.74c10.19,0,20.37,0,28.64-.64,20.37-1.27,41.37-17.82,41.37-46.46Z"/><path class="cls-1" d="M1199.06,439.16h-356.51V0h349.77v96.42h-228.46v77.96h214.99v89.11h-214.99v79.24h235.2v96.42Z"/><path class="cls-1" d="M2296.77,0l-88.78,185.31h-28.28L2090.92,0h-825.94v96.42h17.5v.31h195.69l-211.04,246.01h-2.15v96.42h756.96v-96.42h-212.43l211.05-246.32h1.34l94.72,187.96h24.67v154.78h105.11v-154.78h24.67L2414.38,0h-117.61ZM1672.24,342.74h-267.84l211.05-246.32h72.15v.31h195.68l-211.04,246.01Z"/><g><rect class="cls-1" x="417.86" y="0" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="171.37" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="342.74" width="358.77" height="96.42"/></g></g></g></svg></div>
+  <a href="#hero" class="nav-logo">
+    <div class="nav-logo-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2414.38 439.16"><defs><style>.cls-1{fill:#060604}</style></defs><g><path class="cls-1" d="M365.98,306.77c0,82.11-66.83,122.85-126.02,129.84-22.28,2.55-36.92,2.55-64.92,2.55H0V0h180.12C203.67,0,213.86,0,236.14,2.55c72.56,8.9,113.29,54.73,113.29,112.02,0,40.09-21,70.65-64.29,85.92,55.38,15.9,80.84,52.83,80.84,106.28ZM114.57,173.12h51.56c10.18,0,19.73-.64,28-1.91,21-3.19,35.64-14.01,35.64-40.1s-13.37-36.91-35-40.1c-8.27-1.27-18.46-1.91-28.64-1.91h-51.56v84.02ZM246.32,302.96c0-29.28-21-44.56-44.55-46.46-8.27-.64-18.46-.64-28.64-.64h-58.56v94.21h61.74c10.19,0,20.37,0,28.64-.64,20.37-1.27,41.37-17.82,41.37-46.46Z"/><path class="cls-1" d="M1199.06,439.16h-356.51V0h349.77v96.42h-228.46v77.96h214.99v89.11h-214.99v79.24h235.2v96.42Z"/><path class="cls-1" d="M2296.77,0l-88.78,185.31h-28.28L2090.92,0h-825.94v96.42h17.5v.31h195.69l-211.04,246.01h-2.15v96.42h756.96v-96.42h-212.43l211.05-246.32h1.34l94.72,187.96h24.67v154.78h105.11v-154.78h24.67L2414.38,0h-117.61ZM1672.24,342.74h-267.84l211.05-246.32h72.15v.31h195.68l-211.04,246.01Z"/><g><rect class="cls-1" x="417.86" y="0" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="171.37" width="358.77" height="96.42"/><rect class="cls-1" x="417.86" y="342.74" width="358.77" height="96.42"/></g></g></svg></div>
   </a>
   <ul class="nav-menu">
     <li><a href="#solutions">Soluções</a></li>
     <li><a href="#metodologia">Metodologia</a></li>
     <li><a href="#verticais">Verticais</a></li>
-    <li><a href="#testimonials">Clientes</a></li>
+    <li><a href="#clientes">Clientes</a></li>
+    <li><a href="javascript:openClientPortal()">Portal</a></li>
   </ul>
-  <button class="nav-btn" onclick="openClientPortal()">Acesso Clientes</button>
+  <a href="javascript:openContact()" class="nav-btn">Falar com a Beezzy</a>
 </nav>
 
 <!-- ═══ HERO ═══ -->
@@ -724,6 +807,20 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
       </div>
     </div>
 
+    <!-- Astronaut + Planets Visual -->
+    <div class="hero-visual" id="heroVisual">
+      <div class="hero-star"></div>
+      <div class="hero-star"></div>
+      <div class="hero-star"></div>
+      <div class="hero-star"></div>
+      <div class="hero-star"></div>
+      <div class="hero-planet hero-planet-1" id="planet1"></div>
+      <div class="hero-planet hero-planet-2" id="planet2"></div>
+      <div class="hero-planet hero-planet-3" id="planet3"></div>
+      <div class="hero-planet hero-planet-ring" id="planetRing"></div>
+      <div class="hero-astronaut" id="heroAstronaut">
+        <img src="images/astronauta.png" alt="Astronauta Beezzy">
+      </div>
     </div>
   </div>
 
@@ -966,6 +1063,7 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 
 <!-- ═══ CTA ═══ -->
 <section id="cta">
+  <div class="cta-bg-img"></div>
   <div class="cta-orb" style="width:500px;height:500px" id="orb1"></div>
   <div class="cta-orb" style="width:800px;height:800px" id="orb2"></div>
   <div class="cta-orb" style="width:1100px;height:1100px" id="orb3"></div>
@@ -1028,7 +1126,7 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 ScrollTrigger.config({ignoreMobileResize:true});
 
-/* ═══ SMOOTH SCROLL ═══ */
+/* ═══ SMOOTH ANCHOR SCROLL ═══ */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     const t=document.querySelector(a.getAttribute('href'));
@@ -1083,8 +1181,21 @@ function startHero(){
     .to('#heroCta',{opacity:1,duration:.85,ease:'power3.out'},'<.2')
     .to('#si',{opacity:1,duration:.5},'<.3')
     .from('.stats-bar-item',{opacity:0,y:20,stagger:.08,duration:.6,ease:'power3.out'},'<.4')
-    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.3');
+    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.3')
+    /* Astronaut entrance */
+    .from('#heroAstronaut',{opacity:0,y:60,scale:.9,duration:1.2,ease:'power3.out'},'<.2')
+    .from('#planet1',{opacity:0,x:40,y:-30,duration:1,ease:'power3.out'},'<.3')
+    .from('#planet2',{opacity:0,x:30,y:20,duration:1,ease:'power3.out'},'<.4')
+    .from('#planet3',{opacity:0,x:50,duration:.8,ease:'power3.out'},'<.5')
+    .from('#planetRing',{opacity:0,scale:.5,duration:1.2,ease:'power3.out'},'<.3');
 }
+
+/* ═══ PARALLAX — Astronaut & Planets on scroll ═══ */
+gsap.to('#heroAstronaut',{y:-50,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+gsap.to('#planet1',{y:-80,x:20,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+gsap.to('#planet2',{y:-40,x:-15,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+gsap.to('#planet3',{y:-100,x:30,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+gsap.to('#planetRing',{y:-60,rotation:15,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
 
 /* ═══ NAV SCROLL ═══ */
 ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('nav').classList.toggle('solid',self.progress>0)}});
