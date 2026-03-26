@@ -2768,6 +2768,8 @@ let curSlide=-1;
 function showSlide(i,instant){
   if(i===curSlide)return;
   const prev=curSlide; curSlide=i;
+  /* Hide scroll hint after first slide */
+  if(i>0){var sh=document.getElementById('metScrollHint'); if(sh) gsap.to(sh,{opacity:0,duration:.3});}
 
   /* Counter com fade */
   gsap.to(metCounter,{opacity:0,y:-6,duration:.2,onComplete(){
