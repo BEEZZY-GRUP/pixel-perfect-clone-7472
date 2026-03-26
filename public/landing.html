@@ -154,7 +154,7 @@ body{
 }
 .hero-astronaut{
   position:relative;z-index:2;
-  max-width:380px;width:100%;
+  max-width:300px;width:100%;
   filter:drop-shadow(0 0 60px rgba(255,214,0,.18));
   transition:transform .3s;
 }
@@ -1191,11 +1191,11 @@ function startHero(){
 }
 
 /* ═══ PARALLAX — Astronaut & Planets on scroll ═══ */
-gsap.to('#heroAstronaut',{y:-50,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
-gsap.to('#planet1',{y:-80,x:20,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
-gsap.to('#planet2',{y:-40,x:-15,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
-gsap.to('#planet3',{y:-100,x:30,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
-gsap.to('#planetRing',{y:-60,rotation:15,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:true}});
+gsap.to('#heroAstronaut',{y:-30,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.2}});
+gsap.to('#planet1',{y:-40,x:10,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.5}});
+gsap.to('#planet2',{y:-20,x:-8,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1.8}});
+gsap.to('#planet3',{y:-50,x:15,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:2}});
+gsap.to('#planetRing',{y:-30,rotation:8,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:2}});
 
 /* ═══ NAV SCROLL ═══ */
 ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('nav').classList.toggle('solid',self.progress>0)}});
