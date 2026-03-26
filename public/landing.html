@@ -21,7 +21,7 @@ body{
   background:#060604;
   color:#E8E9EB;
   font-family:'DM Sans',sans-serif;
-  font-weight:300;
+  font-weight:400;
   overflow-x:hidden;
   cursor:none;
   /* Also hide on body for safety */
@@ -30,6 +30,11 @@ body{
 }
 body::-webkit-scrollbar{display:none;width:0;height:0}
 
+/* ── TOUCH DEVICE: restore native cursor ── */
+@media (pointer: coarse) {
+  body { cursor: auto !important; }
+  #cur-dot, #cur-ring { display: none !important; }
+}
 
 /* ── BRAND LOGOS ── */
 .nav-logo{ text-decoration:none; display:block; }
@@ -190,8 +195,12 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   gap:3rem;
 }
 .hero-desc{
-  max-width:400px;font-size:.95rem;line-height:1.9;
-  color:rgba(232,233,235,.5);
+  max-width:400px;font-size:1rem;line-height:1.9;
+  color:rgba(232,233,235,.65);
+}
+.hero-qualifier{
+  font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,214,0,.55);margin-bottom:1.2rem;
 }
 .hero-metrics{display:flex;gap:3.5rem;}
 .metric-val{
@@ -305,8 +314,8 @@ body::-webkit-scrollbar{display:none;width:0;height:0}
   margin-top:4rem;
   max-width:460px;
   margin-left:auto;
-  font-size:.93rem;line-height:2;
-  color:rgba(232,233,235,.42);
+  font-size:1rem;line-height:2;
+  color:rgba(232,233,235,.60);
   opacity:0;
   position:relative;z-index:1;
 }
@@ -850,10 +859,10 @@ footer{
   font-size:2rem;letter-spacing:-.04em;color:#E8E9EB;
 }
 .ft-logo em{color:#FFD600;font-style:normal}
-.ft-tagline{font-size:.82rem;line-height:1.85;color:rgba(232,233,235,.38);margin-top:.7rem}
+.ft-tagline{font-size:.88rem;line-height:1.85;color:rgba(232,233,235,.55);margin-top:.7rem}
 .ft-col h4{
   font-size:.58rem;letter-spacing:.38em;text-transform:uppercase;
-  color:rgba(232,233,235,.18);margin-bottom:1.4rem;
+  color:rgba(232,233,235,.35);margin-bottom:1.4rem;
 }
 .ft-col ul{list-style:none}
 .ft-col li{margin-bottom:.72rem}
@@ -1906,14 +1915,14 @@ footer{
 }
 .portal-btn-hive:hover{background:#e8c400}
 .portal-btn-back{
-  background:none;border:1px solid rgba(232,233,235,.1);
-  color:rgba(232,233,235,.4);
+  background:none;border:1.5px solid rgba(232,233,235,.25);
+  color:rgba(232,233,235,.6);
   font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
   cursor:none;text-align:center;padding:.85rem;width:100%;
   transition:color .3s,border-color .3s;
   font-family:'Syne',sans-serif;
 }
-.portal-btn-back:hover{color:#E8E9EB;border-color:rgba(232,233,235,.25)}
+.portal-btn-back:hover{color:#FFD600;border-color:#FFD600}
 
 
 /* ═══ VERTICAIS MODERNAS ═══ */
@@ -2019,6 +2028,8 @@ footer{
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 /* Only allow scroll on body (the main scroll) */
 html, body { overflow-x: hidden; }
+
+@keyframes scrollHintBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
 </style>
 </head>
@@ -2128,10 +2139,15 @@ window.closeClientPortal = function() {
       <span class="h1-line"><span class="h1-word h1-y">Be easy.</span></span>
     </h1>
 
+    <p class="hero-qualifier" id="heroQualifier" style="opacity:0">Para empresas de médio porte com ambição de crescer com método.</p>
+
     <div class="hero-bottom">
-      <p class="hero-desc" id="heroDesc">
-        Num mundo cheio de metodologias óbvias, a Beezzy enxerga o que outros não conseguem ver — e transforma isso em resultado real, cultura sólida e legado duradouro.
-      </p>
+      <div style="display:flex;flex-direction:column;gap:1.5rem;align-items:flex-start">
+        <p class="hero-desc" id="heroDesc">
+          Num mundo cheio de metodologias óbvias, a Beezzy enxerga o que outros não conseguem ver — e transforma isso em resultado real, cultura sólida e legado duradouro.
+        </p>
+        <button type="button" class="btn-primary" onclick="openContact()" style="cursor:none"><span>Falar com a Beezzy</span><span>→</span></button>
+      </div>
       <div class="hero-metrics" id="heroMetrics">
         <div>
           <div class="metric-val" id="mv1">0</div>
@@ -2245,6 +2261,12 @@ window.closeClientPortal = function() {
         </div>
 
       </div><!-- /met-track -->
+
+      <!-- Scroll hint -->
+      <div id="metScrollHint" style="position:absolute;bottom:clamp(2rem,4vw,3.5rem);left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;transition:opacity .4s">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="animation:scrollHintBounce 1.5s ease infinite"><path d="M4 7l5 5 5-5" stroke="rgba(255,214,0,.5)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span style="font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(232,233,235,.25)">Role para avançar</span>
+      </div>
     </div><!-- /met-sticky -->
 </div><!-- /met-outer -->
 
@@ -2304,9 +2326,15 @@ window.closeClientPortal = function() {
     </div>
   </div>
 
-  <div class="leg-dots" id="legDots">
-    <div class="leg-dot active" data-idx="0"></div>
-    <div class="leg-dot" data-idx="1"></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-top:2.5rem;padding:0 clamp(1.5rem,5vw,5rem)">
+    <div class="leg-dots" id="legDots" style="margin:0">
+      <div class="leg-dot active" data-idx="0"></div>
+      <div class="leg-dot" data-idx="1"></div>
+      <div class="leg-dot" data-idx="2"></div>
+      <div class="leg-dot" data-idx="3"></div>
+      <div class="leg-dot" data-idx="4"></div>
+    </div>
+    <span id="legCounter" style="font-size:.6rem;color:rgba(232,233,235,.3);letter-spacing:.1em;font-family:'Syne',sans-serif;font-weight:700">01 / 05</span>
   </div>
 
   <div class="leg-quote-block">
@@ -2317,6 +2345,89 @@ window.closeClientPortal = function() {
     <a href="#cta" class="btn-y"><span>Quero chegar lá</span><span>→</span></a>
   </div>
 </section>
+
+<!-- ═══ VERTICAIS ═══ -->
+<section id="verticais">
+  <div class="vert-header">
+    <div>
+      <p class="label-y">Como a Beezzy atua</p>
+      <h2 class="sec-title">Verticais de <em>Negócio</em></h2>
+    </div>
+    <p class="vert-intro">Duas frentes complementares — da estratégia ao crescimento tecnológico.</p>
+  </div>
+
+  <div class="v-panels-duo">
+
+    <!-- PaaS -->
+    <div class="vcard-modern">
+      <div class="vcard-badge">
+        <span class="vcard-badge-num">01</span>
+        <span class="vcard-badge-tag">PaaS</span>
+      </div>
+      <h3 class="vcard-title">Partner as<br>a Service</h3>
+      <p class="vcard-desc">Para empresas com R$1M–R$20M em faturamento que precisam de um sócio estratégico sem abrir capital. Gestão, processos e decisões — junto com você.</p>
+      <a href="#cta" class="vcard-link">Quero um parceiro <span>→</span></a>
+      <div class="vcard-accent">01</div>
+    </div>
+
+    <!-- MarTech -->
+    <div class="vcard-modern">
+      <div class="vcard-badge">
+        <span class="vcard-badge-num">02</span>
+        <span class="vcard-badge-tag">MarTech</span>
+      </div>
+      <h3 class="vcard-title">Marketing +<br>Tecnologia</h3>
+      <p class="vcard-desc">Para empresas que investem em marketing sem saber o retorno real. Automação, dados e canais que escalam — sem contratar uma agência genérica.</p>
+      <a href="#cta" class="vcard-link">Quero crescer <span>→</span></a>
+      <div class="vcard-accent">02</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CLIENTES ═══ -->
+<section id="clientes">
+  <div class="cli-header">
+    <div>
+      <p class="cli-eyebrow">Quem confia na Beezzy</p>
+      <h2 class="cli-title">Nossos <em>clientes</em> e parceiros</h2>
+    </div>
+  </div>
+  <div class="cli-track-wrap">
+    <div class="cli-track">
+      <div class="cli-item"><img src="images/logo_novaera.png" alt="Nova Era"></div>
+      <div class="cli-item"><img src="images/logo_on.png" alt="ON Soluções Financeiras"></div>
+      <div class="cli-item"><img src="images/logo_shielid.svg" alt="Shiel ID"></div>
+      <div class="cli-item"><img src="images/logo_palpita.png" alt="Palpita"></div>
+      <div class="cli-item"><img src="images/logo_cliente_extra.png" alt="Cliente parceiro"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NÚMEROS ═══ -->
+<section class="section-light" id="numeros">
+  <p class="sl-label">Resultados reais</p>
+  <h2 class="sl-title">Números que<br><em>impressionam</em></h2>
+  <div class="nums-grid">
+    <div class="num-card">
+      <div class="nc-val" id="nc1" data-target="47" data-suffix="+">33<span>+</span></div>
+      <div class="nc-label">Empresas transformadas<br>com a metodologia Legacy</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-val" id="nc2" data-target="94" data-suffix="%">66<span>%</span></div>
+      <div class="nc-label">Taxa de retenção<br>dos clientes Beezzy</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-val" id="nc3" data-target="3" data-suffix="x">2<span>x</span></div>
+      <div class="nc-label">Crescimento médio<br>de faturamento</div>
+    </div>
+    <div class="num-card">
+      <div class="nc-val" id="nc4" data-target="12" data-suffix="">8<span></span></div>
+      <div class="nc-label">Setores diferentes<br>atendidos com sucesso</div>
+    </div>
+  </div>
+</section>
+
 
 
 <!-- ═══ COMPROMISSO 3D ═══ -->
@@ -2407,89 +2518,6 @@ window.closeClientPortal = function() {
   </div>
 </section>
 
-<!-- ═══ VERTICAIS ═══ -->
-<section id="verticais">
-  <div class="vert-header">
-    <div>
-      <p class="label-y">Como a Beezzy atua</p>
-      <h2 class="sec-title">Verticais de <em>Negócio</em></h2>
-    </div>
-    <p class="vert-intro">Duas frentes complementares — da estratégia ao crescimento tecnológico.</p>
-  </div>
-
-  <div class="v-panels-duo">
-
-    <!-- PaaS -->
-    <div class="vcard-modern">
-      <div class="vcard-badge">
-        <span class="vcard-badge-num">01</span>
-        <span class="vcard-badge-tag">PaaS</span>
-      </div>
-      <h3 class="vcard-title">Partner as<br>a Service</h3>
-      <p class="vcard-desc">Para empresas que precisam destravar faturamento, sair do vermelho e projetar o próximo nível. Um sócio estratégico presente nas decisões que importam.</p>
-      <a href="#cta" class="vcard-link">Quero um parceiro <span>→</span></a>
-      <div class="vcard-accent">01</div>
-    </div>
-
-    <!-- MarTech -->
-    <div class="vcard-modern">
-      <div class="vcard-badge">
-        <span class="vcard-badge-num">02</span>
-        <span class="vcard-badge-tag">MarTech</span>
-      </div>
-      <h3 class="vcard-title">Marketing +<br>Tecnologia</h3>
-      <p class="vcard-desc">Resultados através de tecnologia como facilitadora — reduzindo tempo, aumentando lucro e escalando canais. O conceito mais urgente do mercado brasileiro.</p>
-      <a href="#cta" class="vcard-link">Quero crescer <span>→</span></a>
-      <div class="vcard-accent">02</div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ═══ CLIENTES ═══ -->
-<section id="clientes">
-  <div class="cli-header">
-    <div>
-      <p class="cli-eyebrow">Quem confia na Beezzy</p>
-      <h2 class="cli-title">Nossos <em>clientes</em> e parceiros</h2>
-    </div>
-  </div>
-  <div class="cli-track-wrap">
-    <div class="cli-track">
-      <div class="cli-item"><img src="images/logo_novaera.png" alt="Nova Era"></div>
-      <div class="cli-item"><img src="images/logo_on.png" alt="ON Soluções Financeiras"></div>
-      <div class="cli-item"><img src="images/logo_shielid.svg" alt="Shiel ID"></div>
-      <div class="cli-item"><img src="images/logo_palpita.png" alt="Palpita"></div>
-      <div class="cli-item"><img src="images/logo_cliente_extra.png" alt="Cliente parceiro"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ NÚMEROS ═══ -->
-<section class="section-light" id="numeros">
-  <p class="sl-label">Resultados reais</p>
-  <h2 class="sl-title">Números que<br><em>impressionam</em></h2>
-  <div class="nums-grid">
-    <div class="num-card">
-      <div class="nc-val" id="nc1">0<span>+</span></div>
-      <div class="nc-label">Empresas transformadas<br>com a metodologia Legacy</div>
-    </div>
-    <div class="num-card">
-      <div class="nc-val" id="nc2">0<span>%</span></div>
-      <div class="nc-label">Taxa de retenção<br>dos clientes Beezzy</div>
-    </div>
-    <div class="num-card">
-      <div class="nc-val" id="nc3">0<span>x</span></div>
-      <div class="nc-label">Crescimento médio<br>de faturamento</div>
-    </div>
-    <div class="num-card">
-      <div class="nc-val" id="nc4">0<span></span></div>
-      <div class="nc-label">Setores diferentes<br>atendidos com sucesso</div>
-    </div>
-  </div>
-</section>
-
-
 <!-- ═══ THE HIVE ═══ -->
 <section id="hive">
   <canvas id="hiveCanvas"></canvas>
@@ -2501,6 +2529,10 @@ window.closeClientPortal = function() {
     Construa conexões que impulsionam resultados dentro de um ecossistema feito para quem empreende de verdade.<br><br>
     O próximo cliente Beezzy pode precisar de você — ou você pode precisar dele.
   </p>
+  <p style="font-size:.75rem;color:rgba(255,214,0,.5);margin-top:1.5rem;letter-spacing:.1em;position:relative;z-index:1">Incluído para todos os clientes com Certificado Legado ativo.</p>
+  <div style="margin-top:2rem;position:relative;z-index:1">
+    <a href="https://beezzygroup.com/the-hive" target="_blank" rel="noopener" class="btn-outline" style="cursor:none"><span>Conhecer o ecossistema</span><span>→</span></a>
+  </div>
 </section>
 
 <!-- ═══ CTA ═══ -->
@@ -2683,6 +2715,7 @@ function startHero(){
     .to('.h1-word',{y:'0%',duration:1.1,ease:'power4.out',stagger:.12})
     .to('#heroEyebrow',{opacity:1,duration:.5},'<.3')
     .to('.hero-eyebrow-line',{scaleX:1,duration:.65,stagger:.1,ease:'power3.out'},'<.1')
+    .to('#heroQualifier',{opacity:1,duration:.6,ease:'power3.out'},'<.2')
     .to('#heroDesc',{opacity:1,duration:.85,ease:'power3.out'},'<.3')
     .to('#heroMetrics',{opacity:1,duration:.85,ease:'power3.out'},'<.1')
     .to('#si',{opacity:1,duration:.5},'<.3');
@@ -2735,6 +2768,8 @@ let curSlide=-1;
 function showSlide(i,instant){
   if(i===curSlide)return;
   const prev=curSlide; curSlide=i;
+  /* Hide scroll hint after first slide */
+  if(i>0){var sh=document.getElementById('metScrollHint'); if(sh) gsap.to(sh,{opacity:0,duration:.3});}
 
   /* Counter com fade */
   gsap.to(metCounter,{opacity:0,y:-6,duration:.2,onComplete(){
@@ -2797,7 +2832,7 @@ const metST = ScrollTrigger.create({
       gsap.to(metTrack,{x:targetX,duration:.55,ease:'power3.inOut',overwrite:true});
     }
   },
-  onEnter(){showSlide(0,true); if(metUI) metUI.classList.add('visible');},
+  onEnter(){showSlide(0,true); if(metUI) metUI.classList.add('visible'); var sh=document.getElementById('metScrollHint'); if(sh) gsap.to(sh,{opacity:1,duration:.5,delay:.8});},
   onLeave(){if(metUI) metUI.classList.remove('visible');},
   onEnterBack(){if(metUI) metUI.classList.add('visible');},
   onLeaveBack(){showSlide(0,true); if(metUI) metUI.classList.remove('visible');}
@@ -2844,6 +2879,12 @@ document.querySelectorAll('.comp3d-card').forEach(card=>{
     gsap.to(card,{rotateY:0,rotateX:0,duration:.6,ease:'elastic.out(.8,.5)'});
     gsap.to(curRing,{scale:1,borderColor:'rgba(255,214,0,.45)',duration:.3});
   });
+  /* Click to open methodology popup */
+  const pilarMap=[2,0,4]; /* card 0→Execução(2), card 1→Diagnóstico(0), card 2→Legado(4) */
+  card.addEventListener('click',()=>{
+    openPopup();
+    setTimeout(()=>pmfSetPilar(pilarMap[+card.dataset.index]||0),120);
+  });
 });
 
 ScrollTrigger.create({
@@ -2866,11 +2907,13 @@ ScrollTrigger.create({
   }
 });
 
-/* Contar números */
+/* Contar números — start at 70% of target */
 function animNum(id,end,suffix){
   const el=document.getElementById(id);
   if(!el)return;
-  const o={v:0};
+  const startVal=Math.floor(end*0.7);
+  const o={v:startVal};
+  el.innerHTML=startVal+'<span>'+suffix+'</span>';
   ScrollTrigger.create({trigger:el,start:'top 85%',once:true,
     onEnter(){
       gsap.to(o,{v:end,duration:1.8,ease:'power2.out',
@@ -2897,31 +2940,28 @@ animNum('nc4',12,'');
   const dots   = document.querySelectorAll('.leg-dot');
   const prev   = document.getElementById('legPrev');
   const next   = document.getElementById('legNext');
-  /* Page 0 = cards 0,1,2  |  Page 1 = cards 3,4 */
-  const PAGES  = 2;
-  let page = 0;
+  const counter = document.getElementById('legCounter');
+  const TOTAL  = cards.length;
+  let current = 0;
 
-  function goTo(p, animated=true){
-    page = Math.max(0, Math.min(p, PAGES-1));
-    const wrap   = track.parentElement;
-    const W      = wrap.offsetWidth;
-    const gap    = 24;
-    /* Page 0: cards 1,2,3 (x=0)
-       Page 1: cards 3,4,5 — shift by 2 cards so card 3 is visible on both pages */
-    const cardW  = cards[0].offsetWidth;
-    const x      = page === 0 ? 0 : -(2*(cardW+gap));
+  function goTo(idx, animated=true){
+    current = Math.max(0, Math.min(idx, TOTAL-1));
+    const gap = 24;
+    const cardW = cards[0].offsetWidth;
+    const x = -(current*(cardW+gap));
     if(animated){
       gsap.to(track,{x,duration:.6,ease:'power3.inOut'});
     } else {
       gsap.set(track,{x});
     }
-    dots.forEach((d,i)=>d.classList.toggle('active', i===page));
-    prev.style.opacity = page===0?'.35':'1';
-    next.style.opacity = page===PAGES-1?'.35':'1';
+    dots.forEach((d,i)=>d.classList.toggle('active', i===current));
+    if(counter) counter.textContent=String(current+1).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');
+    prev.style.opacity = current===0?'.35':'1';
+    next.style.opacity = current===TOTAL-1?'.35':'1';
   }
 
-  prev.addEventListener('click',()=>goTo(page-1));
-  next.addEventListener('click',()=>goTo(page+1));
+  prev.addEventListener('click',()=>goTo(current-1));
+  next.addEventListener('click',()=>goTo(current+1));
   dots.forEach(d=>d.addEventListener('click',()=>goTo(+d.dataset.idx)));
 
   let startX=0, isDragging=false;
@@ -2930,15 +2970,15 @@ animNum('nc4',12,'');
     if(!isDragging)return;
     isDragging=false;
     const diff=startX-e.clientX;
-    if(Math.abs(diff)>60) goTo(diff>0?page+1:page-1);
+    if(Math.abs(diff)>60) goTo(diff>0?current+1:current-1);
   });
   track.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
   track.addEventListener('touchend',e=>{
     const diff=startX-e.changedTouches[0].clientX;
-    if(Math.abs(diff)>60) goTo(diff>0?page+1:page-1);
+    if(Math.abs(diff)>60) goTo(diff>0?current+1:current-1);
   });
 
-  window.addEventListener('resize',()=>goTo(page,false));
+  window.addEventListener('resize',()=>goTo(current,false));
   goTo(0,false); /* init */
 
   ScrollTrigger.create({
@@ -3093,6 +3133,11 @@ function pmfSetPilar(idx){
   }
   if(prog) prog.style.width=((idx+1)/5*100)+'%';
   document.querySelectorAll('.pmf-nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  /* Update prev/next buttons */
+  var prevBtn=document.getElementById('pmfPrevBtn');
+  var nextBtn=document.getElementById('pmfNextBtn');
+  if(prevBtn) prevBtn.style.opacity=idx===0?'.3':'1';
+  if(nextBtn) nextBtn.innerHTML=idx===4?'Falar com a Beezzy →':'Próximo →';
 }
 
 function pmfInitCanvas(){
@@ -3244,7 +3289,7 @@ window.closePopup=function(){
     <div class="portal-inner">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.8rem">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2414.38 439.16" style="height:18px;width:auto"><path fill="#E8E9EB" d="M365.98,306.77c0,82.11-66.83,122.85-126.02,129.84-22.28,2.55-36.92,2.55-64.92,2.55H0V0h180.12C203.67,0,213.86,0,236.14,2.55c72.56,8.9,113.29,54.73,113.29,112.02,0,40.09-21,70.65-64.29,85.92,55.38,15.9,80.84,52.83,80.84,106.28ZM114.57,173.12h51.56c10.18,0,19.73-.64,28-1.91,21-3.19,35.64-14.01,35.64-40.1s-13.37-36.91-35-40.1c-8.27-1.27-18.46-1.91-28.64-1.91h-51.56v84.02ZM246.32,302.96c0-29.28-21-44.56-44.55-46.46-8.27-.64-18.46-.64-28.64-.64h-58.56v94.21h61.74c10.19,0,20.37,0,28.64-.64,20.37-1.27,41.37-17.82,41.37-46.46Z"/><path fill="#E8E9EB" d="M1199.06,439.16h-356.51V0h349.77v96.42h-228.46v77.96h214.99v89.11h-214.99v79.24h235.2v96.42Z"/><path fill="#E8E9EB" d="M2296.77,0l-88.78,185.31h-28.28L2090.92,0h-825.94v96.42h17.5v.31h195.69l-211.04,246.01h-2.15v96.42h756.96v-96.42h-212.43l211.05-246.32h1.34l94.72,187.96h24.67v154.78h105.11v-154.78h24.67L2414.38,0h-117.61ZM1672.24,342.74h-267.84l211.05-246.32h72.15v.31h195.68l-211.04,246.01Z"/><rect fill="#E8E9EB" x="417.86" width="358.77" height="96.42"/><rect fill="#E8E9EB" x="417.86" y="171.37" width="358.77" height="96.42"/><rect fill="#E8E9EB" x="417.86" y="342.74" width="358.77" height="96.42"/></svg>
-        <button onclick="closeClientPortal()" style="background:none;border:1px solid rgba(232,233,235,.12);color:rgba(232,233,235,.35);width:28px;height:28px;cursor:none;font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s" onmouseover="this.style.borderColor='#FFD600';this.style.color='#FFD600'" onmouseout="this.style.borderColor='rgba(232,233,235,.12)';this.style.color='rgba(232,233,235,.35)'">✕</button>
+        <button onclick="closeClientPortal()" style="background:none;border:1px solid rgba(232,233,235,.12);color:rgba(232,233,235,.35);width:40px;height:40px;cursor:none;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s" onmouseover="this.style.borderColor='#FFD600';this.style.color='#FFD600'" onmouseout="this.style.borderColor='rgba(232,233,235,.12)';this.style.color='rgba(232,233,235,.35)'">✕</button>
       </div>
       <div class="portal-badge">
         <div class="portal-badge-dot"></div>
@@ -3291,17 +3336,7 @@ window.closePopup=function(){
         </div>
         <div class="cb-row">
           <div class="cb-field">
-            <label>Nome da empresa</label>
-            <input type="text" id="cf-company" placeholder="Minha Empresa" required>
-          </div>
-          <div class="cb-field">
-            <label>CNPJ *</label>
-            <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" required maxlength="20">
-          </div>
-        </div>
-        <div class="cb-row">
-          <div class="cb-field">
-            <label>Qual o seu desafio?</label>
+            <label>Maior desafio hoje</label>
             <select id="cf-challenge" required>
               <option value="" disabled selected>Selecione</option>
               <option>Crescer o faturamento</option>
@@ -3311,6 +3346,16 @@ window.closePopup=function(){
               <option>Escalar o negócio</option>
               <option>Outro</option>
             </select>
+          </div>
+        </div>
+        <div class="cb-row">
+          <div class="cb-field">
+            <label>Nome da empresa (opcional)</label>
+            <input type="text" id="cf-company" placeholder="Minha Empresa">
+          </div>
+          <div class="cb-field">
+            <label>CNPJ (opcional)</label>
+            <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" maxlength="20">
           </div>
         </div>
         <div class="cb-field">
@@ -3346,6 +3391,7 @@ window.closePopup=function(){
       <!-- Interactive canvas -->
       <div class="pmf-canvas-wrap">
         <canvas id="metodCanv"></canvas>
+        <p style="font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(232,233,235,.3);text-align:center;position:absolute;bottom:1.2rem;left:0;right:0;z-index:2">Clique nos pontos para explorar</p>
         <div class="pmf-progress"><div class="pmf-progress-fill" id="pmfProg"></div></div>
       </div>
 
@@ -3362,6 +3408,10 @@ window.closePopup=function(){
           <button class="pmf-nav-btn" data-idx="2">03</button>
           <button class="pmf-nav-btn" data-idx="3">04</button>
           <button class="pmf-nav-btn" data-idx="4">05</button>
+        </div>
+        <div style="display:flex;gap:.8rem;margin-top:.8rem">
+          <button id="pmfPrevBtn" onclick="if(pmfActive>0)pmfSetPilar(pmfActive-1)" style="flex:1;padding:.55rem;background:none;border:1px solid rgba(232,233,235,.1);color:rgba(232,233,235,.4);font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .3s">← Anterior</button>
+          <button id="pmfNextBtn" onclick="if(pmfActive<4){pmfSetPilar(pmfActive+1)}else{closePopup();openContact()}" style="flex:1;padding:.55rem;background:none;border:1px solid rgba(232,233,235,.1);color:rgba(232,233,235,.4);font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .3s">Próximo →</button>
         </div>
       </div>
     </div>
