@@ -10,11 +10,11 @@
 <style>
 /* ═══ RESET & BASE ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,214,0,.18) #060604}
-html::-webkit-scrollbar{width:6px}
-html::-webkit-scrollbar-track{background:#060604}
-html::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,214,0,.22),rgba(255,214,0,.08));border-radius:4px}
-html::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,214,0,.35),rgba(255,214,0,.15))}
+html{overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,214,0,.1) transparent}
+html::-webkit-scrollbar{width:5px}
+html::-webkit-scrollbar-track{background:transparent}
+html::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,214,0,.15),rgba(255,214,0,.03));border-radius:6px}
+html::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,214,0,.25),rgba(255,214,0,.08))}
 body{
   background:#060604;color:#E8E9EB;
   font-family:'DM Sans',sans-serif;font-weight:400;
@@ -57,8 +57,8 @@ body{
 .ld-bar{height:100%;width:0;background:#FFD600}
 
 /* ═══ CURSOR ═══ */
-#cur-dot{position:fixed;width:8px;height:8px;background:#FFD600;border-radius:50%;pointer-events:none;z-index:999999;top:-4px;left:-4px}
-#cur-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(255,214,0,.45);border-radius:50%;pointer-events:none;z-index:999998;top:-20px;left:-20px}
+#cur-dot{position:fixed;width:8px;height:8px;background:#FFD600;border-radius:50%;pointer-events:none;z-index:999999;top:-4px;left:-4px;mix-blend-mode:difference}
+#cur-ring{position:fixed;width:40px;height:40px;border:1px solid rgba(255,214,0,.45);border-radius:50%;pointer-events:none;z-index:999998;top:-20px;left:-20px;mix-blend-mode:difference}
 
 /* ═══ NAV — YELLOW HEADER ═══ */
 #nav{
@@ -1171,22 +1171,6 @@ if(curDot&&curRing){
     el.addEventListener('mouseleave',()=>{gsap.to(curDot,{scale:1,duration:.25});gsap.to(curRing,{scale:1,borderColor:'rgba(255,214,0,.45)',duration:.35})});
   });
 
-  /* Cursor color inversion on yellow backgrounds */
-  const yellowSections=document.querySelectorAll('#nav,.stats-bar,[style*="background:#FFD600"],[style*="background: #FFD600"]');
-  document.addEventListener('mousemove',e=>{
-    let onYellow=false;
-    yellowSections.forEach(sec=>{
-      const r=sec.getBoundingClientRect();
-      if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom) onYellow=true;
-    });
-    if(onYellow){
-      curDot.style.background='#060604';
-      curRing.style.borderColor='rgba(6,6,4,.45)';
-    }else{
-      curDot.style.background='#FFD600';
-      curRing.style.borderColor='rgba(255,214,0,.45)';
-    }
-  });
 }
 
 /* ═══ LOADER ═══ */
