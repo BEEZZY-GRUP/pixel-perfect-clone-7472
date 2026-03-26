@@ -5,6 +5,8 @@ const HomePage = () => {
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     document.body.style.margin = "0";
+    document.documentElement.style.scrollbarWidth = "none";
+    document.body.style.scrollbarWidth = "none";
     return () => {
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
