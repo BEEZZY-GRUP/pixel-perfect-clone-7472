@@ -1082,8 +1082,9 @@ function startHero(){
     .to('#heroEyebrow',{opacity:1,duration:.5},'<.3')
     .to('#heroDesc',{opacity:1,duration:.85,ease:'power3.out'},'<.3')
     .to('#heroCta',{opacity:1,duration:.85,ease:'power3.out'},'<.2')
-    .to('#heroVisual',{opacity:1,duration:1,ease:'power3.out'},'<.3')
-    .to('#si',{opacity:1,duration:.5},'<.3');
+    .to('#si',{opacity:1,duration:.5},'<.3')
+    .from('.stats-bar-item',{opacity:0,y:20,stagger:.08,duration:.6,ease:'power3.out'},'<.4')
+    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.3');
 }
 
 /* ═══ NAV SCROLL ═══ */
