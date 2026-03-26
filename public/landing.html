@@ -2924,31 +2924,28 @@ animNum('nc4',12,'');
   const dots   = document.querySelectorAll('.leg-dot');
   const prev   = document.getElementById('legPrev');
   const next   = document.getElementById('legNext');
-  /* Page 0 = cards 0,1,2  |  Page 1 = cards 3,4 */
-  const PAGES  = 2;
-  let page = 0;
+  const counter = document.getElementById('legCounter');
+  const TOTAL  = cards.length;
+  let current = 0;
 
-  function goTo(p, animated=true){
-    page = Math.max(0, Math.min(p, PAGES-1));
-    const wrap   = track.parentElement;
-    const W      = wrap.offsetWidth;
-    const gap    = 24;
-    /* Page 0: cards 1,2,3 (x=0)
-       Page 1: cards 3,4,5 — shift by 2 cards so card 3 is visible on both pages */
-    const cardW  = cards[0].offsetWidth;
-    const x      = page === 0 ? 0 : -(2*(cardW+gap));
+  function goTo(idx, animated=true){
+    current = Math.max(0, Math.min(idx, TOTAL-1));
+    const gap = 24;
+    const cardW = cards[0].offsetWidth;
+    const x = -(current*(cardW+gap));
     if(animated){
       gsap.to(track,{x,duration:.6,ease:'power3.inOut'});
     } else {
       gsap.set(track,{x});
     }
-    dots.forEach((d,i)=>d.classList.toggle('active', i===page));
-    prev.style.opacity = page===0?'.35':'1';
-    next.style.opacity = page===PAGES-1?'.35':'1';
+    dots.forEach((d,i)=>d.classList.toggle('active', i===current));
+    if(counter) counter.textContent=String(current+1).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');
+    prev.style.opacity = current===0?'.35':'1';
+    next.style.opacity = current===TOTAL-1?'.35':'1';
   }
 
-  prev.addEventListener('click',()=>goTo(page-1));
-  next.addEventListener('click',()=>goTo(page+1));
+  prev.addEventListener('click',()=>goTo(current-1));
+  next.addEventListener('click',()=>goTo(current+1));
   dots.forEach(d=>d.addEventListener('click',()=>goTo(+d.dataset.idx)));
 
   let startX=0, isDragging=false;
