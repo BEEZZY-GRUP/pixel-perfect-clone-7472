@@ -211,23 +211,12 @@ body:has(button:hover) #cursor-ring {
   display: none;
 }
 
-/* Apply gold scrollbar globally to main scrollable areas */
+/* Apply subtle scrollbar globally */
 html {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--gold) / 0.12) hsl(var(--background));
+  scrollbar-width: none;
 }
 html::-webkit-scrollbar {
-  width: 6px;
-}
-html::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-html::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, hsl(var(--gold) / 0.18), hsl(var(--gold) / 0.08));
-  border-radius: 4px;
-}
-html::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, hsl(var(--gold) / 0.3), hsl(var(--gold) / 0.15));
+  display: none;
 }
 
 /* Admin select/option dark theme */
