@@ -2830,7 +2830,7 @@ const metST = ScrollTrigger.create({
       gsap.to(metTrack,{x:targetX,duration:.55,ease:'power3.inOut',overwrite:true});
     }
   },
-  onEnter(){showSlide(0,true); if(metUI) metUI.classList.add('visible');},
+  onEnter(){showSlide(0,true); if(metUI) metUI.classList.add('visible'); var sh=document.getElementById('metScrollHint'); if(sh) gsap.to(sh,{opacity:1,duration:.5,delay:.8});},
   onLeave(){if(metUI) metUI.classList.remove('visible');},
   onEnterBack(){if(metUI) metUI.classList.add('visible');},
   onLeaveBack(){showSlide(0,true); if(metUI) metUI.classList.remove('visible');}
