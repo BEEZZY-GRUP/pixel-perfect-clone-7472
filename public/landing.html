@@ -260,7 +260,7 @@ body{
   background:radial-gradient(ellipse 80% 60% at 80% 20%,rgba(255,255,255,.15) 0%,transparent 60%);
   pointer-events:none;
 }
-.sol-header{max-width:1200px;margin:0 auto 4rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
+.sol-header{max-width:1200px;margin:0 auto 4rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:start}
 .sol-eyebrow{
   font-family:'Montserrat',sans-serif;font-weight:700;font-size:.62rem;
   letter-spacing:.35em;text-transform:uppercase;color:rgba(6,6,4,.5);
@@ -274,19 +274,17 @@ body{
 .sol-intro{font-size:1rem;line-height:1.9;color:rgba(6,6,4,.6);max-width:380px}
 .sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .sol-card{
-  background:rgba(6,6,4,.06);border:2px solid rgba(6,6,4,.08);
-  border-radius:var(--radius-lg);padding:2.5rem 2rem;
+  background:rgba(6,6,4,.04);border:1px solid rgba(6,6,4,.1);
+  border-radius:var(--radius-lg);padding:2.2rem 2rem;
   position:relative;overflow:hidden;transition:all .35s;
 }
-.sol-card:hover{background:rgba(6,6,4,.1);border-color:rgba(6,6,4,.15);transform:translateY(-4px)}
-.sol-card-icon{
-  width:56px;height:56px;border-radius:var(--radius);
-  background:#060604;color:#FFD600;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;margin-bottom:1.5rem;
+.sol-card:hover{background:rgba(6,6,4,.08);border-color:rgba(6,6,4,.18);transform:translateY(-4px)}
+.sol-card-num{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;
+  letter-spacing:.2em;color:rgba(6,6,4,.3);margin-bottom:1.2rem;
 }
-.sol-card-title{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;color:#060604;margin-bottom:.6rem;letter-spacing:-.02em}
-.sol-card-text{font-size:.88rem;line-height:1.8;color:rgba(6,6,4,.55)}
+.sol-card-title{font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800;color:#060604;margin-bottom:.5rem;letter-spacing:-.02em}
+.sol-card-text{font-size:.85rem;line-height:1.8;color:rgba(6,6,4,.5)}
 @media(max-width:899px){.sol-header{grid-template-columns:1fr}.sol-grid{grid-template-columns:1fr}}
 
 /* ═══ NÚMEROS ═══ */
@@ -446,13 +444,19 @@ body{
   border-radius:var(--radius-lg);padding:3rem 2.5rem;
   position:relative;overflow:hidden;transition:all .4s;
 }
-.vert-card:hover{background:#161614;border-color:rgba(255,214,0,.2);transform:translateY(-4px)}
+.vert-card:hover{background:#161614;border-color:rgba(255,214,0,.35);transform:translateY(-4px);box-shadow:0 0 30px rgba(255,214,0,.08)}
 .vert-card::before{
-  content:'';position:absolute;top:0;left:0;width:0;height:3px;
+  content:'';position:absolute;top:0;left:0;width:0;height:4px;
   background:#FFD600;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
   transition:width .55s cubic-bezier(.77,0,.175,1);
 }
 .vert-card:hover::before{width:100%}
+.vert-card::after{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  border:2px solid transparent;pointer-events:none;
+  transition:border-color .4s;
+}
+.vert-card:hover::after{border-color:rgba(255,214,0,.3)}
 .vert-card-badge{
   display:inline-flex;align-items:center;gap:.6rem;
   padding:.35rem .9rem;border-radius:20px;
@@ -554,7 +558,7 @@ body{
 .cta-bg-img{
   position:absolute;inset:0;z-index:0;
   background:url('images/mulher.png') center center / cover no-repeat;
-  opacity:.15;
+  opacity:.45;
   filter:grayscale(.3);
 }
 .cta-bg-img::after{
@@ -872,32 +876,32 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
   </div>
   <div class="sol-grid">
     <div class="sol-card">
-      <div class="sol-card-icon">⚡</div>
+      <div class="sol-card-num">01</div>
       <h3 class="sol-card-title">Diagnóstico Profundo</h3>
       <p class="sol-card-text">Mapeamos processos, identificamos gargalos e encontramos oportunidades que ninguém mais enxerga dentro do seu negócio.</p>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">📊</div>
+      <div class="sol-card-num">02</div>
       <h3 class="sol-card-title">Gestão por Resultados</h3>
       <p class="sol-card-text">Dashboards reais, KPIs definidos e acompanhamento semanal — nada de relatórios que ninguém lê.</p>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🚀</div>
+      <div class="sol-card-num">03</div>
       <h3 class="sol-card-title">Execução de Verdade</h3>
       <p class="sol-card-text">Não entregamos planilhas. Fazemos, acompanhamos, ajustamos e documentamos — do planejamento à realidade.</p>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🎯</div>
+      <div class="sol-card-num">04</div>
       <h3 class="sol-card-title">Marketing + Tecnologia</h3>
       <p class="sol-card-text">Automação, dados e canais que escalam seu crescimento — sem depender de agências genéricas.</p>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🤝</div>
+      <div class="sol-card-num">05</div>
       <h3 class="sol-card-title">Parceiro Estratégico</h3>
       <p class="sol-card-text">Sócio operacional sem abrir capital. Decisões, processos e gestão — junto com você no dia a dia.</p>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🏆</div>
+      <div class="sol-card-num">06</div>
       <h3 class="sol-card-title">Legado Duradouro</h3>
       <p class="sol-card-text">Empresa autossustentável, time preparado e futuro definido. O começo da sua independência real.</p>
     </div>
