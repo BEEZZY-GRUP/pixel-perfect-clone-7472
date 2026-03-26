@@ -2879,6 +2879,12 @@ document.querySelectorAll('.comp3d-card').forEach(card=>{
     gsap.to(card,{rotateY:0,rotateX:0,duration:.6,ease:'elastic.out(.8,.5)'});
     gsap.to(curRing,{scale:1,borderColor:'rgba(255,214,0,.45)',duration:.3});
   });
+  /* Click to open methodology popup */
+  const pilarMap=[2,0,4]; /* card 0→Execução(2), card 1→Diagnóstico(0), card 2→Legado(4) */
+  card.addEventListener('click',()=>{
+    openPopup();
+    setTimeout(()=>pmfSetPilar(pilarMap[+card.dataset.index]||0),120);
+  });
 });
 
 ScrollTrigger.create({
