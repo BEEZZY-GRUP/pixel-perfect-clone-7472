@@ -3389,6 +3389,10 @@ window.closePopup=function(){
           <button class="pmf-nav-btn" data-idx="3">04</button>
           <button class="pmf-nav-btn" data-idx="4">05</button>
         </div>
+        <div style="display:flex;gap:.8rem;margin-top:.8rem">
+          <button id="pmfPrevBtn" onclick="if(pmfActive>0)pmfSetPilar(pmfActive-1)" style="flex:1;padding:.55rem;background:none;border:1px solid rgba(232,233,235,.1);color:rgba(232,233,235,.4);font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .3s">← Anterior</button>
+          <button id="pmfNextBtn" onclick="if(pmfActive<4){pmfSetPilar(pmfActive+1)}else{closePopup();openContact()}" style="flex:1;padding:.55rem;background:none;border:1px solid rgba(232,233,235,.1);color:rgba(232,233,235,.4);font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:none;transition:all .3s">Próximo →</button>
+        </div>
       </div>
     </div>
 
