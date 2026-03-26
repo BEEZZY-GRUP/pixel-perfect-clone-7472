@@ -30,6 +30,11 @@ body{
 }
 body::-webkit-scrollbar{display:none;width:0;height:0}
 
+/* ── TOUCH DEVICE: restore native cursor ── */
+@media (pointer: coarse) {
+  body { cursor: auto !important; }
+  #cur-dot, #cur-ring { display: none !important; }
+}
 
 /* ── BRAND LOGOS ── */
 .nav-logo{ text-decoration:none; display:block; }
