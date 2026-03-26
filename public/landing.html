@@ -274,19 +274,17 @@ body{
 .sol-intro{font-size:1rem;line-height:1.9;color:rgba(6,6,4,.6);max-width:380px}
 .sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .sol-card{
-  background:rgba(6,6,4,.06);border:2px solid rgba(6,6,4,.08);
-  border-radius:var(--radius-lg);padding:2.5rem 2rem;
+  background:rgba(6,6,4,.04);border:1px solid rgba(6,6,4,.1);
+  border-radius:var(--radius-lg);padding:2.2rem 2rem;
   position:relative;overflow:hidden;transition:all .35s;
 }
-.sol-card:hover{background:rgba(6,6,4,.1);border-color:rgba(6,6,4,.15);transform:translateY(-4px)}
-.sol-card-icon{
-  width:56px;height:56px;border-radius:var(--radius);
-  background:#060604;color:#FFD600;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;margin-bottom:1.5rem;
+.sol-card:hover{background:rgba(6,6,4,.08);border-color:rgba(6,6,4,.18);transform:translateY(-4px)}
+.sol-card-num{
+  font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;
+  letter-spacing:.2em;color:rgba(6,6,4,.3);margin-bottom:1.2rem;
 }
-.sol-card-title{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;color:#060604;margin-bottom:.6rem;letter-spacing:-.02em}
-.sol-card-text{font-size:.88rem;line-height:1.8;color:rgba(6,6,4,.55)}
+.sol-card-title{font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800;color:#060604;margin-bottom:.5rem;letter-spacing:-.02em}
+.sol-card-text{font-size:.85rem;line-height:1.8;color:rgba(6,6,4,.5)}
 @media(max-width:899px){.sol-header{grid-template-columns:1fr}.sol-grid{grid-template-columns:1fr}}
 
 /* ═══ NÚMEROS ═══ */
