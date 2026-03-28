@@ -280,15 +280,18 @@ body.page-ready{overflow-y:clip}
 .sol-intro{font-size:1rem;line-height:1.9;color:rgba(6,6,4,.6);max-width:380px}
 .sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .sol-card{
-  background:rgba(6,6,4,.03);border:1px solid rgba(6,6,4,.06);
+  background:rgba(6,6,4,.03);border:1px solid rgba(6,6,4,.08);
   border-radius:var(--radius-lg);padding:2.4rem 2.2rem;
-  position:relative;overflow:hidden;transition:all .45s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;transition:background .4s,border-color .4s,transform .4s cubic-bezier(.4,0,.2,1);
 }
-.sol-card:hover{background:rgba(6,6,4,.06);border-color:transparent;transform:translateY(-4px)}
-.sol-card-border{position:absolute;inset:0;pointer-events:none;z-index:2;width:100%;height:100%}
-.sol-card-border rect{fill:none;stroke:#060604;stroke-width:2;vector-effect:non-scaling-stroke;rx:16;ry:16;stroke-dasharray:2000;stroke-dashoffset:2000;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
-.sol-card:hover .sol-card-border rect{stroke-dashoffset:0}
-.sol-card:not(:hover) .sol-card-border rect{transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)}
+.sol-card::after{
+  content:'';position:absolute;inset:0;border-radius:var(--radius-lg);
+  border:2.5px solid #060604;opacity:0;
+  transition:opacity .55s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;z-index:2;
+}
+.sol-card:hover{background:rgba(6,6,4,.05);border-color:transparent;transform:translateY(-3px)}
+.sol-card:hover::after{opacity:1}
 .sol-card-num{
   font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;
   letter-spacing:.2em;color:rgba(6,6,4,.3);margin-bottom:1.2rem;
