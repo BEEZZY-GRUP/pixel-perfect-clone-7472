@@ -255,106 +255,79 @@ body.page-ready{overflow-y:clip}
 }
 .ti em{color:#FFD600;font-style:normal}
 
-/* ═══ SOLUTIONS — replaces manifesto ═══ */
+/* ═══ SOLUTIONS ═══ */
 #solutions{
-  background:#060604;color:#E8E9EB;
+  background:#FFD600;color:#0A0A08;
   padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
-#solutions::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 50% 50% at 0% 0%,rgba(255,214,0,.06) 0%,transparent 70%),
-    radial-gradient(ellipse 40% 40% at 100% 100%,rgba(255,214,0,.04) 0%,transparent 70%);
-  pointer-events:none;
-}
-.sol-header{max-width:1200px;margin:0 auto 5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
+.sol-header{max-width:1200px;margin:0 auto 4.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
 .sol-eyebrow{
   font-family:'Montserrat',sans-serif;font-weight:700;font-size:.62rem;
-  letter-spacing:.35em;text-transform:uppercase;color:#FFD600;
+  letter-spacing:.35em;text-transform:uppercase;color:#0A0A08;
   margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;
 }
-.sol-eyebrow::before{content:'';width:28px;height:2px;background:linear-gradient(90deg,#FFD600,transparent)}
+.sol-eyebrow::before{content:'';width:28px;height:2px;background:#0A0A08}
 .sol-title{
   font-family:'Montserrat',sans-serif;font-size:clamp(2.2rem,4.5vw,4rem);
-  font-weight:900;letter-spacing:-.03em;line-height:1.08;color:#E8E9EB;
+  font-weight:900;letter-spacing:-.03em;line-height:1.08;color:#0A0A08;
 }
-.sol-title em{font-style:normal;color:#FFD600}
-.sol-intro{font-size:.95rem;line-height:1.9;color:rgba(232,233,235,.45);max-width:380px}
-.sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.sol-title em{font-style:normal;color:#0A0A08;opacity:.5}
+.sol-intro{font-size:.95rem;line-height:1.9;color:rgba(10,10,8,.55);max-width:380px}
+.sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
 
-/* ── Card base ── */
+/* ── Card ── */
 .sol-card{
-  background:rgba(232,233,235,.03);
-  border:1px solid rgba(232,233,235,.06);
-  border-radius:var(--radius-lg);padding:2.6rem 2.2rem;
+  background:rgba(10,10,8,.04);
+  border:1px solid rgba(10,10,8,.08);
+  border-radius:14px;padding:2.4rem 2rem 2rem;
   position:relative;overflow:hidden;
-  transition:transform .5s cubic-bezier(.4,0,.2,1),background .5s,border-color .5s,box-shadow .5s;
+  transition:all .45s cubic-bezier(.4,0,.2,1);
 }
-
-/* Card glow layer */
-.sol-card::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 120% 80% at 50% 120%,rgba(255,214,0,.08) 0%,transparent 60%);
-  opacity:0;transition:opacity .5s;pointer-events:none;
-}
-.sol-card::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,#FFD600,transparent);
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .6s cubic-bezier(.4,0,.2,1);
-}
-
 .sol-card:hover{
-  transform:translateY(-8px);
-  background:rgba(232,233,235,.05);
-  border-color:rgba(255,214,0,.15);
-  box-shadow:0 20px 60px -15px rgba(255,214,0,.1),0 0 0 1px rgba(255,214,0,.08);
+  background:#0A0A08;
+  border-color:#0A0A08;
+  transform:translateY(-6px);
+  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
 }
-.sol-card:hover::before{opacity:1}
-.sol-card:hover::after{transform:scaleX(1)}
+.sol-card:hover .sol-card-icon{color:#FFD600}
+.sol-card:hover .sol-card-num{color:rgba(255,214,0,.35)}
+.sol-card:hover .sol-card-title{color:#fff}
+.sol-card:hover .sol-card-text{color:rgba(255,255,255,.55)}
+.sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0)}
 
 /* Icon */
 .sol-card-icon{
-  width:48px;height:48px;border-radius:12px;
-  background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.12);
+  width:44px;height:44px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:1.4rem;font-size:1.3rem;
-  transition:background .4s,transform .4s,border-color .4s;
+  margin-bottom:1.2rem;color:#0A0A08;
+  transition:color .4s;
 }
-.sol-card:hover .sol-card-icon{
-  background:rgba(255,214,0,.15);border-color:rgba(255,214,0,.3);
-  transform:scale(1.08) rotate(-3deg);
-}
+.sol-card-icon svg{width:32px;height:32px;fill:currentColor}
 
 .sol-card-num{
   font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:700;
-  letter-spacing:.2em;color:rgba(232,233,235,.15);margin-bottom:1rem;
+  letter-spacing:.2em;color:rgba(10,10,8,.2);margin-bottom:.8rem;
   transition:color .4s;
 }
-.sol-card:hover .sol-card-num{color:rgba(255,214,0,.4)}
 
 .sol-card-title{
-  font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:800;
-  color:#E8E9EB;margin-bottom:.6rem;letter-spacing:-.02em;
+  font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800;
+  color:#0A0A08;margin-bottom:.5rem;letter-spacing:-.02em;
   transition:color .4s;
 }
-.sol-card:hover .sol-card-title{color:#FFD600}
 
-.sol-card-text{font-size:.85rem;line-height:1.8;color:rgba(232,233,235,.4);transition:color .4s}
-.sol-card:hover .sol-card-text{color:rgba(232,233,235,.6)}
+.sol-card-text{font-size:.83rem;line-height:1.8;color:rgba(10,10,8,.45);transition:color .4s}
 
 /* Card arrow */
 .sol-card-arrow{
-  position:absolute;bottom:1.8rem;right:1.8rem;
+  position:absolute;bottom:1.6rem;right:1.6rem;
   width:28px;height:28px;border-radius:50%;
-  background:rgba(255,214,0,.06);
   display:flex;align-items:center;justify-content:center;
   opacity:0;transform:translate(-6px,6px);
-  transition:opacity .4s,transform .4s,background .4s;
+  transition:opacity .4s,transform .4s;
 }
 .sol-card-arrow svg{width:14px;height:14px;stroke:#FFD600;stroke-width:2;fill:none}
-.sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0);background:rgba(255,214,0,.12)}
 
 @media(max-width:899px){.sol-header{grid-template-columns:1fr}.sol-grid{grid-template-columns:1fr}}
 
@@ -946,42 +919,42 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
   </div>
   <div class="sol-grid">
     <div class="sol-card">
-      <div class="sol-card-icon">🔍</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M16,12.43a1,1,0,0,0-1.41,0l-.36.36L13,11.58A5.45,5.45,0,0,0,4.64,4.64,5.45,5.45,0,0,0,11.58,13l1.2,1.2-.36.36a1,1,0,0,0,0,1.41l4.95,4.95a1,1,0,0,0,1.41,0l2.13-2.12a1,1,0,0,0,0-1.41ZM6,11a3.54,3.54,0,1,1,5,0A3.63,3.63,0,0,1,6,11ZM18.09,18.8l-3.54-3.54.71-.71,3.54,3.54Z"/></svg></div>
       <div class="sol-card-num">01</div>
       <h3 class="sol-card-title">Diagnóstico Profundo</h3>
       <p class="sol-card-text">Mapeamos processos, identificamos gargalos e encontramos oportunidades que ninguém mais enxerga dentro do seu negócio.</p>
       <div class="sol-card-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></div>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">📊</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M3,21H21a1,1,0,0,0,1-1V8h0a1,1,0,0,0-.29-.72A1,1,0,0,0,20.89,7H17V5a1,1,0,0,0-1-1H8A1,1,0,0,0,7,5V7H3.11A1,1,0,0,0,2,8H2V20A1,1,0,0,0,3,21Zm1-2V10.41l3.27,3.3A1,1,0,0,0,8,14h3v2a1,1,0,0,0,2,0V14h3a1,1,0,0,0,.71-.3L20,10.41V19ZM18.59,9l-3,3H8.4l-3-3ZM9,6h6V7H9Z"/></svg></div>
       <div class="sol-card-num">02</div>
       <h3 class="sol-card-title">Gestão por Resultados</h3>
       <p class="sol-card-text">Dashboards reais, KPIs definidos e acompanhamento semanal — nada de relatórios que ninguém lê.</p>
       <div class="sol-card-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></div>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">⚡</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M21.45,2.11a1,1,0,0,0-1,.09L16.67,5H14a1,1,0,0,0-1,1V7H8A5,5,0,0,0,8,17v4a1,1,0,0,0,1,1h3a1,1,0,0,0,1-1V18a1,1,0,0,0,1,1h2.67l3.73,2.8a1,1,0,0,0,.6.2,1,1,0,0,0,1-1V3A1,1,0,0,0,21.45,2.11ZM13,15H9V9h4ZM5,12A3,3,0,0,1,7,9.18v5.63A3,3,0,0,1,5,12Zm6,8H10V17h1Zm4-4V7h1V17H15Zm5,3-2-1.5V6.5L20,5Z"/></svg></div>
       <div class="sol-card-num">03</div>
       <h3 class="sol-card-title">Execução de Verdade</h3>
       <p class="sol-card-text">Não entregamos planilhas. Fazemos, acompanhamos, ajustamos e documentamos — do planejamento à realidade.</p>
       <div class="sol-card-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></div>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🚀</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M21,4.93h0L12.32,2.05a1,1,0,0,0-.61,0l-9,2.75A1,1,0,0,0,2,5.57,1.06,1.06,0,0,0,1.93,6V9A1.07,1.07,0,0,0,3,10.07H5V17H3a1,1,0,0,0-1,1v3a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V18a1,1,0,0,0-1-1H19V10.07h2A1.07,1.07,0,0,0,22.07,9V6A1.07,1.07,0,0,0,21,4.93ZM12,4l2.64.88H9.1Zm-5,6H8V17H7ZM13,17V10.07h1V17Zm-2,        0H10V10.07h1Zm9,3H4V19H20Zm-3-3H16V10.07h1Zm2.93-9.07H4.07V7.07H19.93Z"/></svg></div>
       <div class="sol-card-num">04</div>
       <h3 class="sol-card-title">Marketing + Tecnologia</h3>
       <p class="sol-card-text">Automação, dados e canais que escalam seu crescimento — sem depender de agências genéricas.</p>
       <div class="sol-card-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></div>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🤝</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M19,9A7,7,0,1,0,8,14.74V21a1,1,0,0,0,1.71.71L12,19.41l2.29,2.29A1,1,0,0,0,16,21l-.14-6.14A7,7,0,0,0,19,9ZM7,9a5,5,0,1,1,5,5A5,5,0,0,1,7,9Zm6.94,9.53-1.24-1.24a1,1,0,0,0-1.41,0L10,18.59V15.71a6.88,6.88,0,0,0,3.88,0Z"/><path d="M10.71,8.71,11,8.41V11H10v2h4V11H13V6a1,1,0,0,0-1.71-.71l-2,2a1,1,0,0,0,1.41,1.41Z"/></svg></div>
       <div class="sol-card-num">05</div>
       <h3 class="sol-card-title">Parceiro Estratégico</h3>
       <p class="sol-card-text">Sócio operacional sem abrir capital. Decisões, processos e gestão — junto com você no dia a dia.</p>
       <div class="sol-card-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></div>
     </div>
     <div class="sol-card">
-      <div class="sol-card-icon">🏛️</div>
+      <div class="sol-card-icon"><svg viewBox="0 0 24 24"><path d="M21,2H9A1,1,0,0,0,8,3V5H3A1,1,0,0,0,2,6V21a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V3A1,1,0,0,0,21,2ZM4,11H8v2H4ZM8,7V9H4V7ZM4,15H8v5H4Zm10,5V18h2v2Zm6,0H18V17a1,1,0,0,0-1-1H13a1,1,0,0,0-1,1v3H10V4H20Z"/><rect height="2" width="2" x="12" y="5"/><rect height="2" width="2" x="16" y="5"/><rect height="2" width="2" x="12" y="9"/><rect height="2" width="2" x="16" y="9"/></svg></div>
       <div class="sol-card-num">06</div>
       <h3 class="sol-card-title">Legado Duradouro</h3>
       <p class="sol-card-text">Empresa autossustentável, time preparado e futuro definido. O começo da sua independência real.</p>
