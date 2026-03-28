@@ -99,7 +99,7 @@ body.page-ready{overflow-y:clip}
 #hero{
   min-height:100vh;min-height:100svh;
   display:flex;align-items:center;
-  padding:clamp(6rem,10vw,10rem) clamp(1.5rem,5vw,5rem) clamp(3rem,5vw,5rem);
+  padding:clamp(6rem,10vw,10rem) clamp(1.5rem,5vw,5rem) clamp(1.5rem,3vw,2.5rem);
   position:relative;overflow:hidden;
   background:#060604;
 }
@@ -1241,19 +1241,19 @@ gsap.to(pObj,{n:100,duration:2.0,ease:'power2.inOut',
 /* ═══ HERO ENTRANCE ═══ */
 function startHero(){
   gsap.timeline()
-    .to('.h1-word',{y:'0%',duration:1.1,ease:'power4.out',stagger:.12})
-    .to('#heroEyebrow',{opacity:1,duration:.5},'<.3')
-    .to('#heroDesc',{opacity:1,duration:.85,ease:'power3.out'},'<.3')
-    .to('#heroCta',{opacity:1,duration:.85,ease:'power3.out'},'<.2')
-    .to('#si',{opacity:1,duration:.5},'<.3')
-    .from('.stats-bar-item',{opacity:0,y:20,stagger:.08,duration:.6,ease:'power3.out'},'<.4')
-    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.3')
+    .to('.h1-word',{y:'0%',duration:.8,ease:'power4.out',stagger:.08})
+    .to('#heroEyebrow',{opacity:1,duration:.4},'<.2')
+    .to('#heroDesc',{opacity:1,duration:.6,ease:'power3.out'},'<.2')
+    .to('#heroCta',{opacity:1,duration:.6,ease:'power3.out'},'<.15')
+    .to('#si',{opacity:1,duration:.4},'<.2')
+    .from('.stats-bar-item',{opacity:0,y:20,stagger:.06,duration:.5,ease:'power3.out'},'<.3')
+    .from('.stats-bar-badge',{opacity:0,duration:.4},'<.2')
     /* Astronaut entrance */
-    .from('#heroAstronaut',{opacity:0,y:60,scale:.9,duration:1.2,ease:'power3.out'},'<.2')
-    .from('#planet1',{opacity:0,x:40,y:-30,duration:1,ease:'power3.out'},'<.3')
-    .from('#planet2',{opacity:0,x:30,y:20,duration:1,ease:'power3.out'},'<.4')
-    .from('#planet3',{opacity:0,x:50,duration:.8,ease:'power3.out'},'<.5')
-    .from('#planetRing',{opacity:0,scale:.5,duration:1.2,ease:'power3.out'},'<.3');
+    .from('#heroAstronaut',{opacity:0,y:60,scale:.9,duration:.9,ease:'power3.out'},'<.15')
+    .from('#planet1',{opacity:0,x:40,y:-30,duration:.8,ease:'power3.out'},'<.2')
+    .from('#planet2',{opacity:0,x:30,y:20,duration:.8,ease:'power3.out'},'<.3')
+    .from('#planet3',{opacity:0,x:50,duration:.6,ease:'power3.out'},'<.4')
+    .from('#planetRing',{opacity:0,scale:.5,duration:.9,ease:'power3.out'},'<.2');
 }
 
 /* ═══ PARALLAX — Astronaut & Planets on scroll ═══ */
@@ -1268,7 +1268,7 @@ ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('na
 
 /* ═══ SCROLL ANIMATIONS ═══ */
 /* Solutions */
-ScrollTrigger.create({trigger:'#solutions',start:'top 65%',once:true,
+ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
   onEnter(){
     gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out',clearProps:'all'});
     gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1276,7 +1276,7 @@ ScrollTrigger.create({trigger:'#solutions',start:'top 65%',once:true,
 });
 
 /* Numbers */
-ScrollTrigger.create({trigger:'#numeros',start:'top 60%',once:true,
+ScrollTrigger.create({trigger:'#numeros',start:'top 82%',once:true,
   onEnter(){
     gsap.from('.nums-eyebrow,.nums-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.num-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.2,clearProps:'all'});
@@ -1293,7 +1293,7 @@ ScrollTrigger.create({trigger:'#numeros',start:'top 60%',once:true,
 });
 
 /* Methodology */
-ScrollTrigger.create({trigger:'#metodologia',start:'top 60%',once:true,
+ScrollTrigger.create({trigger:'#metodologia',start:'top 82%',once:true,
   onEnter(){
     gsap.from('.met-eyebrow,.met-title,.met-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.met-card',{opacity:0,x:-30,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1301,7 +1301,7 @@ ScrollTrigger.create({trigger:'#metodologia',start:'top 60%',once:true,
 });
 
 /* Verticais */
-ScrollTrigger.create({trigger:'#verticais',start:'top 60%',once:true,
+ScrollTrigger.create({trigger:'#verticais',start:'top 82%',once:true,
   onEnter(){
     gsap.from('.vert-eyebrow,.vert-title,.vert-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.vert-card',{opacity:0,y:40,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1309,7 +1309,7 @@ ScrollTrigger.create({trigger:'#verticais',start:'top 60%',once:true,
 });
 
 /* Clients */
-ScrollTrigger.create({trigger:'#clientes',start:'top 65%',once:true,
+ScrollTrigger.create({trigger:'#clientes',start:'top 85%',once:true,
   onEnter(){
     gsap.from('.cli-eyebrow,.cli-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.cli-item',{opacity:0,y:20,stagger:.06,duration:.6,ease:'power3.out',delay:.2,clearProps:'all'});
@@ -1317,7 +1317,7 @@ ScrollTrigger.create({trigger:'#clientes',start:'top 65%',once:true,
 });
 
 /* Testimonials */
-ScrollTrigger.create({trigger:'#testimonials',start:'top 60%',once:true,
+ScrollTrigger.create({trigger:'#testimonials',start:'top 82%',once:true,
   onEnter(){
     gsap.from('.test-eyebrow,.test-title',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.test-card',{opacity:0,y:40,stagger:.1,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1325,11 +1325,11 @@ ScrollTrigger.create({trigger:'#testimonials',start:'top 60%',once:true,
 });
 
 /* CTA */
-['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 65%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
-gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 60%',once:true}});
+['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 85%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
+gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 82%',once:true}});
 
 /* Footer */
-gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 85%',once:true}});
+gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 90%',once:true}});
 
 /* ═══ CONTACT FORM ═══ */
 window.submitContact=async function(e){
