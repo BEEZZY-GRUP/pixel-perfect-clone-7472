@@ -10,16 +10,18 @@
 <style>
 /* ═══ RESET & BASE ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,214,0,.1) transparent}
+html{overflow-x:hidden;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,214,0,.1) transparent}
 html::-webkit-scrollbar{width:5px}
 html::-webkit-scrollbar-track{background:transparent}
 html::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,214,0,.15),rgba(255,214,0,.03));border-radius:6px}
 html::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(255,214,0,.25),rgba(255,214,0,.08))}
+html.page-ready{overflow-y:auto}
 body{
   background:#060604;color:#E8E9EB;
   font-family:'DM Sans',sans-serif;font-weight:400;
-  overflow-x:hidden;cursor:none;
+  overflow-x:hidden;overflow-y:clip;cursor:none;
 }
+body.page-ready{overflow-y:clip}
 @media(pointer:coarse){body{cursor:auto!important}#cur-dot,#cur-ring{display:none!important}}
 
 /* ═══ VARIABLES ═══ */
@@ -1187,7 +1189,7 @@ gsap.fromTo('.ld-logo-svg',{opacity:0,y:20},{opacity:1,y:0,duration:1.0,ease:'po
 const pObj={n:0};
 gsap.to(pObj,{n:100,duration:2.0,ease:'power2.inOut',
   onUpdate(){const v=Math.floor(pObj.n);document.getElementById('ld-count').textContent=v;document.getElementById('ld-bar').style.width=v+'%'},
-  onComplete(){gsap.to('#loader',{yPercent:-100,duration:1.1,ease:'power4.inOut',onComplete(){document.getElementById('loader').style.display='none';startHero();setTimeout(()=>ScrollTrigger.refresh(),100)}})}
+  onComplete(){gsap.to('#loader',{yPercent:-100,duration:1.1,ease:'power4.inOut',onComplete(){document.getElementById('loader').style.display='none';document.documentElement.classList.add('page-ready');document.body.classList.add('page-ready');startHero();setTimeout(()=>ScrollTrigger.refresh(),100)}})}
 });
 
 /* ═══ HERO ENTRANCE ═══ */
