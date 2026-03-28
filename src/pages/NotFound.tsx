@@ -101,9 +101,9 @@ const NotFound = () => {
         {/* Floating logo */}
         <div className="animate-float">
           <img
-            src="/images/logo_shielid.svg"
-            alt="Beezzy Logo"
-            className="w-20 h-20 md:w-28 md:h-28 opacity-80"
+            src="/images/astronauta.png"
+            alt="Astronauta Beezzy"
+            className="w-36 h-auto md:w-52 drop-shadow-[0_0_40px_hsla(36,35%,61%,0.3)]"
           />
         </div>
 
