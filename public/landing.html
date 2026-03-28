@@ -886,27 +886,6 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
   </div>
 </section>
 
-<!-- ═══ STATS BAR ═══ -->
-<section id="stats-bar">
-  <div class="stats-bar-inner">
-    <div class="stats-bar-item">
-      <div class="stats-bar-val">5</div>
-      <div class="stats-bar-lbl">Pilares<br>Metodológicos</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="stats-bar-val">2</div>
-      <div class="stats-bar-lbl">Verticais<br>de Negócio</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="stats-bar-val">∞</div>
-      <div class="stats-bar-lbl">Potencial<br>de Legado</div>
-    </div>
-    <div class="stats-bar-item">
-      <div class="stats-bar-val">47<span>+</span></div>
-      <div class="stats-bar-lbl">Empresas<br>Transformadas</div>
-    </div>
-  </div>
-</section>
 
 <!-- TICKER -->
 <div class="ticker">
@@ -1248,8 +1227,6 @@ function startHero(){
     .to('#heroDesc',{opacity:1,duration:.8},'<.3')
     .to('#heroCta',{opacity:1,duration:.8},'<.2')
     .to('#si',{opacity:1,duration:.6},'<.25')
-    .from('.stats-bar-item',{opacity:0,y:15,stagger:.08,duration:.6},'<.35')
-    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.25')
     /* Astronaut entrance */
     .from('#heroAstronaut',{opacity:0,y:50,scale:.92,duration:1.2,ease:'expo.out'},'<.2')
     .from('#planet1',{opacity:0,x:35,y:-25,duration:1,ease:'expo.out'},'<.25')
