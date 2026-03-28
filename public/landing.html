@@ -1325,8 +1325,8 @@ ScrollTrigger.create({trigger:'#testimonials',start:'top 82%',once:true,
 });
 
 /* CTA */
-['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 65%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
-gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 60%',once:true}});
+['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 85%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
+gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 82%',once:true}});
 
 /* Footer */
 gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 85%',once:true}});
