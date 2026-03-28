@@ -1269,19 +1269,35 @@ gsap.to('#planetRing',{y:-30,rotation:8,ease:'none',scrollTrigger:{trigger:'#her
 ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('nav').classList.toggle('solid',self.progress>0)}});
 
 /* ═══ SCROLL ANIMATIONS ═══ */
+/* Hide all scroll-animated elements initially to prevent flash */
+gsap.set('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25});
+gsap.set('.sol-card',{opacity:0,y:40});
+gsap.set('.nums-eyebrow,.nums-title',{opacity:0,y:20});
+gsap.set('.num-card',{opacity:0,y:40});
+gsap.set('.met-eyebrow,.met-title,.met-intro',{opacity:0,y:25});
+gsap.set('.met-card',{opacity:0,x:-30});
+gsap.set('.vert-eyebrow,.vert-title,.vert-intro',{opacity:0,y:25});
+gsap.set('.vert-card',{opacity:0,y:40});
+gsap.set('.cli-eyebrow,.cli-title',{opacity:0,y:20});
+gsap.set('.cli-item',{opacity:0,y:20});
+gsap.set('.test-eyebrow,.test-title',{opacity:0,y:25});
+gsap.set('.test-card',{opacity:0,y:40});
+gsap.set('#ctaTitle',{opacity:0,y:45});
+gsap.set('footer',{opacity:0,y:25});
+
 /* Solutions */
-ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
+ScrollTrigger.create({trigger:'#solutions',start:'top 80%',once:true,
   onEnter(){
-    gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out',clearProps:'all'});
-    gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
+    gsap.to('.sol-eyebrow,.sol-title,.sol-intro',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.sol-card',{opacity:1,y:0,stagger:.08,duration:.9,ease:'power3.out',delay:.3});
   }
 });
 
 /* Numbers */
-ScrollTrigger.create({trigger:'#numeros',start:'top 82%',once:true,
+ScrollTrigger.create({trigger:'#numeros',start:'top 80%',once:true,
   onEnter(){
-    gsap.from('.nums-eyebrow,.nums-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.num-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.2,clearProps:'all'});
+    gsap.to('.nums-eyebrow,.nums-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.num-card',{opacity:1,y:0,stagger:.08,duration:.9,ease:'power3.out',delay:.2});
     /* Animate numbers */
     [{id:'nc1',end:47,s:'+'},{id:'nc2',end:94,s:'%'},{id:'nc3',end:3,s:'x'},{id:'nc4',end:12,s:''}].forEach(({id,end,s})=>{
       const el=document.getElementById(id);if(!el)return;
@@ -1295,43 +1311,43 @@ ScrollTrigger.create({trigger:'#numeros',start:'top 82%',once:true,
 });
 
 /* Methodology */
-ScrollTrigger.create({trigger:'#metodologia',start:'top 82%',once:true,
+ScrollTrigger.create({trigger:'#metodologia',start:'top 80%',once:true,
   onEnter(){
-    gsap.from('.met-eyebrow,.met-title,.met-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.met-card',{opacity:0,x:-30,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
+    gsap.to('.met-eyebrow,.met-title,.met-intro',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.met-card',{opacity:1,x:0,stagger:.12,duration:.9,ease:'power3.out',delay:.3});
   }
 });
 
 /* Verticais */
-ScrollTrigger.create({trigger:'#verticais',start:'top 82%',once:true,
+ScrollTrigger.create({trigger:'#verticais',start:'top 80%',once:true,
   onEnter(){
-    gsap.from('.vert-eyebrow,.vert-title,.vert-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.vert-card',{opacity:0,y:40,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
+    gsap.to('.vert-eyebrow,.vert-title,.vert-intro',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.vert-card',{opacity:1,y:0,stagger:.12,duration:.9,ease:'power3.out',delay:.3});
   }
 });
 
 /* Clients */
-ScrollTrigger.create({trigger:'#clientes',start:'top 85%',once:true,
+ScrollTrigger.create({trigger:'#clientes',start:'top 82%',once:true,
   onEnter(){
-    gsap.from('.cli-eyebrow,.cli-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.cli-item',{opacity:0,y:20,stagger:.06,duration:.6,ease:'power3.out',delay:.2,clearProps:'all'});
+    gsap.to('.cli-eyebrow,.cli-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.cli-item',{opacity:1,y:0,stagger:.06,duration:.7,ease:'power3.out',delay:.2});
   }
 });
 
 /* Testimonials */
-ScrollTrigger.create({trigger:'#testimonials',start:'top 82%',once:true,
+ScrollTrigger.create({trigger:'#testimonials',start:'top 80%',once:true,
   onEnter(){
-    gsap.from('.test-eyebrow,.test-title',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
-    gsap.from('.test-card',{opacity:0,y:40,stagger:.1,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
+    gsap.to('.test-eyebrow,.test-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.test-card',{opacity:1,y:0,stagger:.1,duration:.9,ease:'power3.out',delay:.3});
   }
 });
 
 /* CTA */
-['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 85%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
-gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 82%',once:true}});
+['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 82%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
+ScrollTrigger.create({trigger:'#cta',start:'top 80%',once:true,onEnter(){gsap.to('#ctaTitle',{opacity:1,y:0,duration:1.1,ease:'power3.out'})}});
 
 /* Footer */
-gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 90%',once:true}});
+ScrollTrigger.create({trigger:'footer',start:'top 88%',once:true,onEnter(){gsap.to('footer',{opacity:1,y:0,duration:.9,ease:'power3.out'})}});
 
 /* ═══ CONTACT FORM ═══ */
 window.submitContact=async function(e){
