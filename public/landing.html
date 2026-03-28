@@ -1268,7 +1268,7 @@ ScrollTrigger.create({start:'top -80',onUpdate(self){document.getElementById('na
 
 /* ═══ SCROLL ANIMATIONS ═══ */
 /* Solutions */
-ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
+ScrollTrigger.create({trigger:'#solutions',start:'top 65%',once:true,
   onEnter(){
     gsap.from('.sol-eyebrow,.sol-title,.sol-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out',clearProps:'all'});
     gsap.from('.sol-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1276,7 +1276,7 @@ ScrollTrigger.create({trigger:'#solutions',start:'top 85%',once:true,
 });
 
 /* Numbers */
-ScrollTrigger.create({trigger:'#numeros',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#numeros',start:'top 60%',once:true,
   onEnter(){
     gsap.from('.nums-eyebrow,.nums-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.num-card',{opacity:0,y:40,stagger:.08,duration:.8,ease:'power3.out',delay:.2,clearProps:'all'});
@@ -1293,7 +1293,7 @@ ScrollTrigger.create({trigger:'#numeros',start:'top 75%',once:true,
 });
 
 /* Methodology */
-ScrollTrigger.create({trigger:'#metodologia',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#metodologia',start:'top 60%',once:true,
   onEnter(){
     gsap.from('.met-eyebrow,.met-title,.met-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.met-card',{opacity:0,x:-30,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1301,7 +1301,7 @@ ScrollTrigger.create({trigger:'#metodologia',start:'top 75%',once:true,
 });
 
 /* Verticais */
-ScrollTrigger.create({trigger:'#verticais',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#verticais',start:'top 60%',once:true,
   onEnter(){
     gsap.from('.vert-eyebrow,.vert-title,.vert-intro',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.vert-card',{opacity:0,y:40,stagger:.12,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1309,7 +1309,7 @@ ScrollTrigger.create({trigger:'#verticais',start:'top 75%',once:true,
 });
 
 /* Clients */
-ScrollTrigger.create({trigger:'#clientes',start:'top 80%',once:true,
+ScrollTrigger.create({trigger:'#clientes',start:'top 65%',once:true,
   onEnter(){
     gsap.from('.cli-eyebrow,.cli-title',{opacity:0,y:20,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.cli-item',{opacity:0,y:20,stagger:.06,duration:.6,ease:'power3.out',delay:.2,clearProps:'all'});
@@ -1317,7 +1317,7 @@ ScrollTrigger.create({trigger:'#clientes',start:'top 80%',once:true,
 });
 
 /* Testimonials */
-ScrollTrigger.create({trigger:'#testimonials',start:'top 75%',once:true,
+ScrollTrigger.create({trigger:'#testimonials',start:'top 60%',once:true,
   onEnter(){
     gsap.from('.test-eyebrow,.test-title',{opacity:0,y:25,stagger:.1,duration:.7,ease:'power3.out'});
     gsap.from('.test-card',{opacity:0,y:40,stagger:.1,duration:.8,ease:'power3.out',delay:.3,clearProps:'all'});
@@ -1325,11 +1325,11 @@ ScrollTrigger.create({trigger:'#testimonials',start:'top 75%',once:true,
 });
 
 /* CTA */
-['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 80%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
-gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 78%',once:true}});
+['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 65%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
+gsap.from('#ctaTitle',{opacity:0,y:45,duration:1.1,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'#cta',start:'top 60%',once:true}});
 
 /* Footer */
-gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 92%',once:true}});
+gsap.from('footer',{opacity:0,y:25,duration:.9,ease:'power3.out',clearProps:'all',scrollTrigger:{trigger:'footer',start:'top 85%',once:true}});
 
 /* ═══ CONTACT FORM ═══ */
 window.submitContact=async function(e){
