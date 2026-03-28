@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
 
 const NotFound = () => {
   const location = useLocation();
@@ -10,139 +9,86 @@ const NotFound = () => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
 
-  // Same volumetric smoke shader from HeroSection
+  // 2D Canvas starfield (no WebGL needed)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    const uniforms = {
-      uTime: { value: 0 },
-      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-      uMouseVel: { value: new THREE.Vector2(0, 0) },
-    };
-
-    const vertShader = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
-    const fragShader = `
-      precision highp float;
-      uniform float uTime;
-      uniform vec2 uResolution;
-      uniform vec2 uMouse;
-      uniform vec2 uMouseVel;
-      varying vec2 vUv;
-
-      #define OCTAVES 6
-
-      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-
-      float noise(vec2 p) {
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        return mix(
-          mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-          u.y
-        );
-      }
-
-      float fbm(vec2 p) {
-        float v = 0.0, a = 0.5;
-        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-        for (int i = 0; i < OCTAVES; i++) {
-          v += a * noise(p);
-          p = rot * p * 2.0 + 3.7;
-          a *= 0.5;
-        }
-        return v;
-      }
-
-      float smokeField(vec2 uv, float t, vec2 mouse, vec2 mvel) {
-        vec2 delta = uv - mouse;
-        float dist = length(delta);
-        float influence = smoothstep(0.25, 0.0, dist);
-        vec2 pushDir = normalize(delta + 0.0001);
-        vec2 displaced = uv + pushDir * influence * 0.012;
-        displaced += mvel * smoothstep(0.2, 0.0, dist) * 0.06;
-        float d1 = fbm(displaced * 2.0 + vec2(t * 0.5, t * 0.3));
-        float d2 = fbm(displaced * 1.6 + vec2(d1 * 0.7 - t * 0.35, d1 * 0.5 + t * 0.2));
-        float d3 = fbm(displaced * 2.8 + vec2(d2 * 0.6 + t * 0.25, -d2 * 0.4 + t * 0.35));
-        float trail = influence * 0.015;
-        return d3 + trail;
-      }
-
-      float grain(vec2 uv, float t) {
-        return (hash(uv * uResolution * 0.5 + fract(t * 43.0)) * 2.0 - 1.0) * 0.035;
-      }
-
-      void main() {
-        vec2 uv = vUv;
-        float t = uTime * 0.07;
-        float smoke = smokeField(uv, t, uMouse, uMouseVel);
-        float base = smoothstep(0.25, 0.75, smoke);
-        float layer1 = smoothstep(0.35, 0.55, fbm(uv * 1.8 + t * 0.2)) * 0.4;
-        float layer2 = smoothstep(0.4, 0.65, fbm(uv * 3.0 - t * 0.15)) * 0.25;
-        float lightDir = dot(normalize(uv - vec2(0.2, 0.8)), vec2(0.7, -0.7));
-        float volumeLight = smoothstep(-0.2, 0.6, lightDir) * base * 0.15;
-        float lum = mix(0.03, 0.14, base) + layer1 - layer2 + volumeLight;
-        vec3 col = vec3(lum);
-        col += vec3(0.04, 0.025, 0.005) * smoothstep(0.12, 0.25, lum);
-        float vig = 1.0 - smoothstep(0.3, 0.85, length(uv - 0.5) * 1.2);
-        col *= mix(0.6, 1.0, vig);
-        col += grain(uv, uTime);
-        col = clamp(col, 0.0, 1.0);
-        gl_FragColor = vec4(col, 0.92);
-      }
-    `;
-
-    const geo = new THREE.PlaneGeometry(2, 2);
-    const mat = new THREE.ShaderMaterial({ uniforms, vertexShader: vertShader, fragmentShader: fragShader, transparent: true });
-    scene.add(new THREE.Mesh(geo, mat));
-
-    let prevMouse = { x: 0.5, y: 0.5 };
-    const onMouseMove = (e: MouseEvent) => {
-      const nx = e.clientX / window.innerWidth;
-      const ny = 1 - e.clientY / window.innerHeight;
-      uniforms.uMouseVel.value.set(nx - prevMouse.x, ny - prevMouse.y);
-      uniforms.uMouse.value.set(nx, ny);
-      prevMouse = { x: nx, y: ny };
-    };
-    document.addEventListener("mousemove", onMouseMove);
-
-    const onResize = () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-    };
-    window.addEventListener("resize", onResize);
-
-    const startTime = performance.now();
     let raf: number;
+    const stars: { x: number; y: number; z: number; pz: number }[] = [];
+    const NUM_STARS = 350;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    for (let i = 0; i < NUM_STARS; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * canvas.width * 2,
+        y: (Math.random() - 0.5) * canvas.height * 2,
+        z: Math.random() * canvas.width,
+        pz: 0,
+      });
+    }
+
     const animate = () => {
       raf = requestAnimationFrame(animate);
-      uniforms.uTime.value = (performance.now() - startTime) * 0.001;
-      uniforms.uMouseVel.value.multiplyScalar(0.88);
-      renderer.render(scene, camera);
+      ctx.fillStyle = "rgba(8, 8, 7, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      for (const star of stars) {
+        star.pz = star.z;
+        star.z -= 1.2;
+
+        if (star.z <= 0) {
+          star.x = (Math.random() - 0.5) * canvas.width * 2;
+          star.y = (Math.random() - 0.5) * canvas.height * 2;
+          star.z = canvas.width;
+          star.pz = star.z;
+        }
+
+        const sx = (star.x / star.z) * cx + cx;
+        const sy = (star.y / star.z) * cy + cy;
+        const px = (star.x / star.pz) * cx + cx;
+        const py = (star.y / star.pz) * cy + cy;
+
+        const size = Math.max(0, (1 - star.z / canvas.width) * 2.5);
+        const alpha = Math.max(0, 1 - star.z / canvas.width);
+
+        ctx.beginPath();
+        ctx.strokeStyle = `hsla(36, 35%, 61%, ${alpha * 0.6})`;
+        ctx.lineWidth = size;
+        ctx.moveTo(px, py);
+        ctx.lineTo(sx, sy);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(36, 54%, 71%, ${alpha})`;
+        ctx.arc(sx, sy, size * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
     };
+
     raf = requestAnimationFrame(animate);
 
     return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("resize", onResize);
       cancelAnimationFrame(raf);
-      renderer.dispose();
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 opacity-55" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0" />
       <div className="hero-noise" />
       <div className="absolute inset-0 z-[1] bg-gradient-to-t from-background via-transparent to-background/60 pointer-events-none" />
 
