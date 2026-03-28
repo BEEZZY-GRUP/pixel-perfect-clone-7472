@@ -1242,20 +1242,20 @@ gsap.to(pObj,{n:100,duration:2.0,ease:'power2.inOut',
 
 /* ═══ HERO ENTRANCE ═══ */
 function startHero(){
-  gsap.timeline()
-    .to('.h1-word',{y:'0%',duration:.8,ease:'power4.out',stagger:.08})
-    .to('#heroEyebrow',{opacity:1,duration:.4},'<.2')
-    .to('#heroDesc',{opacity:1,duration:.6,ease:'power3.out'},'<.2')
-    .to('#heroCta',{opacity:1,duration:.6,ease:'power3.out'},'<.15')
-    .to('#si',{opacity:1,duration:.4},'<.2')
-    .from('.stats-bar-item',{opacity:0,y:20,stagger:.06,duration:.5,ease:'power3.out'},'<.3')
-    .from('.stats-bar-badge',{opacity:0,duration:.4},'<.2')
+  gsap.timeline({defaults:{ease:'power3.out'}})
+    .to('.h1-word',{y:'0%',duration:1.1,ease:'expo.out',stagger:.12})
+    .to('#heroEyebrow',{opacity:1,duration:.7},'<.25')
+    .to('#heroDesc',{opacity:1,duration:.8},'<.3')
+    .to('#heroCta',{opacity:1,duration:.8},'<.2')
+    .to('#si',{opacity:1,duration:.6},'<.25')
+    .from('.stats-bar-item',{opacity:0,y:15,stagger:.08,duration:.6},'<.35')
+    .from('.stats-bar-badge',{opacity:0,duration:.5},'<.25')
     /* Astronaut entrance */
-    .from('#heroAstronaut',{opacity:0,y:60,scale:.9,duration:.9,ease:'power3.out'},'<.15')
-    .from('#planet1',{opacity:0,x:40,y:-30,duration:.8,ease:'power3.out'},'<.2')
-    .from('#planet2',{opacity:0,x:30,y:20,duration:.8,ease:'power3.out'},'<.3')
-    .from('#planet3',{opacity:0,x:50,duration:.6,ease:'power3.out'},'<.4')
-    .from('#planetRing',{opacity:0,scale:.5,duration:.9,ease:'power3.out'},'<.2');
+    .from('#heroAstronaut',{opacity:0,y:50,scale:.92,duration:1.2,ease:'expo.out'},'<.2')
+    .from('#planet1',{opacity:0,x:35,y:-25,duration:1,ease:'expo.out'},'<.25')
+    .from('#planet2',{opacity:0,x:25,y:15,duration:1,ease:'expo.out'},'<.35')
+    .from('#planet3',{opacity:0,x:40,duration:.8,ease:'expo.out'},'<.45')
+    .from('#planetRing',{opacity:0,scale:.6,duration:1.1,ease:'expo.out'},'<.25');
 }
 
 /* ═══ PARALLAX — Astronaut & Planets on scroll ═══ */
