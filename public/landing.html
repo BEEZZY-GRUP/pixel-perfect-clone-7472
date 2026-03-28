@@ -278,11 +278,15 @@ body{
 .sol-intro{font-size:1rem;line-height:1.9;color:rgba(6,6,4,.6);max-width:380px}
 .sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .sol-card{
-  background:rgba(6,6,4,.04);border:1px solid rgba(6,6,4,.1);
-  border-radius:var(--radius-lg);padding:2.2rem 2rem;
-  position:relative;overflow:hidden;transition:all .35s;
+  background:rgba(6,6,4,.03);border:1px solid rgba(6,6,4,.06);
+  border-radius:var(--radius-lg);padding:2.4rem 2.2rem;
+  position:relative;overflow:hidden;transition:all .45s cubic-bezier(.4,0,.2,1);
 }
-.sol-card:hover{background:rgba(6,6,4,.08);border-color:rgba(6,6,4,.18);transform:translateY(-4px)}
+.sol-card:hover{background:rgba(6,6,4,.06);border-color:transparent;transform:translateY(-4px)}
+.sol-card-border{position:absolute;inset:0;pointer-events:none;z-index:2;width:100%;height:100%}
+.sol-card-border rect{fill:none;stroke:#060604;stroke-width:2;vector-effect:non-scaling-stroke;rx:16;ry:16;stroke-dasharray:2000;stroke-dashoffset:2000;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.sol-card:hover .sol-card-border rect{stroke-dashoffset:0}
+.sol-card:not(:hover) .sol-card-border rect{transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)}
 .sol-card-num{
   font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;
   letter-spacing:.2em;color:rgba(6,6,4,.3);margin-bottom:1.2rem;
@@ -857,7 +861,6 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
       <div class="stats-bar-val">47<span>+</span></div>
       <div class="stats-bar-lbl">Empresas<br>Transformadas</div>
     </div>
-    <div class="stats-bar-badge">Para empresas com ambição de crescer com método</div>
   </div>
 </section>
 
@@ -880,31 +883,37 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
   </div>
   <div class="sol-grid">
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">01</div>
       <h3 class="sol-card-title">Diagnóstico Profundo</h3>
       <p class="sol-card-text">Mapeamos processos, identificamos gargalos e encontramos oportunidades que ninguém mais enxerga dentro do seu negócio.</p>
     </div>
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">02</div>
       <h3 class="sol-card-title">Gestão por Resultados</h3>
       <p class="sol-card-text">Dashboards reais, KPIs definidos e acompanhamento semanal — nada de relatórios que ninguém lê.</p>
     </div>
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">03</div>
       <h3 class="sol-card-title">Execução de Verdade</h3>
       <p class="sol-card-text">Não entregamos planilhas. Fazemos, acompanhamos, ajustamos e documentamos — do planejamento à realidade.</p>
     </div>
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">04</div>
       <h3 class="sol-card-title">Marketing + Tecnologia</h3>
       <p class="sol-card-text">Automação, dados e canais que escalam seu crescimento — sem depender de agências genéricas.</p>
     </div>
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">05</div>
       <h3 class="sol-card-title">Parceiro Estratégico</h3>
       <p class="sol-card-text">Sócio operacional sem abrir capital. Decisões, processos e gestão — junto com você no dia a dia.</p>
     </div>
     <div class="sol-card">
+      <svg class="sol-card-border" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="1" y="1" width="98" height="98"/></svg>
       <div class="sol-card-num">06</div>
       <h3 class="sol-card-title">Legado Duradouro</h3>
       <p class="sol-card-text">Empresa autossustentável, time preparado e futuro definido. O começo da sua independência real.</p>
