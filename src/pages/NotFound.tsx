@@ -146,16 +146,17 @@ const NotFound = () => {
       <div className="hero-noise" />
       <div className="absolute inset-0 z-[1] bg-gradient-to-t from-background via-transparent to-background/60 pointer-events-none" />
 
-      <div className="relative z-[2] text-center flex flex-col items-center gap-6 px-6">
-        {/* Floating astronaut */}
-        <div className="animate-float">
-          <img
-            src="/images/astronauta.png"
-            alt="Astronauta Beezzy"
-            className="w-36 h-auto md:w-52 drop-shadow-[0_0_40px_hsla(36,35%,61%,0.3)]"
-          />
-        </div>
+      {/* Astronaut behind */}
+      <div className="absolute z-[2] animate-float">
+        <img
+          src="/images/astronauta.png"
+          alt="Astronauta Beezzy"
+          className="w-52 h-auto md:w-72 lg:w-80 opacity-40 drop-shadow-[0_0_60px_hsla(36,35%,61%,0.25)]"
+        />
+      </div>
 
+      {/* Text in front */}
+      <div className="relative z-[3] text-center flex flex-col items-center gap-6 px-6">
         <h1
           className="font-display text-[clamp(5rem,15vw,12rem)] font-light leading-none tracking-tight text-gold/30"
           style={{ textShadow: "0 0 60px hsla(36,35%,61%,0.15)" }}
