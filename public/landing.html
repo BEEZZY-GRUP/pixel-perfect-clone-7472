@@ -1463,16 +1463,14 @@ window.submitContact=async function(e){
             <input type="email" id="cf-email" placeholder="joao@empresa.com.br" required>
           </div>
         </div>
-        <div class="cb-row">
-          <div class="cb-field">
-            <label>CNPJ</label>
-            <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
-          </div>
-          <div class="cb-field">
-            <label>Nome da empresa</label>
-            <input type="text" id="cf-company" placeholder="Preenchido automaticamente">
-            <span class="cb-company-status" id="cnpj-status"></span>
-          </div>
+        <div class="cb-field">
+          <label>CNPJ</label>
+          <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+        </div>
+        <div class="cb-field">
+          <label>Nome da empresa</label>
+          <input type="text" id="cf-company" placeholder="Preenchido automaticamente pelo CNPJ" readonly style="opacity:.7;cursor:default">
+          <span class="cb-company-status" id="cnpj-status"></span>
         </div>
         <div class="cb-field">
           <label>Mensagem <span style="color:rgba(232,233,235,.2);font-weight:400;letter-spacing:.1em">(opcional)</span></label>
