@@ -89,7 +89,7 @@ const NotFound = () => {
         style={{ background: "linear-gradient(180deg, rgba(10,10,9,0.9) 0%, transparent 100%)" }}
       >
         <a href="/" className="flex items-center gap-3 no-underline">
-          <img src="/images/logo_shielid.svg" alt="Beezzy" className="h-7 w-auto" />
+          <img src="/images/logo_branca.png" alt="Beezzy" className="h-7 w-auto" />
         </a>
         <a
           href="/"
