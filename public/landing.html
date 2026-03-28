@@ -255,106 +255,79 @@ body.page-ready{overflow-y:clip}
 }
 .ti em{color:#FFD600;font-style:normal}
 
-/* ═══ SOLUTIONS — replaces manifesto ═══ */
+/* ═══ SOLUTIONS ═══ */
 #solutions{
-  background:#060604;color:#E8E9EB;
+  background:#FFD600;color:#0A0A08;
   padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
   position:relative;overflow:hidden;
 }
-#solutions::before{
-  content:'';position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 50% 50% at 0% 0%,rgba(255,214,0,.06) 0%,transparent 70%),
-    radial-gradient(ellipse 40% 40% at 100% 100%,rgba(255,214,0,.04) 0%,transparent 70%);
-  pointer-events:none;
-}
-.sol-header{max-width:1200px;margin:0 auto 5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
+.sol-header{max-width:1200px;margin:0 auto 4.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:end}
 .sol-eyebrow{
   font-family:'Montserrat',sans-serif;font-weight:700;font-size:.62rem;
-  letter-spacing:.35em;text-transform:uppercase;color:#FFD600;
+  letter-spacing:.35em;text-transform:uppercase;color:#0A0A08;
   margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;
 }
-.sol-eyebrow::before{content:'';width:28px;height:2px;background:linear-gradient(90deg,#FFD600,transparent)}
+.sol-eyebrow::before{content:'';width:28px;height:2px;background:#0A0A08}
 .sol-title{
   font-family:'Montserrat',sans-serif;font-size:clamp(2.2rem,4.5vw,4rem);
-  font-weight:900;letter-spacing:-.03em;line-height:1.08;color:#E8E9EB;
+  font-weight:900;letter-spacing:-.03em;line-height:1.08;color:#0A0A08;
 }
-.sol-title em{font-style:normal;color:#FFD600}
-.sol-intro{font-size:.95rem;line-height:1.9;color:rgba(232,233,235,.45);max-width:380px}
-.sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.sol-title em{font-style:normal;color:#0A0A08;opacity:.5}
+.sol-intro{font-size:.95rem;line-height:1.9;color:rgba(10,10,8,.55);max-width:380px}
+.sol-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
 
-/* ── Card base ── */
+/* ── Card ── */
 .sol-card{
-  background:rgba(232,233,235,.03);
-  border:1px solid rgba(232,233,235,.06);
-  border-radius:var(--radius-lg);padding:2.6rem 2.2rem;
+  background:rgba(10,10,8,.04);
+  border:1px solid rgba(10,10,8,.08);
+  border-radius:14px;padding:2.4rem 2rem 2rem;
   position:relative;overflow:hidden;
-  transition:transform .5s cubic-bezier(.4,0,.2,1),background .5s,border-color .5s,box-shadow .5s;
+  transition:all .45s cubic-bezier(.4,0,.2,1);
 }
-
-/* Card glow layer */
-.sol-card::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 120% 80% at 50% 120%,rgba(255,214,0,.08) 0%,transparent 60%);
-  opacity:0;transition:opacity .5s;pointer-events:none;
-}
-.sol-card::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,#FFD600,transparent);
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .6s cubic-bezier(.4,0,.2,1);
-}
-
 .sol-card:hover{
-  transform:translateY(-8px);
-  background:rgba(232,233,235,.05);
-  border-color:rgba(255,214,0,.15);
-  box-shadow:0 20px 60px -15px rgba(255,214,0,.1),0 0 0 1px rgba(255,214,0,.08);
+  background:#0A0A08;
+  border-color:#0A0A08;
+  transform:translateY(-6px);
+  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
 }
-.sol-card:hover::before{opacity:1}
-.sol-card:hover::after{transform:scaleX(1)}
+.sol-card:hover .sol-card-icon{color:#FFD600}
+.sol-card:hover .sol-card-num{color:rgba(255,214,0,.35)}
+.sol-card:hover .sol-card-title{color:#fff}
+.sol-card:hover .sol-card-text{color:rgba(255,255,255,.55)}
+.sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0)}
 
 /* Icon */
 .sol-card-icon{
-  width:48px;height:48px;border-radius:12px;
-  background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.12);
+  width:44px;height:44px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:1.4rem;font-size:1.3rem;
-  transition:background .4s,transform .4s,border-color .4s;
+  margin-bottom:1.2rem;color:#0A0A08;
+  transition:color .4s;
 }
-.sol-card:hover .sol-card-icon{
-  background:rgba(255,214,0,.15);border-color:rgba(255,214,0,.3);
-  transform:scale(1.08) rotate(-3deg);
-}
+.sol-card-icon svg{width:32px;height:32px;fill:currentColor}
 
 .sol-card-num{
   font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:700;
-  letter-spacing:.2em;color:rgba(232,233,235,.15);margin-bottom:1rem;
+  letter-spacing:.2em;color:rgba(10,10,8,.2);margin-bottom:.8rem;
   transition:color .4s;
 }
-.sol-card:hover .sol-card-num{color:rgba(255,214,0,.4)}
 
 .sol-card-title{
-  font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:800;
-  color:#E8E9EB;margin-bottom:.6rem;letter-spacing:-.02em;
+  font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800;
+  color:#0A0A08;margin-bottom:.5rem;letter-spacing:-.02em;
   transition:color .4s;
 }
-.sol-card:hover .sol-card-title{color:#FFD600}
 
-.sol-card-text{font-size:.85rem;line-height:1.8;color:rgba(232,233,235,.4);transition:color .4s}
-.sol-card:hover .sol-card-text{color:rgba(232,233,235,.6)}
+.sol-card-text{font-size:.83rem;line-height:1.8;color:rgba(10,10,8,.45);transition:color .4s}
 
 /* Card arrow */
 .sol-card-arrow{
-  position:absolute;bottom:1.8rem;right:1.8rem;
+  position:absolute;bottom:1.6rem;right:1.6rem;
   width:28px;height:28px;border-radius:50%;
-  background:rgba(255,214,0,.06);
   display:flex;align-items:center;justify-content:center;
   opacity:0;transform:translate(-6px,6px);
-  transition:opacity .4s,transform .4s,background .4s;
+  transition:opacity .4s,transform .4s;
 }
 .sol-card-arrow svg{width:14px;height:14px;stroke:#FFD600;stroke-width:2;fill:none}
-.sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0);background:rgba(255,214,0,.12)}
 
 @media(max-width:899px){.sol-header{grid-template-columns:1fr}.sol-grid{grid-template-columns:1fr}}
 
