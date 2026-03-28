@@ -804,10 +804,10 @@ footer{
 <div class="noise-overlay"></div>
 
 <script>
-window.openContact=function(){document.getElementById('contact-overlay').classList.add('open');document.body.style.overflow='hidden'};
-window.closeContact=function(){document.getElementById('contact-overlay').classList.remove('open');document.body.style.overflow=''};
-window.openClientPortal=function(){document.getElementById('portal-overlay').classList.add('open');document.body.style.overflow='hidden'};
-window.closeClientPortal=function(){document.getElementById('portal-overlay').classList.remove('open');document.body.style.overflow=''};
+window.openContact=function(){document.getElementById('contact-overlay').classList.add('open');document.documentElement.style.overflow='hidden';document.body.style.overflow='hidden'};
+window.closeContact=function(){document.getElementById('contact-overlay').classList.remove('open');document.documentElement.style.overflow='';document.body.style.overflow=''};
+window.openClientPortal=function(){document.getElementById('portal-overlay').classList.add('open');document.documentElement.style.overflow='hidden';document.body.style.overflow='hidden'};
+window.closeClientPortal=function(){document.getElementById('portal-overlay').classList.remove('open');document.documentElement.style.overflow='';document.body.style.overflow=''};
 </script>
 
 <!-- ═══ LOADER ═══ -->
