@@ -550,16 +550,18 @@ body.page-ready{overflow-y:clip}
 .cli-eyebrow::before{content:'';width:20px;height:1px;background:rgba(232,233,235,.25)}
 .cli-title{font-family:'Montserrat',sans-serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:800;letter-spacing:-.03em;color:#E8E9EB}
 .cli-title em{color:#FFD600;font-style:normal}
-.cli-track{max-width:1200px;margin:0 auto;display:flex;gap:2.5rem;justify-content:center;flex-wrap:wrap}
+.cli-carousel{overflow:hidden;position:relative;width:100%;mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 10%,#000 90%,transparent 100%)}
+.cli-track{display:flex;gap:3rem;width:max-content;animation:cliScroll 20s linear infinite;will-change:transform}
+@keyframes cliScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .cli-item{
-  flex-shrink:0;width:clamp(120px,16vw,180px);height:clamp(60px,8vw,80px);
+  flex-shrink:0;width:200px;height:100px;
   display:flex;align-items:center;justify-content:center;
   background:rgba(232,233,235,.04);border:1px solid rgba(232,233,235,.07);
-  border-radius:var(--radius);padding:1rem 1.5rem;
+  border-radius:var(--radius);padding:1.2rem 1.8rem;
   transition:all .3s;
 }
-.cli-item:hover{background:rgba(255,214,0,.08);border-color:rgba(255,214,0,.2);transform:scale(1.08)}
-.cli-item img{max-width:100%;max-height:60px;width:auto;height:auto;object-fit:contain;opacity:.9;transition:opacity .3s}
+.cli-item:hover{background:rgba(255,214,0,.08);border-color:rgba(255,214,0,.2);transform:scale(1.06)}
+.cli-item img{max-width:100%;max-height:70px;width:auto;height:auto;object-fit:contain;opacity:.85;transition:opacity .3s}
 .cli-item:hover img{opacity:1}
 
 /* ═══ TESTIMONIALS ═══ */
@@ -1067,12 +1069,20 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
     <p class="cli-eyebrow">Quem confia na Beezzy</p>
     <h2 class="cli-title">Nossos <em>clientes</em> e parceiros</h2>
   </div>
-  <div class="cli-track">
-    <div class="cli-item"><img src="images/logo_novaera.png" alt="Nova Era"></div>
-    <div class="cli-item"><img src="images/logo_on.png" alt="ON Soluções Financeiras"></div>
-    <div class="cli-item"><img src="images/logo_shielid.svg" alt="Shiel ID"></div>
-    <div class="cli-item"><img src="images/logo_palpita.png" alt="Palpita"></div>
-    <div class="cli-item"><img src="images/logo_cliente_extra.png" alt="Cliente parceiro"></div>
+  <div class="cli-carousel">
+    <div class="cli-track">
+      <div class="cli-item"><img src="images/logo_novaera.png" alt="Nova Era"></div>
+      <div class="cli-item"><img src="images/logo_on.png" alt="ON Soluções Financeiras"></div>
+      <div class="cli-item"><img src="images/logo_shielid.svg" alt="Shiel ID"></div>
+      <div class="cli-item"><img src="images/logo_palpita.png" alt="Palpita"></div>
+      <div class="cli-item"><img src="images/logo_cliente_extra.png" alt="Cliente parceiro"></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="cli-item"><img src="images/logo_novaera.png" alt="Nova Era"></div>
+      <div class="cli-item"><img src="images/logo_on.png" alt="ON Soluções Financeiras"></div>
+      <div class="cli-item"><img src="images/logo_shielid.svg" alt="Shiel ID"></div>
+      <div class="cli-item"><img src="images/logo_palpita.png" alt="Palpita"></div>
+      <div class="cli-item"><img src="images/logo_cliente_extra.png" alt="Cliente parceiro"></div>
+    </div>
   </div>
 </section>
 
