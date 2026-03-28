@@ -1389,37 +1389,45 @@ window.submitContact=async function(e){
 <div id="contact-overlay" onclick="closeContact()">
   <div id="contact-box" onclick="event.stopPropagation()">
     <div class="cb-top-bar"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.8rem .8rem;border-bottom:1px solid rgba(255,214,0,.07)">
-      <div style="font-family:'Montserrat',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,214,0,.5);display:flex;align-items:center;gap:.6rem"><span style="display:inline-block;width:14px;height:1px;background:rgba(255,214,0,.4)"></span>Vamos Conversar</div>
-      <button onclick="closeContact()" style="background:none;border:1px solid rgba(232,233,235,.12);border-radius:8px;color:rgba(232,233,235,.35);width:30px;height:30px;cursor:none;font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s">✕</button>
+    <div class="cb-header">
+      <div class="cb-header-label">Vamos Conversar</div>
+      <button class="cb-close" onclick="closeContact()">✕</button>
     </div>
     <div class="cb-inner">
-      <h2 class="cb-title">Fale com a<br>Beezzy</h2>
-      <p class="cb-sub">Conta pra gente sobre o seu negócio. Nossa equipe entra em contato em até 24h.</p>
+      <h2 class="cb-title">Fale com a Beezzy</h2>
+      <p class="cb-sub">Preencha abaixo e nossa equipe entra em contato em até 24h.</p>
       <form class="cb-form" id="contactForm" onsubmit="submitContact(event)">
-        <div class="cb-row">
-          <div class="cb-field"><label>Seu nome</label><input type="text" id="cf-name" placeholder="João Silva" required></div>
-          <div class="cb-field"><label>WhatsApp / Telefone</label><input type="tel" id="cf-phone" placeholder="(11) 99999-9999" required></div>
+        <div class="cb-field">
+          <label>Seu nome</label>
+          <input type="text" id="cf-name" placeholder="João Silva" required>
         </div>
-        <div class="cb-field"><label>E-mail</label><input type="email" id="cf-email" placeholder="joao@empresa.com.br" required></div>
         <div class="cb-row">
           <div class="cb-field">
-            <label>Maior desafio hoje</label>
-            <select id="cf-challenge" required>
-              <option value="" disabled selected>Selecione</option>
-              <option>Crescer o faturamento</option><option>Organizar processos</option>
-              <option>Estruturar a gestão</option><option>Preparar a liderança</option>
-              <option>Escalar o negócio</option><option>Outro</option>
-            </select>
+            <label>WhatsApp / Telefone</label>
+            <input type="tel" id="cf-phone" placeholder="(11) 99999-9999" required>
+          </div>
+          <div class="cb-field">
+            <label>E-mail</label>
+            <input type="email" id="cf-email" placeholder="joao@empresa.com.br" required>
           </div>
         </div>
         <div class="cb-row">
-          <div class="cb-field"><label>Nome da empresa (opcional)</label><input type="text" id="cf-company" placeholder="Minha Empresa"></div>
-          <div class="cb-field"><label>CNPJ (opcional)</label><input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" maxlength="20"></div>
+          <div class="cb-field">
+            <label>CNPJ</label>
+            <input type="text" id="cf-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+          </div>
+          <div class="cb-field">
+            <label>Nome da empresa</label>
+            <input type="text" id="cf-company" placeholder="Preenchido automaticamente">
+            <span class="cb-company-status" id="cnpj-status"></span>
+          </div>
         </div>
-        <div class="cb-field"><label>Mensagem (opcional)</label><textarea id="cf-message" placeholder="Me conta mais sobre o que está acontecendo na sua empresa..."></textarea></div>
-        <button type="submit" class="cb-submit"><span>Quero falar com a Beezzy</span><span>→</span></button>
-        <p class="cb-privacy">Seus dados são tratados com sigilo absoluto. Zero spam.</p>
+        <div class="cb-field">
+          <label>Mensagem <span style="color:rgba(232,233,235,.2);font-weight:400;letter-spacing:.1em">(opcional)</span></label>
+          <textarea id="cf-message" placeholder="Conta pra gente o que está acontecendo na sua empresa..."></textarea>
+        </div>
+        <button type="submit" class="cb-submit"><span>Enviar mensagem</span><span>→</span></button>
+        <p class="cb-privacy">🔒 Seus dados são tratados com sigilo absoluto. Zero spam.</p>
       </form>
       <div class="cb-success" id="cbSuccess">
         <div class="cb-success-icon">✓</div>
