@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 import CommentItem from "./CommentItem";
+import RoleBadge from "./RoleBadge";
 
 const CONFESSIONARIO_SLUG = "confessionario";
 
@@ -50,13 +51,12 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         .maybeSingle();
       if (!data) return null;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_name, avatar_url")
-        .eq("user_id", data.user_id)
-        .maybeSingle();
+      const [{ data: profile }, { data: roleData }] = await Promise.all([
+        supabase.from("profiles").select("company_name, avatar_url").eq("user_id", data.user_id).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", data.user_id).maybeSingle(),
+      ]);
 
-      return { ...data, profile };
+      return { ...data, profile, userRole: roleData?.role ?? null };
     },
   });
 
@@ -71,13 +71,14 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
       if (!data?.length) return [];
 
       const userIds = [...new Set(data.map((c) => c.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, company_name, avatar_url")
-        .in("user_id", userIds);
+      const [{ data: profiles }, { data: roles }] = await Promise.all([
+        supabase.from("profiles").select("user_id, company_name, avatar_url").in("user_id", userIds),
+        supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
+      ]);
 
       const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
-      return data.map((c) => ({ ...c, profile: profileMap.get(c.user_id) ?? null }));
+      const roleMap = new Map(roles?.map((r) => [r.user_id, r.role]) ?? []);
+      return data.map((c) => ({ ...c, profile: profileMap.get(c.user_id) ?? null, userRole: roleMap.get(c.user_id) ?? null }));
     },
   });
 
@@ -201,12 +202,17 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
               />
             </button>
             <div>
-              <button
-                onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-                className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
-              >
-                {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+                  className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                >
+                  {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                </button>
+                {!hideAuthor && !post.is_anonymous && post.userRole && post.userRole !== "user" && (
+                  <RoleBadge role={post.userRole} />
+                )}
+              </div>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
                 <Clock size={10} />
                 <time

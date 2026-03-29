@@ -8,6 +8,7 @@ import { Trash2, Heart, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "./UserAvatar";
+import RoleBadge from "./RoleBadge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -19,6 +20,7 @@ interface CommentData {
   content: string;
   created_at: string;
   profile: { user_id: string; company_name: string; avatar_url: string | null } | null;
+  userRole?: string | null;
   replies?: CommentData[];
 }
 
@@ -150,6 +152,9 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
               >
                 {hideAuthor ? "Anônimo" : (comment.profile?.company_name || "Membro")}
               </button>
+              {!hideAuthor && comment.userRole && comment.userRole !== "user" && (
+                <RoleBadge role={comment.userRole} />
+              )}
               <time
                 className="text-muted-foreground text-[.6rem] shrink-0"
                 dateTime={comment.created_at}

@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import BadgesPanel from "./BadgesPanel";
 import UserAvatar from "./UserAvatar";
+import RoleBadge from "./RoleBadge";
 import OnboardingTutorial from "./OnboardingTutorial";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,6 +45,15 @@ const ProfilePanel = () => {
         .eq("user_id", user!.id)
         .single();
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: userRole } = useQuery({
+    queryKey: ["user_role", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).maybeSingle();
+      return data?.role ?? null;
     },
     enabled: !!user,
   });
@@ -277,13 +287,17 @@ const ProfilePanel = () => {
                 </div>
               ) : (
                 <>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {(profile as any).name ? (
+                      <h2 className="text-foreground text-lg font-medium">{(profile as any).name}</h2>
+                    ) : (
+                      <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
+                    )}
+                    {userRole && userRole !== "user" && <RoleBadge role={userRole} size="md" />}
+                  </div>
                   {(profile as any).name && (
-                    <h2 className="text-foreground text-lg font-medium">{(profile as any).name}</h2>
+                    <p className="text-muted-foreground text-sm mt-0.5">{profile.company_name}</p>
                   )}
-                  <p className={`text-muted-foreground text-sm ${(profile as any).name ? "mt-0.5" : ""}`}>
-                    {!(profile as any).name && <span className="text-foreground text-lg font-medium">{profile.company_name}</span>}
-                    {(profile as any).name && profile.company_name}
-                  </p>
                   {profile.bio && (
                     <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{profile.bio}</p>
                   )}
