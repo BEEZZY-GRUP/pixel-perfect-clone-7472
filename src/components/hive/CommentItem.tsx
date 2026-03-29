@@ -20,6 +20,7 @@ interface CommentData {
   content: string;
   created_at: string;
   profile: { user_id: string; company_name: string; avatar_url: string | null } | null;
+  userRole?: string | null;
   replies?: CommentData[];
 }
 
