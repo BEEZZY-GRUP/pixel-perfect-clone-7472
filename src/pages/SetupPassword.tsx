@@ -58,7 +58,7 @@ const SetupPassword = () => {
         <div className="absolute -top-3 -left-3 w-8 h-8 border-t border-l border-gold/40" />
         <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b border-r border-gold/40" />
 
-        <div className="card-gradient p-10 md:p-12">
+        <div className="card-gradient p-6 sm:p-10 md:p-12">
           <div className="text-center mb-8">
             <a href="/" className="font-display font-black text-[1.6rem] tracking-[-.04em] text-foreground no-underline">
               Beezzy<span className="text-gold">.</span>

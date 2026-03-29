@@ -155,7 +155,7 @@ const ProfilePanel = () => {
         {/* Cover gradient */}
         <div className="h-20 bg-gradient-to-br from-gold/20 via-gold/5 to-transparent" />
 
-        <div className="px-6 pb-6 -mt-10">
+        <div className="px-3 sm:px-6 pb-4 sm:pb-6 -mt-10">
           {/* Avatar + edit button */}
           <div className="flex items-end justify-between mb-4">
             <div className="relative group" data-onboarding="avatar">

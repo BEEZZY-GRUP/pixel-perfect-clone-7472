@@ -110,7 +110,7 @@ function ConsoleContent() {
       </header>
 
       {/* Content */}
-      <main className="relative z-10 p-4 md:p-8">
+      <main className="relative z-10 p-2 sm:p-4 md:p-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}

@@ -347,8 +347,8 @@ const CommunityLayout = () => {
                       >
                         ← Voltar às categorias
                       </button>
-                      <div className="flex items-center justify-between">
-                        <h1 className="font-heading text-lg tracking-wide text-foreground flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
+                        <h1 className="font-heading text-base sm:text-lg tracking-wide text-foreground flex items-center gap-2 min-w-0 truncate">
                           {activeCategory === "todas"
                             ? "📋 Todas as Publicações"
                             : (categories?.find((c) => c.slug === activeCategory)?.emoji ?? "") + " " +
@@ -360,10 +360,11 @@ const CommunityLayout = () => {
                           return canPostHere ? (
                             <Button
                               onClick={() => setShowCreate(true)}
-                              className="bg-gold text-background hover:bg-gold-light font-heading text-[.65rem] tracking-widest uppercase gap-2 shrink-0"
+                              className="bg-gold text-background hover:bg-gold-light font-heading text-[.55rem] sm:text-[.65rem] tracking-widest uppercase gap-1.5 sm:gap-2 shrink-0 px-2 sm:px-3 h-8 sm:h-9"
                             >
                               <Plus size={14} />
-                              Criar publicação
+                              <span className="hidden sm:inline">Criar publicação</span>
+                              <span className="sm:hidden">Criar</span>
                             </Button>
                           ) : null;
                         })()}

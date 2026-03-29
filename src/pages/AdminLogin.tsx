@@ -32,7 +32,7 @@ export default function AdminLogin() {
         <div className="absolute -top-3 -left-3 w-8 h-8 border-t border-l border-gold/40" />
         <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b border-r border-gold/40" />
 
-        <div className="card-gradient p-10 md:p-12">
+        <div className="card-gradient p-6 sm:p-10 md:p-12">
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
             <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
