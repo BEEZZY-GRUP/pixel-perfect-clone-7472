@@ -62,7 +62,7 @@ export default function TrashPanel() {
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{lead.email}</td>
                   <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground uppercase">{lead.status}</td>
                   <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
-                    {lead.archived_at ? new Date(lead.archived_at).toLocaleDateString("pt-BR") : "—"}
+                    {lead.archived_at ? new Date(lead.archived_at).toLocaleDateString("pt-BR") : "-"}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
