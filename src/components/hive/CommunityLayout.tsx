@@ -238,9 +238,9 @@ const CommunityLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background community-zoom">
+    <div className="min-h-screen bg-background community-zoom relative">
+      <PageBackground />
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-md px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
