@@ -241,59 +241,51 @@ const CommunityLayout = () => {
     <div className="min-h-screen bg-background community-zoom relative">
       <PageBackground />
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden text-foreground"
-          >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          <button onClick={() => navigate("/the-hive/community")} className="font-display font-black text-[1rem] tracking-[-.03em] text-foreground">
-            Beezzy<span className="text-gold">.</span>
-          </button>
-          <span className="text-muted-foreground text-[.65rem] tracking-widest uppercase font-heading hidden sm:inline">
-            The Hive
-          </span>
-        </div>
-
-        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none">
-          {navItems.map((item) => (
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md px-2 sm:px-3 md:px-8">
+        <div className="flex items-center justify-between py-2 md:py-3">
+          <div className="flex items-center gap-2 shrink-0">
             <button
-              key={item.key}
-              onClick={() => handleViewChange(item.key)}
-              className={`flex items-center gap-1 px-2 md:px-3 py-1.5 text-[.6rem] md:text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm whitespace-nowrap ${
-                (item.key === "community" && (isBrowsingCategories || isCategoryDetail)) ||
-                (item.key === "feed" && isHome) ||
-                (item.key !== "feed" && item.key !== "community" && activeView === item.key && !isPostDetail)
-                  ? "bg-gold/10 text-gold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="md:hidden text-foreground"
             >
-              {item.icon}
-              <span className="hidden sm:inline">{item.label}</span>
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-          ))}
+            <button onClick={() => navigate("/the-hive/community")} className="font-display font-black text-[.9rem] sm:text-[1rem] tracking-[-.03em] text-foreground">
+              Beezzy<span className="text-gold">.</span>
+            </button>
+            <span className="text-muted-foreground text-[.6rem] tracking-widest uppercase font-heading hidden md:inline">
+              The Hive
+            </span>
+          </div>
 
-          {profile && (
-            <div className="hidden lg:flex items-center gap-1 px-3 py-1.5 border border-gold/20 ml-2">
-              <span className="text-gold text-[.65rem] font-heading font-semibold">
-                Lv.{profile.level}
-              </span>
-              <span className="text-muted-foreground text-[.6rem]">
-                {profile.xp}XP
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-0.5 shrink-0">
+            {/* On mobile: show only icons. On sm+: show labels */}
+            {navItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => handleViewChange(item.key)}
+                className={`flex items-center gap-1 px-1.5 sm:px-2 md:px-3 py-1.5 text-[.55rem] sm:text-[.6rem] md:text-[.65rem] tracking-wider uppercase font-heading transition-colors rounded-sm whitespace-nowrap ${
+                  (item.key === "community" && (isBrowsingCategories || isCategoryDetail)) ||
+                  (item.key === "feed" && isHome) ||
+                  (item.key !== "feed" && item.key !== "community" && activeView === item.key && !isPostDetail)
+                    ? "bg-gold/10 text-gold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {item.icon}
+                <span className="hidden md:inline">{item.label}</span>
+              </button>
+            ))}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSignOut}
-            className="text-muted-foreground hover:text-foreground ml-1 shrink-0"
-          >
-            <LogOut size={16} />
-          </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSignOut}
+              className="text-muted-foreground hover:text-foreground ml-0.5 shrink-0 w-7 h-7 sm:w-8 sm:h-8"
+            >
+              <LogOut size={14} />
+            </Button>
+          </div>
         </div>
       </header>
 
