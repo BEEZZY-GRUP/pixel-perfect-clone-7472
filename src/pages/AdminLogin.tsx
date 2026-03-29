@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Lock, ArrowRight } from "lucide-react";
+import PageBackground from "@/components/PageBackground";
 
 const ADMIN_USER = "admin";
 const ADMIN_PASS = 'N"IL25JJ3.b0_}';
@@ -25,47 +25,31 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/[0.03] rounded-full blur-[180px]" />
-        <div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
-      </div>
+      <PageBackground />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-[440px]"
-      >
+      <div className="relative z-10 w-full max-w-[440px]">
         {/* Decorative corners */}
-        <div className="absolute -top-3 -left-3 w-8 h-8 border-t border-l border-primary/40" />
-        <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b border-r border-primary/40" />
+        <div className="absolute -top-3 -left-3 w-8 h-8 border-t border-l border-gold/40" />
+        <div className="absolute -bottom-3 -right-3 w-8 h-8 border-b border-r border-gold/40" />
 
-        <div className="border border-border bg-card/30 backdrop-blur-sm p-10 md:p-12">
+        <div className="card-gradient p-10 md:p-12">
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-2 h-2 bg-primary" />
-            <p className="font-mono text-primary text-xs tracking-[0.3em] font-semibold">BZY</p>
+            <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
+            <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
           </div>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground mb-10 pl-5">
+          <p className="font-heading text-[10px] tracking-[0.2em] text-muted-foreground mb-10 pl-5 font-semibold">
             CONSOLE · ACESSO RESTRITO
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* User field */}
             <div className="relative">
-              <motion.div
-                animate={{ scaleX: focused === "user" ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute bottom-0 left-0 w-full h-px bg-primary origin-left"
+              <div
+                className="absolute bottom-0 left-0 w-full h-px bg-gold origin-left transition-transform duration-300"
+                style={{ transform: `scaleX(${focused === "user" ? 1 : 0})` }}
               />
-              <label className="font-mono text-[10px] tracking-[0.15em] text-muted-foreground mb-2 block">
+              <label className="font-heading text-[10px] tracking-[0.15em] text-muted-foreground mb-2 block font-semibold">
                 USUÁRIO
               </label>
               <input
@@ -74,19 +58,18 @@ export default function AdminLogin() {
                 onChange={(e) => { setUser(e.target.value); setError(false); }}
                 onFocus={() => setFocused("user")}
                 onBlur={() => setFocused(null)}
-                className="w-full bg-transparent border border-border px-4 py-3 text-foreground text-sm font-mono placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-transparent border border-border px-4 py-3 text-foreground text-sm font-heading placeholder:text-muted-foreground/40 focus:outline-none focus:border-gold/50 transition-colors rounded-lg"
                 placeholder="admin"
               />
             </div>
 
             {/* Pass field */}
             <div className="relative">
-              <motion.div
-                animate={{ scaleX: focused === "pass" ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute bottom-0 left-0 w-full h-px bg-primary origin-left"
+              <div
+                className="absolute bottom-0 left-0 w-full h-px bg-gold origin-left transition-transform duration-300"
+                style={{ transform: `scaleX(${focused === "pass" ? 1 : 0})` }}
               />
-              <label className="font-mono text-[10px] tracking-[0.15em] text-muted-foreground mb-2 block">
+              <label className="font-heading text-[10px] tracking-[0.15em] text-muted-foreground mb-2 block font-semibold">
                 SENHA
               </label>
               <input
@@ -95,25 +78,21 @@ export default function AdminLogin() {
                 onChange={(e) => { setPass(e.target.value); setError(false); }}
                 onFocus={() => setFocused("pass")}
                 onBlur={() => setFocused(null)}
-                className="w-full bg-transparent border border-border px-4 py-3 text-foreground text-sm font-mono placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-transparent border border-border px-4 py-3 text-foreground text-sm font-heading placeholder:text-muted-foreground/40 focus:outline-none focus:border-gold/50 transition-colors rounded-lg"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <motion.p
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-destructive text-xs font-mono flex items-center gap-2"
-              >
+              <p className="text-destructive text-xs font-heading flex items-center gap-2 animate-pulse">
                 <Lock size={12} />
                 Credenciais inválidas.
-              </motion.p>
+              </p>
             )}
 
             <button
               type="submit"
-              className="w-full group border border-primary bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-mono text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3"
+              className="w-full group border border-gold bg-gold/10 hover:bg-gold text-gold hover:text-background font-heading text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3 rounded-lg font-bold"
             >
               ACESSAR
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -123,13 +102,13 @@ export default function AdminLogin() {
           {/* Bottom decorative */}
           <div className="mt-10 flex items-center gap-3">
             <div className="flex-1 h-px bg-border" />
-            <p className="font-mono text-[9px] tracking-[0.2em] text-muted-foreground/40">
+            <p className="font-heading text-[9px] tracking-[0.2em] text-muted-foreground/40 font-semibold">
               BEEZZY SYSTEMS
             </p>
             <div className="flex-1 h-px bg-border" />
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
