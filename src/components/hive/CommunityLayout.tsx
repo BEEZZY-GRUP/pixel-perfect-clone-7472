@@ -24,6 +24,7 @@ import SidebarWidgets from "./SidebarWidgets";
 import SearchBar from "./SearchBar";
 import PostDetail from "./PostDetail";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   LogOut, Plus, Menu, X, Trophy, Target, User, Shield, Home,
   Video, BookOpen, MessageCircle, Bell,
