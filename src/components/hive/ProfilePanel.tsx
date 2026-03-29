@@ -124,9 +124,11 @@ const ProfilePanel = () => {
 
   const startEditing = () => {
     if (!profile) return;
+    const profileName = profile.name || "";
+    const companyName = profile.company_name || "";
     setEditValues({
-      name: (profile as any).name || "",
-      company_name: profile.company_name,
+      name: profileName || companyName,
+      company_name: profileName ? companyName : "",
       bio: profile.bio || "",
     });
     setEditing(true);
