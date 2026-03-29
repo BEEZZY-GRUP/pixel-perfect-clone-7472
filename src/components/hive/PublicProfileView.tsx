@@ -40,6 +40,14 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
     },
   });
 
+  const { data: userRole } = useQuery({
+    queryKey: ["user_role", userId],
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle();
+      return data?.role ?? null;
+    },
+  });
+
 
   if (isLoading) {
     return (
