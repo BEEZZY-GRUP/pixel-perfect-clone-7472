@@ -40,16 +40,7 @@ function ConsoleContent() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-[0.012]"
-          style={{
-            backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
-      </div>
+      <PageBackground />
 
       {/* Top bar */}
       <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-card/30 backdrop-blur-sm">
