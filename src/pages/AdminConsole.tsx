@@ -86,7 +86,7 @@ function ConsoleContent() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.15em] px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors hidden md:flex"
+            className="flex items-center gap-1.5 font-heading text-[10px] tracking-[0.15em] px-3 py-2 bg-gold text-background hover:bg-gold-light transition-colors hidden md:flex rounded-lg font-bold"
           >
             <Plus size={12} /> NOVO
           </button>
