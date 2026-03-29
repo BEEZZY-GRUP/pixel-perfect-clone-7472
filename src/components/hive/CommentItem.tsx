@@ -8,6 +8,7 @@ import { Trash2, Heart, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import UserAvatar from "./UserAvatar";
+import RoleBadge from "./RoleBadge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
