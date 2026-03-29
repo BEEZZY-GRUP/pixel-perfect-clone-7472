@@ -152,6 +152,9 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
               >
                 {hideAuthor ? "Anônimo" : (comment.profile?.company_name || "Membro")}
               </button>
+              {!hideAuthor && comment.userRole && comment.userRole !== "user" && (
+                <RoleBadge role={comment.userRole} />
+              )}
               <time
                 className="text-muted-foreground text-[.6rem] shrink-0"
                 dateTime={comment.created_at}
