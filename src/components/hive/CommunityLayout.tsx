@@ -248,7 +248,7 @@ const CommunityLayout = () => {
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <button onClick={() => navigate("/the-hive/community")} className="font-sans font-extrabold text-[1rem] tracking-[.22em] uppercase text-foreground">
+          <button onClick={() => navigate("/the-hive/community")} className="font-display font-black text-[1rem] tracking-[-.03em] text-foreground">
             Beezzy<span className="text-gold">.</span>
           </button>
           <span className="text-muted-foreground text-[.65rem] tracking-widest uppercase font-heading hidden sm:inline">
