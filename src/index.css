@@ -41,11 +41,11 @@
     --grey-mid: 30 4% 59%;
     --grey-dark: 60 2% 16%;
 
-    --gold: 36 35% 61%;
-    --gold-light: 36 54% 71%;
-    --gold-dim: 36 35% 61% / 0.12;
-    --gold-border: 36 35% 61% / 0.3;
-    --gold-dark: 36 48% 37%;
+    --gold: 50 100% 50%;
+    --gold-light: 50 100% 60%;
+    --gold-dim: 50 100% 50% / 0.12;
+    --gold-border: 50 100% 50% / 0.3;
+    --gold-dark: 50 100% 37%;
 
     --font-display: 'Cormorant Garamond', serif;
     --font-heading: 'DM Sans', sans-serif;
