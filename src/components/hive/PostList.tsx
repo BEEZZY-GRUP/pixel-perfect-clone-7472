@@ -49,13 +49,14 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
       if (!data?.length) return [];
 
       const userIds = [...new Set(data.map((p) => p.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, company_name, avatar_url")
-        .in("user_id", userIds);
+      const [{ data: profiles }, { data: roles }] = await Promise.all([
+        supabase.from("profiles").select("user_id, company_name, avatar_url").in("user_id", userIds),
+        supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
+      ]);
 
       const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
-      return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
+      const roleMap = new Map(roles?.map((r) => [r.user_id, r.role]) ?? []);
+      return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null, userRole: roleMap.get(post.user_id) ?? null }));
     },
   });
 
