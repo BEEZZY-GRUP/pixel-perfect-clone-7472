@@ -50,7 +50,7 @@ const SetupPassword = () => {
   const passwordLongEnough = password.length >= 6;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
       <PageBackground />
 
       <div className="relative z-10 w-full max-w-[440px]">
