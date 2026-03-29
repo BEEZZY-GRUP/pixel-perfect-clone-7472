@@ -43,12 +43,12 @@ function ConsoleContent() {
       <PageBackground />
 
       {/* Top bar */}
-      <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-card/30 backdrop-blur-sm">
+      <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-background/80 backdrop-blur-md">
         {/* Logo */}
         <div className="flex items-center gap-3 py-4">
-          <div className="w-2 h-2 bg-primary" />
-          <p className="font-mono text-primary text-xs tracking-[0.3em] font-semibold">BZY</p>
-          <span className="font-mono text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline">
+          <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
+          <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
+          <span className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline font-semibold">
             CONSOLE
           </span>
         </div>
