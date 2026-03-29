@@ -44,6 +44,7 @@ const VIEW_MAP: Record<string, View> = {
 
 const CommunityLayout = () => {
   const { user, signOut } = useAuth();
+  const queryClient = useQueryClient();
   const { isAdmin, isModerator } = useIsAdmin();
   const navigate = useNavigate();
   const params = useParams();
