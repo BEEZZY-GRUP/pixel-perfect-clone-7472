@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Lock, ArrowRight } from "lucide-react";
 import PageBackground from "@/components/PageBackground";
 
-const ADMIN_USER = "admin";
-const ADMIN_PASS = 'N"IL25JJ3.b0_}';
+const ADMIN_USER = "beezzygroup";
+const ADMIN_PASS = "Zetslife@2026";
 
 export default function AdminLogin() {
   const [user, setUser] = useState("");
