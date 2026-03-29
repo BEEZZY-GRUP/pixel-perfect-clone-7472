@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
+import RoleBadge from "./RoleBadge";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Category = Tables<"categories">;
