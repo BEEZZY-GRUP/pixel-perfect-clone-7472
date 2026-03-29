@@ -43,67 +43,69 @@ function ConsoleContent() {
       <PageBackground />
 
       {/* Top bar */}
-      <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-background/80 backdrop-blur-md">
-        {/* Logo */}
-        <div className="flex items-center gap-3 py-4">
-          <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
-          <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
-          <span className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline font-semibold">
-            CONSOLE
-          </span>
-        </div>
+      <header className="relative z-10 border-b border-border px-2 sm:px-4 md:px-8 bg-background/80 backdrop-blur-md">
+        <div className="flex items-center justify-between py-0">
+          {/* Logo */}
+          <div className="flex items-center gap-2 sm:gap-3 py-3 sm:py-4 shrink-0">
+            <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
+            <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
+            <span className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline font-semibold">
+              CONSOLE
+            </span>
+          </div>
 
-        {/* Tabs */}
-        <nav className="flex h-full overflow-x-auto">
-          {TABS.map((t) => {
-            const Icon = t.icon;
-            const isActive = tab === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`relative flex items-center gap-2 px-4 py-4 font-heading text-[10px] tracking-[0.15em] transition-colors duration-200 whitespace-nowrap font-semibold ${
-                  isActive
-                    ? "text-gold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon size={14} />
-                <span className="hidden sm:inline">{t.label}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute bottom-0 left-0 w-full h-px bg-gold"
-                    transition={{ duration: 0.25, ease: "easeInOut" }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+          {/* Tabs */}
+          <nav className="flex h-full overflow-x-auto scrollbar-none mx-1 sm:mx-2">
+            {TABS.map((t) => {
+              const Icon = t.icon;
+              const isActive = tab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`relative flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 md:px-4 py-3 sm:py-4 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] transition-colors duration-200 whitespace-nowrap font-semibold ${
+                    isActive
+                      ? "text-gold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon size={13} />
+                  <span className="hidden sm:inline">{t.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 w-full h-px bg-gold"
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setAddOpen(true)}
-            className="flex items-center gap-1.5 font-heading text-[10px] tracking-[0.15em] px-3 py-2 bg-gold text-background hover:bg-gold-light transition-colors hidden md:flex rounded-lg font-bold"
-          >
-            <Plus size={12} /> NOVO
-          </button>
-          <button
-            onClick={() => refresh()}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-            title="Atualizar"
-          >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 font-heading text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-4 font-semibold"
-          >
-            <LogOut size={13} />
-            <span className="hidden sm:inline">SAIR</span>
-          </button>
+          {/* Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <button
+              onClick={() => setAddOpen(true)}
+              className="flex items-center gap-1.5 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] px-2 sm:px-3 py-1.5 sm:py-2 bg-gold text-background hover:bg-gold-light transition-colors rounded-lg font-bold"
+            >
+              <Plus size={12} /> <span className="hidden sm:inline">NOVO</span>
+            </button>
+            <button
+              onClick={() => refresh()}
+              className="p-1.5 sm:p-2 text-muted-foreground hover:text-foreground transition-colors"
+              title="Atualizar"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 sm:gap-2 font-heading text-[9px] sm:text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-3 sm:py-4 font-semibold"
+            >
+              <LogOut size={13} />
+              <span className="hidden sm:inline">SAIR</span>
+            </button>
+          </div>
         </div>
       </header>
 
