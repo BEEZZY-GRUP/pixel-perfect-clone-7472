@@ -1406,8 +1406,8 @@ window.submitContact=async function(e){
     message:document.getElementById('cf-message').value.trim()||null
   };
   try{
-    const SUPABASE_URL='https://mlyniuxsdnhlorsvctna.supabase.co';
-    const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1seW5pdXhzZG5obG9yc3ZjdG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4OTEyNzgsImV4cCI6MjA4OTQ2NzI3OH0.HU7JpOzyeIyqvGbJoe9Qz3uiCEVr-UM_gacj1E_B3a4';
+    const SUPABASE_URL='https://uodgzldblxonxpnlkjib.supabase.co';
+    const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZGd6bGRibHhvbnhwbmxramliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjg3MTMsImV4cCI6MjA4OTg0NDcxM30.buQbmEVAZy4P71qyd8iRMlFmRxY7eBzERtxj21pva9Y';
     await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal'},body:JSON.stringify(payload)});
   }catch(err){console.error('Lead save error',err)}
   setTimeout(()=>{
