@@ -99,7 +99,7 @@ function ConsoleContent() {
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-4"
+            className="flex items-center gap-2 font-heading text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-4 font-semibold"
           >
             <LogOut size={13} />
             <span className="hidden sm:inline">SAIR</span>
