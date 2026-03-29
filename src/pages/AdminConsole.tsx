@@ -73,7 +73,7 @@ function ConsoleContent() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 w-full h-px bg-primary"
+                    className="absolute bottom-0 left-0 w-full h-px bg-gold"
                     transition={{ duration: 0.25, ease: "easeInOut" }}
                   />
                 )}
