@@ -180,8 +180,42 @@ const CommunityLayout = () => {
       return count ?? 0;
     },
     enabled: !!user,
-    refetchInterval: 30_000,
   });
+
+  // Realtime: update unread count + show toast on new notification
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel("notif_badge_realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload: any) => {
+          queryClient.invalidateQueries({ queryKey: ["unread_notifications", user.id] });
+          queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+          // Show toast
+          const title = payload.new?.title;
+          if (title) {
+            toast(title, {
+              description: payload.new?.body || undefined,
+              action: payload.new?.link
+                ? { label: "Ver", onClick: () => navigate(payload.new.link) }
+                : undefined,
+            });
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["unread_notifications", user.id] });
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user, queryClient, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
