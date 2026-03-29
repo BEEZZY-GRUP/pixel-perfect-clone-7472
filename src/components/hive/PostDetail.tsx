@@ -51,13 +51,12 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
         .maybeSingle();
       if (!data) return null;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_name, avatar_url")
-        .eq("user_id", data.user_id)
-        .maybeSingle();
+      const [{ data: profile }, { data: roleData }] = await Promise.all([
+        supabase.from("profiles").select("company_name, avatar_url").eq("user_id", data.user_id).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", data.user_id).maybeSingle(),
+      ]);
 
-      return { ...data, profile };
+      return { ...data, profile, userRole: roleData?.role ?? null };
     },
   });
 
