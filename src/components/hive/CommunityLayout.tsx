@@ -291,7 +291,7 @@ const CommunityLayout = () => {
 
       <div className="pt-[57px]">
         {/* Main content */}
-        <main className="min-h-[calc(100vh-85px)] px-3 md:px-6 py-4 md:py-6 overflow-x-hidden">
+        <main className="min-h-[calc(100vh-85px)] px-2 sm:px-3 md:px-6 py-3 md:py-6 overflow-x-hidden">
           <div className={`mx-auto ${showSidebar ? "max-w-[1200px]" : "max-w-[720px]"}`}>
             <div className={`${showSidebar ? "flex gap-6" : ""}`}>
               {/* Left sidebar */}
