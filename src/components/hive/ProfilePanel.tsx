@@ -49,6 +49,15 @@ const ProfilePanel = () => {
     enabled: !!user,
   });
 
+  const { data: userRole } = useQuery({
+    queryKey: ["user_role", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).maybeSingle();
+      return data?.role ?? null;
+    },
+    enabled: !!user,
+  });
+
   const { data: stats } = useQuery({
     queryKey: ["user_stats", user?.id],
     queryFn: async () => {
