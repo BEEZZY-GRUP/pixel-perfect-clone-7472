@@ -96,14 +96,14 @@ const MissionsPanel = () => {
                   : "border-border hover:border-gold/20"
               }`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span>{mission.emoji}</span>
-                    <span className="text-foreground text-sm font-medium">
+                    <span className="text-foreground text-sm font-medium break-words">
                       {mission.title}
                     </span>
-                    <span className={`text-[.6rem] uppercase tracking-wider font-heading ${typeColor(mission.mission_type)}`}>
+                    <span className={`text-[.55rem] sm:text-[.6rem] uppercase tracking-wider font-heading ${typeColor(mission.mission_type)}`}>
                       {typeLabel(mission.mission_type)}
                     </span>
                   </div>

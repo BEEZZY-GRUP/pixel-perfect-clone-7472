@@ -103,15 +103,15 @@ const GlossaryPanel = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <BookOpen size={18} className="text-gold" />
-          <h1 className="font-heading text-lg tracking-wide text-foreground">Sumário</h1>
-          <span className="text-muted-foreground text-xs font-heading">{filtered.length} termos</span>
+      <div className="flex items-center justify-between gap-2 mb-6">
+        <div className="flex items-center gap-2 min-w-0">
+          <BookOpen size={18} className="text-gold shrink-0" />
+          <h1 className="font-heading text-base sm:text-lg tracking-wide text-foreground truncate">Sumário</h1>
+          <span className="text-muted-foreground text-[.6rem] sm:text-xs font-heading shrink-0">{filtered.length}</span>
         </div>
         {isAdmin && !creating && (
-          <Button onClick={() => setCreating(true)} className="bg-gold text-background hover:bg-gold-light font-heading text-xs tracking-widest uppercase gap-2">
-            <Plus size={14} /> Novo Termo
+          <Button onClick={() => setCreating(true)} className="bg-gold text-background hover:bg-gold-light font-heading text-[.55rem] sm:text-xs tracking-widest uppercase gap-1.5 shrink-0 px-2 sm:px-3 h-8 sm:h-9">
+            <Plus size={14} /> <span className="hidden sm:inline">Novo Termo</span><span className="sm:hidden">Novo</span>
           </Button>
         )}
       </div>

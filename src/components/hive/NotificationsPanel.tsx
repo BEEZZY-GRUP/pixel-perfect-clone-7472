@@ -74,10 +74,10 @@ const NotificationsPanel = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
         <div className="flex items-center gap-3">
-          <Bell size={22} className="text-gold" />
-          <h2 className="font-heading text-lg tracking-widest uppercase text-foreground">
+          <Bell size={20} className="text-gold shrink-0" />
+          <h2 className="font-heading text-base sm:text-lg tracking-widest uppercase text-foreground">
             Notificações
           </h2>
           {unreadCount > 0 && (
@@ -92,10 +92,11 @@ const NotificationsPanel = () => {
             size="sm"
             onClick={() => markAllRead.mutate()}
             disabled={markAllRead.isPending}
-            className="text-xs h-9 px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5"
+            className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5 self-start sm:self-auto"
           >
             <CheckCheck size={14} />
-            Marcar todas como lidas
+            <span className="hidden sm:inline">Marcar todas como lidas</span>
+            <span className="sm:hidden">Marcar lidas</span>
           </Button>
         )}
       </div>
