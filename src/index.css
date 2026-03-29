@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -35,21 +35,21 @@
     --ring: 40 11% 95%;
     --border-strong: 40 11% 95% / 0.18;
 
-    --radius: 0rem;
+    --radius: 0.75rem;
 
     --grey-light: 40 9% 89%;
     --grey-mid: 30 4% 59%;
     --grey-dark: 60 2% 16%;
 
-    --gold: 36 35% 61%;
-    --gold-light: 36 54% 71%;
-    --gold-dim: 36 35% 61% / 0.12;
-    --gold-border: 36 35% 61% / 0.3;
-    --gold-dark: 36 48% 37%;
+    --gold: 50 100% 50%;
+    --gold-light: 50 100% 60%;
+    --gold-dim: 50 100% 50% / 0.12;
+    --gold-border: 50 100% 50% / 0.3;
+    --gold-dark: 50 100% 37%;
 
-    --font-display: 'Cormorant Garamond', serif;
-    --font-heading: 'DM Sans', sans-serif;
-    --font-sans: 'Syne', sans-serif;
+    --font-display: 'Montserrat', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-sans: 'Montserrat', sans-serif;
 
     --sidebar-background: 40 6% 3%;
     --sidebar-foreground: 40 11% 95%;
@@ -159,12 +159,86 @@ body:has(button:hover) #cursor-ring {
 }
 
 /* ─── NOISE TEXTURE ──────────────────────────────── */
-.hero-noise {
-  position: absolute; inset: 0; z-index: 1;
+.noise-overlay {
+  position: fixed; inset: 0; z-index: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
   background-size: 180px;
   pointer-events: none;
-  opacity: .5;
+  opacity: .35;
+}
+
+/* ─── GRADIENT ORBS ─────────────────────────────── */
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.ambient-orb-1 {
+  width: 400px; height: 400px;
+  background: hsl(var(--gold) / 0.08);
+  top: -10%; right: -5%;
+  animation-delay: 0s;
+}
+.ambient-orb-2 {
+  width: 300px; height: 300px;
+  background: hsl(var(--gold) / 0.05);
+  bottom: 10%; left: -5%;
+  animation-delay: -3s;
+}
+@keyframes orbFloat {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(30px,-20px) scale(1.1); }
+  66% { transform: translate(-20px,30px) scale(.95); }
+}
+
+/* ─── GEOMETRIC PATTERN ─────────────────────────── */
+.geo-pattern {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iQ2FtYWRhXzIiIGRhdGEtbmFtZT0iQ2FtYWRhIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCAzODY0IDIxNzMuNSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogbm9uZTsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiB1cmwoI05vdm9fcGFkcsOjbyk7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogIzA2MDYwNDsKICAgICAgfQogICAgPC9zdHlsZT4KICAgIDxwYXR0ZXJuIGlkPSJOb3ZvX3BhZHLDo28iIGRhdGEtbmFtZT0iTm92byBwYWRyw6NvIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIgcGF0dGVyblRyYW5zZm9ybT0idHJhbnNsYXRlKDIwMjAuNDMgNjY2MS43MSkiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHZpZXdCb3g9IjAgMCAyNjYuMjggMjQxLjE0Ij4KICAgICAgPGc+CiAgICAgICAgPHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iMjY2LjI4IiBoZWlnaHQ9IjI0MS4xNCIvPgogICAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTI2Ni4yOCwyNjcuNXYzMy45Mkgwdi0zMy45MmguNzZsNzQuMjQtODYuNTRINi4xNnYtLjExSDB2LTMzLjkyaDI2Ni4yOHYzMy45MmgtLjQ5bC03NC4yNCw4Ni42NWg3NC43M1pNMTI0LjI2LDI2Ny41aDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDE0Ni45M3YzMy45Mkgwdi0zMy45MmguNzZMNzQuOTksNjAuMzlINi4xNnYtLjExSDBWMjYuMzdoMjY2LjI4djMzLjkyaC0uNDlsLTc0LjI0LDg2LjY1aDc0LjczWk0xMjQuMjYsMTQ2LjkzaDE5LjAxbDc0LjI0LTg2LjU0aC02OC44NHYtLjExaC0yNS4zOGwtNzQuMjQsODYuNjVoNzUuMjJaIi8+CiAgICAgICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjY2LjI4LDI2LjM3djMzLjkySDBWMjYuMzdoLjc2TDc0Ljk5LTYwLjE4SDYuMTZ2LS4xMUgwdi0zMy45MmgyNjYuMjh2MzMuOTJoLS40OUwxOTEuNTUsMjYuMzdoNzQuNzNaTTEyNC4yNiwyNi4zN2gxOS4wMWw3NC4yNC04Ni41NGgtNjguODR2LS4xMWgtMjUuMzhMNDkuMDQsMjYuMzdoNzUuMjJaIi8+CiAgICAgIDwvZz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPGcgaWQ9IkNhbWFkYV8xLTIiIGRhdGEtbmFtZT0iQ2FtYWRhIDEiPgogICAgPHJlY3QgY2xhc3M9ImNscy0yIiB5PSIwIiB3aWR0aD0iMzg2NCIgaGVpZ2h0PSIyMTczLjUiLz4KICA8L2c+Cjwvc3ZnPg==');
+  background-size: 200px;
+  opacity: .03;
+  pointer-events: none;
+}
+
+/* ─── GRADIENT BORDER CARD ──────────────────────── */
+.card-gradient {
+  background: hsl(var(--background));
+  border: none;
+  border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+}
+.card-gradient::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  padding: 1.5px;
+  background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold) / 0.2) 50%, hsl(var(--gold)) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: all .4s;
+}
+.card-gradient::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  background: radial-gradient(ellipse at 50% 0%, hsl(var(--gold) / 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.card-gradient:hover::before {
+  background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold) / 0.5) 50%, hsl(var(--gold)) 100%);
+}
+
+/* ─── PAGE BACKGROUND LAYER ─────────────────────── */
+.page-bg {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 /* ─── DIVIDER ────────────────────────────────────── */

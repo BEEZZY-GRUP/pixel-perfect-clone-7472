@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import PageBackground from "@/components/PageBackground";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -237,9 +238,10 @@ const CommunityLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background community-zoom">
+    <div className="min-h-screen bg-background community-zoom relative">
+      <PageBackground />
       {/* Top bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-md px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md px-3 md:px-8 py-2 md:py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -247,7 +249,7 @@ const CommunityLayout = () => {
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <button onClick={() => navigate("/the-hive/community")} className="font-sans font-extrabold text-[1rem] tracking-[.22em] uppercase text-foreground">
+          <button onClick={() => navigate("/the-hive/community")} className="font-display font-black text-[1rem] tracking-[-.03em] text-foreground">
             Beezzy<span className="text-gold">.</span>
           </button>
           <span className="text-muted-foreground text-[.65rem] tracking-widest uppercase font-heading hidden sm:inline">

@@ -21,7 +21,7 @@ const LoadingScreen = () => {
       <div className="relative flex flex-col items-center gap-8">
         {/* Logo */}
         <div className="flex flex-col items-center gap-2">
-          <h1 className="font-sans font-extrabold text-2xl tracking-[.25em] uppercase text-foreground">
+          <h1 className="font-display font-black text-2xl tracking-[-.03em] text-foreground">
             Beezzy<span className="text-gold">.</span>
           </h1>
           <span className="text-muted-foreground text-[.6rem] tracking-[.35em] uppercase font-heading">

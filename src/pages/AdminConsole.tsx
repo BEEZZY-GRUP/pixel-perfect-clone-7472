@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import PageBackground from "@/components/PageBackground";
 import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw } from "lucide-react";
 import { LeadsProvider, useLeads } from "@/components/admin/LeadsContext";
 import KanbanBoard from "@/components/admin/KanbanBoard";
@@ -39,24 +40,15 @@ function ConsoleContent() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-[0.012]"
-          style={{
-            backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
-      </div>
+      <PageBackground />
 
       {/* Top bar */}
-      <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-card/30 backdrop-blur-sm">
+      <header className="relative z-10 border-b border-border px-4 md:px-8 py-0 flex items-center justify-between bg-background/80 backdrop-blur-md">
         {/* Logo */}
         <div className="flex items-center gap-3 py-4">
-          <div className="w-2 h-2 bg-primary" />
-          <p className="font-mono text-primary text-xs tracking-[0.3em] font-semibold">BZY</p>
-          <span className="font-mono text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline">
+          <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
+          <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
+          <span className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline font-semibold">
             CONSOLE
           </span>
         </div>
@@ -70,9 +62,9 @@ function ConsoleContent() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`relative flex items-center gap-2 px-4 py-4 font-mono text-[10px] tracking-[0.15em] transition-colors duration-200 whitespace-nowrap ${
+                className={`relative flex items-center gap-2 px-4 py-4 font-heading text-[10px] tracking-[0.15em] transition-colors duration-200 whitespace-nowrap font-semibold ${
                   isActive
-                    ? "text-primary"
+                    ? "text-gold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -81,7 +73,7 @@ function ConsoleContent() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 w-full h-px bg-primary"
+                    className="absolute bottom-0 left-0 w-full h-px bg-gold"
                     transition={{ duration: 0.25, ease: "easeInOut" }}
                   />
                 )}
@@ -94,7 +86,7 @@ function ConsoleContent() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.15em] px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors hidden md:flex"
+            className="flex items-center gap-1.5 font-heading text-[10px] tracking-[0.15em] px-3 py-2 bg-gold text-background hover:bg-gold-light transition-colors hidden md:flex rounded-lg font-bold"
           >
             <Plus size={12} /> NOVO
           </button>
@@ -107,7 +99,7 @@ function ConsoleContent() {
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-4"
+            className="flex items-center gap-2 font-heading text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-4 font-semibold"
           >
             <LogOut size={13} />
             <span className="hidden sm:inline">SAIR</span>
