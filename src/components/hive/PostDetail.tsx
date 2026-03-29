@@ -201,12 +201,17 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
               />
             </button>
             <div>
-              <button
-                onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
-                className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
-              >
-                {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
+                  className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
+                >
+                  {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                </button>
+                {!hideAuthor && !post.is_anonymous && post.userRole && post.userRole !== "user" && (
+                  <RoleBadge role={post.userRole} />
+                )}
+              </div>
               <div className="flex items-center gap-1.5 text-muted-foreground text-[.65rem]">
                 <Clock size={10} />
                 <time
