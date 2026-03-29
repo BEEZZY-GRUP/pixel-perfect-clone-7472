@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 import CommentItem from "./CommentItem";
+import RoleBadge from "./RoleBadge";
 
 const CONFESSIONARIO_SLUG = "confessionario";
 
