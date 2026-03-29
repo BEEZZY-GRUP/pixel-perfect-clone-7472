@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import UserAvatar from "./UserAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Input } from "@/components/ui/input";
@@ -376,11 +377,13 @@ const AdminPanel = () => {
                         <ChevronRight size={18} className="text-muted-foreground shrink-0" />
                       )}
 
-                      {/* Avatar placeholder */}
-                      <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                        <span className="text-gold text-sm font-bold uppercase">
-                          {(profile.company_name || "U").charAt(0)}
-                        </span>
+                      <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
+                        <UserAvatar
+                          avatarUrl={profile.avatar_url}
+                          name={profile.company_name}
+                          size="md"
+                          className="w-full h-full"
+                        />
                       </div>
 
                       <div className="min-w-0 flex-1">
