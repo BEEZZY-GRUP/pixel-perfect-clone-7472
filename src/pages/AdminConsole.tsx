@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import PageBackground from "@/components/PageBackground";
 import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw } from "lucide-react";
 import { LeadsProvider, useLeads } from "@/components/admin/LeadsContext";
 import KanbanBoard from "@/components/admin/KanbanBoard";
