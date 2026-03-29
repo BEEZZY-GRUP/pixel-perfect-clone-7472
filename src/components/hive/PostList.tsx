@@ -126,7 +126,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                     size="md"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <button
                         onClick={(e) => {
                           if (!hideAuthor && !post.is_anonymous) {
@@ -138,6 +138,9 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                       >
                         {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
                       </button>
+                      {!hideAuthor && !post.is_anonymous && post.userRole && post.userRole !== "user" && (
+                        <RoleBadge role={post.userRole} />
+                      )}
                       {post.pinned && (
                         <span className="inline-flex items-center gap-1 text-[.55rem] bg-gold/10 text-gold px-1.5 py-0.5 uppercase tracking-wider font-heading">
                           <Pin size={9} />
