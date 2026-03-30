@@ -259,9 +259,9 @@ const VaultGlobalPlanning = () => {
         <div>
           <div className="grid grid-cols-3 gap-2.5 mb-5">
             {[
-              { label: "MRR Projetado Jun/26", value: "R$ 620k", sub: "▲ +27,3% vs atual", cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
-              { label: "ARR Projetado 2026", value: "R$ 6,8M", sub: "Crescimento anual" },
-              { label: "Runway", value: "18 meses", sub: "Com base no burn rate", cls: "text-green-400" },
+              { label: "MRR Atual", value: projectionData.totalMRR > 0 ? fmtK(projectionData.totalMRR) : "Sem dados", sub: "Receita recorrente mensal", cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
+              { label: `MRR Projetado ${projectionData.futureMonths[5]?.label ?? ""}`, value: projectionData.projectedMRR6 > 0 ? fmtK(projectionData.projectedMRR6) : "—", sub: projectionData.totalMRR > 0 ? `▲ +${projectionData.mrrGrowthPct}% vs atual` : "Cadastre receitas para projetar" },
+              { label: "Runway", value: projectionData.runway >= 99 ? "∞" : `${projectionData.runway} meses`, sub: projectionData.totalBurn > 0 ? `Burn: ${fmtK(projectionData.totalBurn + projectionData.totalPayroll)}/mês` : "Sem despesas registradas", cls: projectionData.runway > 12 ? "text-green-400" : projectionData.runway > 6 ? "text-yellow-400" : "text-red-400" },
             ].map((k, i) => (
               <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
                 <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
@@ -270,29 +270,49 @@ const VaultGlobalPlanning = () => {
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
-            <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR | Próximos 6 meses</span></div>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Empresa</th>
-                  {["Abr", "Mai", "Jun", "Jul", "Ago", "Set"].map(m => <th key={m} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{m}/26</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { name: "Beezzy", base: 248000, rate: 1.05, color: "#a78bfa" },
-                  { name: "Palpita.io", base: 146000, rate: 1.06, color: "#f472b6" },
-                  { name: "Starmind", base: 93000, rate: 1.04, color: "#F5C518" },
-                ].map(co => (
-                  <tr key={co.name} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                    <td className="px-4 py-2.5"><span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${co.color}15`, color: co.color }}>{co.name}</span></td>
-                    {[1,2,3,4,5,6].map(i => <td key={i} className="px-4 py-2.5 text-xs">{fmtK(Math.round(co.base * Math.pow(co.rate, i)))}</td>)}
+
+          {projectionData.companyProjections.filter(c => c.currentMRR > 0).length === 0 ? (
+            <div className="rounded-xl border border-white/5 p-8 text-center" style={{ background: "#0e0e0a" }}>
+              <div className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Cadastre lançamentos de faturamento nas empresas para gerar projeções</div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+              <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR | Próximos 6 meses</span></div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Empresa</th>
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>MRR Atual</th>
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Cresc.</th>
+                    {projectionData.futureMonths.map(m => (
+                      <th key={m.key} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{m.label}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {projectionData.companyProjections.filter(c => c.currentMRR > 0).map(co => (
+                    <tr key={co.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                      <td className="px-4 py-2.5"><span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${co.color}15`, color: co.color }}>{co.name}</span></td>
+                      <td className="px-4 py-2.5 text-xs font-medium">{fmtK(co.currentMRR)}</td>
+                      <td className="px-4 py-2.5 text-xs" style={{ color: co.growthRate >= 1 ? "#22c55e" : "#ef4444" }}>{((co.growthRate - 1) * 100).toFixed(1)}%</td>
+                      {[1,2,3,4,5,6].map(i => (
+                        <td key={i} className="px-4 py-2.5 text-xs">{fmtK(Math.round(co.currentMRR * Math.pow(co.growthRate, i)))}</td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-white/10 font-semibold">
+                    <td className="px-4 py-2.5 text-xs">TOTAL</td>
+                    <td className="px-4 py-2.5 text-xs">{fmtK(projectionData.totalMRR)}</td>
+                    <td className="px-4 py-2.5 text-xs" />
+                    {[1,2,3,4,5,6].map(i => {
+                      const total = projectionData.companyProjections.filter(c => c.currentMRR > 0).reduce((a, co) => a + Math.round(co.currentMRR * Math.pow(co.growthRate, i)), 0);
+                      return <td key={i} className="px-4 py-2.5 text-xs">{fmtK(total)}</td>;
+                    })}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
