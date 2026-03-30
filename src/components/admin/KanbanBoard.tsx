@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Building2, Phone, GripVertical, Eye, Trash2, Mail, Calendar, Tag, Users } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, type Lead } from "./types";
-import { supabase } from "@/integrations/supabase/client";
 import LeadDetailModal from "./LeadDetailModal";
 
 export default function KanbanBoard() {
