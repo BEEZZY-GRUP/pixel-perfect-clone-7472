@@ -34,6 +34,18 @@ const VaultGlobalHR = () => {
     queryFn: async () => { const { data } = await supabase.from("vault_vacations").select("*").order("start_date", { ascending: false }); return data ?? []; },
   });
 
+  const { data: salaryHistory } = useQuery({
+    queryKey: ["vault_salary_history_global"],
+    queryFn: async () => { const { data } = await supabase.from("vault_salary_history").select("*").order("change_date", { ascending: false }); return data ?? []; },
+  });
+
+  const queryClient = useQueryClient();
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
+  const [showVacForm, setShowVacForm] = useState(false);
+  const [showSalaryForm, setShowSalaryForm] = useState(false);
+  const [vacForm, setVacForm] = useState({ start_date: "", return_date: "", days: 0, leave_type: "Férias", status: "aprovado" });
+  const [salaryForm, setSalaryForm] = useState({ new_salary: "", change_date: new Date().toISOString().split("T")[0], reason: "" });
+
   const filtered = employees?.filter((e: any) =>
     (!filterCo || e.company_id === filterCo) &&
     (!filterDept || e.department === filterDept) &&
