@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { Gift, Cake } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Gift, Cake, User, Plus, ArrowLeft, Calendar, DollarSign, TrendingUp, TrendingDown, Minus, X } from "lucide-react";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
 const fmtDate = (s: string | null) => { if (!s) return "-"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
