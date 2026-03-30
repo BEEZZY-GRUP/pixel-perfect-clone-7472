@@ -461,9 +461,9 @@ export const EmployeeProfile = ({
               </div>
               {salaryForm.new_salary && (
                 <div className="text-[10px] mb-3 flex items-center gap-2" style={{ color: "rgba(242,240,232,0.4)" }}>
-                  De <strong className="text-white/70">{fmt(Number(employee.salary))}</strong> para <strong className="text-[#FFD600]">{fmt(Number(salaryForm.new_salary))}</strong>
+                  De <strong className="text-white/70">{fmt(Number(employee.salary))}</strong> para <strong className="text-[#FFD600]">{fmt(Number(unmaskCurrency(salaryForm.new_salary)))}</strong>
                   {(() => {
-                    const diff = Number(salaryForm.new_salary) - Number(employee.salary);
+                    const diff = Number(unmaskCurrency(salaryForm.new_salary)) - Number(employee.salary);
                     const pct = Number(employee.salary) > 0 ? ((diff / Number(employee.salary)) * 100).toFixed(1) : "0";
                     return <span className={diff > 0 ? "text-green-400" : diff < 0 ? "text-red-400" : ""}>({diff > 0 ? "+" : ""}{pct}%)</span>;
                   })()}
@@ -471,7 +471,7 @@ export const EmployeeProfile = ({
               )}
               <button
                 onClick={onSaveSalary}
-                disabled={!salaryForm.new_salary || Number(salaryForm.new_salary) === Number(employee.salary)}
+                disabled={!salaryForm.new_salary || Number(unmaskCurrency(salaryForm.new_salary)) === Number(employee.salary)}
                 className="text-[10px] font-medium px-4 py-1.5 rounded-lg bg-[#FFD600] text-black hover:bg-[#FFD600]/90 transition-colors disabled:opacity-30"
               >Salvar Alteração</button>
             </div>
