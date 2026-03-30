@@ -12,7 +12,7 @@ import VaultBankAccountForm from "./VaultBankAccountForm";
 import VaultTransactionForm from "./VaultTransactionForm";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
 import { EmployeeProfile } from "./VaultGlobalHR";
-import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber, unmaskCurrency } from "@/lib/masks";
+import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber, maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   company: any;
@@ -48,7 +48,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; title: string; desc: string; onConfirm: () => Promise<void> }>({ open: false, title: "", desc: "", onConfirm: async () => {} });
   const [goalModal, setGoalModal] = useState<{ open: boolean; goal?: any }>({ open: false });
-  const [goalForm, setGoalForm] = useState({ goal_type: "", description: "", target_value: "", current_value: "" });
+  const [goalForm, setGoalForm] = useState({ goal_type: "", description: "", unit_type: "valor", target_value: "", current_value: "", year: String(new Date().getFullYear()) });
 
   // RH tab state
   const [selectedRHEmployee, setSelectedRHEmployee] = useState<any>(null);
@@ -350,7 +350,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                 {hasPerm("fin") && (
                   <button
                     onClick={() => {
-                      setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" });
+                      setGoalForm({ goal_type: "", description: "", unit_type: "valor", target_value: "", current_value: "", year: String(new Date().getFullYear()) });
                       setGoalModal({ open: true });
                     }}
                     className="p-1 rounded hover:bg-white/10 transition-colors"
@@ -364,15 +364,25 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                 <div className="space-y-3">
                   {goals?.map((g: any) => {
                     const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
+                    const parts = (g.goal_type ?? "").split("|");
+                    const unitType = parts[1] || "valor";
+                    const fmtGoalVal = (v: number) => unitType === "valor" ? fmtK(v) : unitType === "percentual" ? `${v}%` : String(v);
+                    const initCurr = (v: any) => { const n = Number(v); if (!v || n === 0) return ""; return maskCurrency(n.toFixed(2).replace(".", ",")); };
                     return (
                       <div key={g.id} className="group">
                         <div className="flex justify-between text-[11px] mb-1">
-                          <span className="truncate mr-2">{g.description || g.goal_type}</span>
+                          <span className="truncate mr-2">{g.description || parts[0]}</span>
                           <div className="flex items-center gap-1">
-                            <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                            <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtGoalVal(Number(g.current_value))} / {fmtGoalVal(Number(g.target_value))}</span>
+                            <span className="flex-shrink-0 ml-1" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
                             {hasPerm("fin") && (
                               <>
-                                <button onClick={() => { setGoalForm({ goal_type: g.goal_type, description: g.description || "", target_value: String(g.target_value), current_value: String(g.current_value) }); setGoalModal({ open: true, goal: g }); }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
+                                <button onClick={() => {
+                                  const tv = unitType === "valor" ? initCurr(g.target_value) : String(g.target_value);
+                                  const cv = unitType === "valor" ? initCurr(g.current_value) : String(g.current_value);
+                                  setGoalForm({ goal_type: parts[0] || "", description: g.description || "", unit_type: unitType, target_value: tv, current_value: cv, year: String(g.year) });
+                                  setGoalModal({ open: true, goal: g });
+                                }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
                                 <button onClick={() => handleDelete("vault_goals", g.id, "Meta", "vault_goals")} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/20 transition-all"><Trash2 size={10} className="text-red-400/60" /></button>
                               </>
                             )}
@@ -390,7 +400,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   <span className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</span>
                   {hasPerm("fin") && (
                     <button
-                      onClick={() => { setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" }); setGoalModal({ open: true }); }}
+                      onClick={() => { setGoalForm({ goal_type: "", description: "", unit_type: "valor", target_value: "", current_value: "", year: String(new Date().getFullYear()) }); setGoalModal({ open: true }); }}
                       className="text-[10px] px-3 py-1 rounded bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors"
                     >
                       + Criar meta
@@ -1047,49 +1057,64 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
-              <select
-                value={goalForm.goal_type}
-                onChange={e => setGoalForm(f => ({ ...f, goal_type: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-              >
-                <option value="" className="bg-[#111]">Selecione...</option>
-                {["Faturamento", "Clientes", "Margem", "Redução de Custos", "Outros"].map(t => (
-                  <option key={t} value={t} className="bg-[#111]">{t}</option>
-                ))}
-              </select>
-            </div>
-            <div>
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
-              <input
-                type="text"
-                placeholder="Ex: Atingir R$ 100k de faturamento"
-                value={goalForm.description}
-                onChange={e => setGoalForm(f => ({ ...f, description: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
-              />
+              <input value={goalForm.description} onChange={e => setGoalForm(f => ({ ...f, description: e.target.value }))} placeholder="Ex: Atingir R$ 100k de MRR" className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Alvo</label>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+                <select value={goalForm.goal_type} onChange={e => setGoalForm(f => ({ ...f, goal_type: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  <option value="" className="bg-[#111]">Selecione...</option>
+                  {["MRR", "Churn", "Receita", "Clientes", "NPS", "Conversão", "Leads", "Outro"].map(t => <option key={t} value={t} className="bg-[#111]">{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Unidade</label>
+                <select value={goalForm.unit_type} onChange={e => {
+                  const newUnit = e.target.value;
+                  setGoalForm(f => ({ ...f, unit_type: newUnit, target_value: "", current_value: "" }));
+                }} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  {[
+                    { value: "valor", label: "Valor (R$)" },
+                    { value: "quantidade", label: "Quantidade" },
+                    { value: "percentual", label: "Percentual (%)" },
+                  ].map(u => <option key={u.value} value={u.value} className="bg-[#111]">{u.label}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Meta {goalForm.unit_type === "percentual" ? "(%)" : goalForm.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
                 <input
-                  type="number"
-                  placeholder="0"
+                  type={goalForm.unit_type === "valor" ? "text" : "number"}
+                  inputMode={goalForm.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={goalForm.unit_type === "valor" ? "R$ 0,00" : "0"}
                   value={goalForm.target_value}
-                  onChange={e => setGoalForm(f => ({ ...f, target_value: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                  onChange={e => setGoalForm(f => ({ ...f, target_value: goalForm.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Atual</label>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Realizado {goalForm.unit_type === "percentual" ? "(%)" : goalForm.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
                 <input
-                  type="number"
-                  placeholder="0"
+                  type={goalForm.unit_type === "valor" ? "text" : "number"}
+                  inputMode={goalForm.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={goalForm.unit_type === "valor" ? "R$ 0,00" : "0"}
                   value={goalForm.current_value}
-                  onChange={e => setGoalForm(f => ({ ...f, current_value: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                  onChange={e => setGoalForm(f => ({ ...f, current_value: goalForm.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
                 />
               </div>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
+              <select value={goalForm.year} onChange={e => setGoalForm(f => ({ ...f, year: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                {["2025", "2026", "2027"].map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
+              </select>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-3">
@@ -1098,13 +1123,15 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
               className="bg-[#FFD600] text-black hover:bg-[#E6C200]"
               onClick={async () => {
                 if (!goalForm.goal_type) { toast.error("Selecione o tipo da meta"); return; }
+                const targetVal = goalForm.unit_type === "valor" ? Number(unmaskCurrency(goalForm.target_value)) : Number(goalForm.target_value);
+                const currentVal = goalForm.unit_type === "valor" ? Number(unmaskCurrency(goalForm.current_value)) : Number(goalForm.current_value) || 0;
                 const payload = {
                   company_id: coId,
-                  goal_type: goalForm.goal_type,
+                  goal_type: `${goalForm.goal_type}|${goalForm.unit_type}`,
                   description: goalForm.description || null,
-                  target_value: Number(goalForm.target_value) || 0,
-                  current_value: Number(goalForm.current_value) || 0,
-                  year: new Date().getFullYear(),
+                  target_value: targetVal,
+                  current_value: currentVal,
+                  year: Number(goalForm.year) || new Date().getFullYear(),
                 };
                 const { error } = goalModal.goal
                   ? await supabase.from("vault_goals").update(payload).eq("id", goalModal.goal.id)

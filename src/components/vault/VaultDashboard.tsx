@@ -284,12 +284,15 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
               {goals.slice(0, 5).map((g: any) => {
                 const p = pct(Number(g.current_value), Number(g.target_value));
                 const co = companies.find((c: any) => c.id === g.company_id);
+                const parts = (g.goal_type ?? "").split("|");
+                const unitType = parts[1] || "valor";
+                const fmtGoalVal = (v: number) => unitType === "valor" ? fmtK(v) : unitType === "percentual" ? `${v}%` : String(v);
                 return (
                   <div key={g.id}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5">
                         {co && <span className="w-1.5 h-1.5 rounded-full" style={{ background: co.color }} />}
-                        <span className="text-[11px] truncate max-w-[130px]">{g.description || g.goal_type}</span>
+                        <span className="text-[11px] truncate max-w-[130px]">{g.description || parts[0]}</span>
                       </div>
                       <span className={`text-[10px] font-semibold ${p >= 100 ? "text-green-400" : p >= 70 ? "text-amber-400" : ""}`}>{p}%</span>
                     </div>
@@ -297,8 +300,8 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
                       <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(p, 100)}%`, background: co?.color ?? "#FFD600" }} />
                     </div>
                     <div className="text-[9px] mt-0.5 flex justify-between" style={{ color: "rgba(242,240,232,0.3)" }}>
-                      <span>{fmtK(Number(g.current_value))}</span>
-                      <span>{fmtK(Number(g.target_value))}</span>
+                      <span>{fmtGoalVal(Number(g.current_value))}</span>
+                      <span>{fmtGoalVal(Number(g.target_value))}</span>
                     </div>
                   </div>
                 );
