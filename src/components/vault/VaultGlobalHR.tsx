@@ -369,6 +369,267 @@ const getDaysUntilBirthday = (birthDateStr: string) => {
   return Math.ceil((next.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
 };
 
+/* ───── Employee Profile Sub-Component ───── */
+
+const EmployeeProfile = ({
+  employee, vacations, salaryHistory, getCoName, getCoColor, onBack,
+  showVacForm, setShowVacForm, vacForm, setVacForm,
+  showSalaryForm, setShowSalaryForm, salaryForm, setSalaryForm,
+  onSaveVacation, onSaveSalary,
+}: {
+  employee: any; vacations: any[]; salaryHistory: any[];
+  getCoName: (id: string) => string; getCoColor: (id: string) => string;
+  onBack: () => void;
+  showVacForm: boolean; setShowVacForm: (v: boolean) => void;
+  vacForm: any; setVacForm: (v: any) => void;
+  showSalaryForm: boolean; setShowSalaryForm: (v: boolean) => void;
+  salaryForm: any; setSalaryForm: (v: any) => void;
+  onSaveVacation: () => void; onSaveSalary: () => void;
+}) => {
+  const [profileTab, setProfileTab] = useState(0);
+  const profileTabs = ["Visão Geral", "Férias", "Histórico Salarial"];
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+          <ArrowLeft className="w-4 h-4 text-white/50" />
+        </button>
+        <div className="flex items-center gap-3 flex-1">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-base font-bold" style={{ background: `${getCoColor(employee.company_id)}20`, color: getCoColor(employee.company_id) }}>
+            {employee.name?.charAt(0)?.toUpperCase() ?? "?"}
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold">{employee.name}</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{employee.position ?? "-"} · {employee.department ?? "-"}</span>
+              <span className="inline-flex text-[9px] font-medium px-1.5 py-0.5 rounded" style={{ background: `${getCoColor(employee.company_id)}15`, color: getCoColor(employee.company_id) }}>{getCoName(employee.company_id)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex border-b border-white/5 mb-5 gap-0">
+        {profileTabs.map((t, i) => (
+          <button key={t} onClick={() => setProfileTab(i)}
+            className={`px-3.5 py-2 text-xs whitespace-nowrap border-b-2 transition-colors ${profileTab === i ? "text-[#FFD600] border-[#FFD600] font-medium" : "text-white/40 border-transparent hover:text-white/60"}`}
+          >{t}</button>
+        ))}
+      </div>
+
+      {/* Profile Overview */}
+      {profileTab === 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            { label: "Tipo", value: employee.employment_type },
+            { label: "Salário Atual", value: fmt(Number(employee.salary)) },
+            { label: "Admissão", value: fmtDate(employee.admission_date) },
+            { label: "Nascimento", value: fmtDate(employee.birth_date) },
+            { label: "E-mail", value: employee.email ?? "-" },
+            { label: "CPF", value: employee.cpf ?? "-" },
+            { label: "PIS", value: employee.pis ?? "-" },
+            { label: "Status", value: employee.status },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-white/5 p-3" style={{ background: "#0e0e0a" }}>
+              <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.3)" }}>{item.label}</div>
+              <div className="text-xs font-medium">{item.value ?? "-"}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Vacations */}
+      {profileTab === 1 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-[#FFD600]" /> Férias & Afastamentos</span>
+            <button onClick={() => setShowVacForm(true)} className="flex items-center gap-1.5 text-[10px] font-medium px-3 py-1.5 rounded-lg bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors">
+              <Plus className="w-3 h-3" /> Adicionar
+            </button>
+          </div>
+
+          {showVacForm && (
+            <div className="rounded-xl border border-[#FFD600]/20 p-4 mb-4" style={{ background: "#0e0e0a" }}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium">Novo período</span>
+                <button onClick={() => setShowVacForm(false)} className="text-white/30 hover:text-white/60"><X className="w-3.5 h-3.5" /></button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-3">
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Tipo</label>
+                  <select value={vacForm.leave_type} onChange={e => setVacForm({ ...vacForm, leave_type: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none">
+                    {["Férias", "Licença Médica", "Licença Maternidade", "Licença Paternidade", "Afastamento"].map(t => <option key={t} value={t} className="bg-[#111]">{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Início</label>
+                  <input type="date" value={vacForm.start_date} onChange={e => setVacForm({ ...vacForm, start_date: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none" />
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Retorno</label>
+                  <input type="date" value={vacForm.return_date} onChange={e => setVacForm({ ...vacForm, return_date: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none" />
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Status</label>
+                  <select value={vacForm.status} onChange={e => setVacForm({ ...vacForm, status: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none">
+                    {["aprovado", "pendente"].map(s => <option key={s} value={s} className="bg-[#111]">{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                  </select>
+                </div>
+              </div>
+              <button
+                onClick={onSaveVacation}
+                disabled={!vacForm.start_date || !vacForm.return_date}
+                className="text-[10px] font-medium px-4 py-1.5 rounded-lg bg-[#FFD600] text-black hover:bg-[#FFD600]/90 transition-colors disabled:opacity-30"
+              >Salvar</button>
+            </div>
+          )}
+
+          <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+            {vacations.length === 0 ? (
+              <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum período registrado</div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    {["Tipo", "Início", "Retorno", "Dias", "Status"].map(h => (
+                      <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {vacations.map((v: any) => (
+                    <tr key={v.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                      <td className="px-4 py-2.5 text-xs">{v.leave_type}</td>
+                      <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(v.start_date)}</td>
+                      <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(v.return_date)}</td>
+                      <td className="px-4 py-2.5 text-xs">{v.days} dias</td>
+                      <td className="px-4 py-2.5">{statusBadge(v.status)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Salary History */}
+      {profileTab === 2 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium flex items-center gap-2"><DollarSign className="w-3.5 h-3.5 text-[#FFD600]" /> Histórico Salarial</span>
+            <button onClick={() => { setShowSalaryForm(true); setSalaryForm({ ...salaryForm, new_salary: "" }); }} className="flex items-center gap-1.5 text-[10px] font-medium px-3 py-1.5 rounded-lg bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors">
+              <Plus className="w-3 h-3" /> Alteração Salarial
+            </button>
+          </div>
+
+          {/* Current salary card */}
+          <div className="rounded-xl border border-[#FFD600]/15 p-4 mb-4 flex items-center gap-4" style={{ background: "#0e0e0a" }}>
+            <div className="w-10 h-10 rounded-full bg-[#FFD600]/10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-[#FFD600]" />
+            </div>
+            <div>
+              <div className="text-[9px] uppercase tracking-widest" style={{ color: "rgba(242,240,232,0.3)" }}>Salário Atual</div>
+              <div className="text-lg font-heading font-bold text-[#FFD600]">{fmt(Number(employee.salary))}</div>
+            </div>
+            {salaryHistory.length > 0 && (() => {
+              const lastChange = salaryHistory[0];
+              const diff = Number(lastChange.new_salary) - Number(lastChange.previous_salary);
+              const pct = Number(lastChange.previous_salary) > 0 ? ((diff / Number(lastChange.previous_salary)) * 100).toFixed(1) : "—";
+              return (
+                <div className="ml-auto flex items-center gap-1.5">
+                  {diff > 0 ? <TrendingUp className="w-4 h-4 text-green-400" /> : diff < 0 ? <TrendingDown className="w-4 h-4 text-red-400" /> : <Minus className="w-4 h-4 text-white/30" />}
+                  <span className={`text-xs font-semibold ${diff > 0 ? "text-green-400" : diff < 0 ? "text-red-400" : "text-white/30"}`}>
+                    {diff > 0 ? "+" : ""}{pct}%
+                  </span>
+                  <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.3)" }}>última alteração</span>
+                </div>
+              );
+            })()}
+          </div>
+
+          {showSalaryForm && (
+            <div className="rounded-xl border border-[#FFD600]/20 p-4 mb-4" style={{ background: "#0e0e0a" }}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium">Nova alteração salarial</span>
+                <button onClick={() => setShowSalaryForm(false)} className="text-white/30 hover:text-white/60"><X className="w-3.5 h-3.5" /></button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-3">
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Novo Salário (R$)</label>
+                  <input type="number" value={salaryForm.new_salary} onChange={e => setSalaryForm({ ...salaryForm, new_salary: e.target.value })} placeholder={String(employee.salary)} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none placeholder:text-white/15" />
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Data</label>
+                  <input type="date" value={salaryForm.change_date} onChange={e => setSalaryForm({ ...salaryForm, change_date: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none" />
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Motivo</label>
+                  <select value={salaryForm.reason} onChange={e => setSalaryForm({ ...salaryForm, reason: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none">
+                    <option value="" className="bg-[#111]">Selecione</option>
+                    {["Reajuste anual", "Promoção", "Mérito", "Dissídio", "Correção", "Outro"].map(r => <option key={r} value={r} className="bg-[#111]">{r}</option>)}
+                  </select>
+                </div>
+              </div>
+              {salaryForm.new_salary && (
+                <div className="text-[10px] mb-3 flex items-center gap-2" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  De <strong className="text-white/70">{fmt(Number(employee.salary))}</strong> para <strong className="text-[#FFD600]">{fmt(Number(salaryForm.new_salary))}</strong>
+                  {(() => {
+                    const diff = Number(salaryForm.new_salary) - Number(employee.salary);
+                    const pct = Number(employee.salary) > 0 ? ((diff / Number(employee.salary)) * 100).toFixed(1) : "0";
+                    return <span className={diff > 0 ? "text-green-400" : diff < 0 ? "text-red-400" : ""}>({diff > 0 ? "+" : ""}{pct}%)</span>;
+                  })()}
+                </div>
+              )}
+              <button
+                onClick={onSaveSalary}
+                disabled={!salaryForm.new_salary || Number(salaryForm.new_salary) === Number(employee.salary)}
+                className="text-[10px] font-medium px-4 py-1.5 rounded-lg bg-[#FFD600] text-black hover:bg-[#FFD600]/90 transition-colors disabled:opacity-30"
+              >Salvar Alteração</button>
+            </div>
+          )}
+
+          <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+            {salaryHistory.length === 0 ? (
+              <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma alteração salarial registrada</div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    {["Data", "Anterior", "Novo", "Variação", "Motivo"].map(h => (
+                      <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {salaryHistory.map((s: any) => {
+                    const diff = Number(s.new_salary) - Number(s.previous_salary);
+                    const pct = Number(s.previous_salary) > 0 ? ((diff / Number(s.previous_salary)) * 100).toFixed(1) : "—";
+                    return (
+                      <tr key={s.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(s.change_date)}</td>
+                        <td className="px-4 py-2.5 text-xs">{fmt(Number(s.previous_salary))}</td>
+                        <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(s.new_salary))}</td>
+                        <td className="px-4 py-2.5">
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-semibold ${diff > 0 ? "text-green-400" : diff < 0 ? "text-red-400" : "text-white/30"}`}>
+                            {diff > 0 ? <TrendingUp className="w-3 h-3" /> : diff < 0 ? <TrendingDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                            {diff > 0 ? "+" : ""}{pct}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{s.reason ?? "-"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const BirthdayTab = ({ employees, companies, getCoName, getCoColor }: {
   employees: any[];
   companies: any[] | undefined;
