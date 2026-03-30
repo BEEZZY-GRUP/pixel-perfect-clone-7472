@@ -164,37 +164,61 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               if (type === "config") return "settings";
               return null;
             };
-            const renderNotif = (n: any) => {
+            const deleteNotif = async (id: string, e: React.MouseEvent) => {
+              e.stopPropagation();
+              await supabase.from("vault_notifications").delete().eq("id", id);
+              qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+            };
+            const deleteAllRead = async () => {
+              const ids = read.map((n: any) => n.id);
+              for (const id of ids) { await supabase.from("vault_notifications").delete().eq("id", id); }
+              qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+            };
+            const renderNotif = (n: any, showDelete = false) => {
               const targetView = getTargetView(n.notification_type);
               return (
-                <button key={n.id} onClick={async () => {
-                  if (!n.read) {
-                    await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
-                    qc.invalidateQueries({ queryKey: ["vault_notifications"] });
-                  }
-                  if (targetView) handleGlobalView(targetView);
-                }}
-                  className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
-                  <span className="text-lg">{n.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
-                    {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
-                  </div>
-                  {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
-                </button>
+                <div key={n.id} className="relative group">
+                  <button onClick={async () => {
+                    if (!n.read) {
+                      await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
+                      qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                    }
+                    if (targetView) handleGlobalView(targetView);
+                  }}
+                    className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
+                    <span className="text-lg">{n.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
+                      {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
+                    </div>
+                    {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
+                  </button>
+                  {showDelete && (
+                    <button onClick={(e) => deleteNotif(n.id, e)}
+                      className="absolute top-2 right-2 p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Excluir">
+                      <Trash2 size={12} className="text-red-400" />
+                    </button>
+                  )}
+                </div>
               );
             };
             return (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="font-heading text-lg font-semibold">Notificações</h1>
-                  {unread.length > 0 && (
-                    <button onClick={async () => {
-                      const ids = unread.map((n: any) => n.id);
-                      for (const id of ids) { await supabase.from("vault_notifications").update({ read: true }).eq("id", id); }
-                      qc.invalidateQueries({ queryKey: ["vault_notifications"] });
-                    }} className="text-[11px] text-[#FFD600] hover:underline">Marcar todas como lidas</button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {unread.length > 0 && (
+                      <button onClick={async () => {
+                        const ids = unread.map((n: any) => n.id);
+                        for (const id of ids) { await supabase.from("vault_notifications").update({ read: true }).eq("id", id); }
+                        qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                      }} className="text-[11px] text-[#FFD600] hover:underline">Marcar todas como lidas</button>
+                    )}
+                    {read.length > 0 && (
+                      <button onClick={deleteAllRead} className="text-[11px] text-red-400 hover:underline">Excluir todas lidas</button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Não lidas */}
@@ -203,7 +227,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                 </div>
                 <div className="space-y-2 mb-6">
                   {unread.length === 0 && <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação pendente 🎉</div>}
-                  {unread.map(renderNotif)}
+                  {unread.map((n: any) => renderNotif(n, false))}
                 </div>
 
                 {/* Lidas */}
@@ -213,7 +237,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                       Lidas ({read.length})
                     </div>
                     <div className="space-y-2">
-                      {read.map(renderNotif)}
+                      {read.map((n: any) => renderNotif(n, true))}
                     </div>
                   </>
                 )}
