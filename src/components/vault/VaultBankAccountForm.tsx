@@ -12,12 +12,6 @@ interface Props {
   account?: any;
 }
 
-const BANKS = [
-  "Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa Econômica",
-  "Nubank", "Inter", "C6 Bank", "BTG Pactual", "Safra", "Sicoob",
-  "Sicredi", "PagBank", "Mercado Pago", "Stone", "Outro",
-];
-
 const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!account;
@@ -33,11 +27,11 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!form.bank_name) { toast.error("Selecione o banco"); return; }
+    if (!form.bank_name.trim()) { toast.error("Informe o nome do banco"); return; }
     setLoading(true);
     const payload = {
       company_id: companyId,
-      bank_name: form.bank_name,
+      bank_name: form.bank_name.trim(),
       agency: form.agency || null,
       account_number: form.account_number || null,
       account_type: form.account_type,
@@ -54,20 +48,6 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
     qc.invalidateQueries({ queryKey: ["vault_bank_accounts"] });
     onClose();
   };
-
-  const selectField = (label: string, key: string, options: { value: string; label: string }[], placeholder?: string) => (
-    <div>
-      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      <select
-        value={(form as any)[key]}
-        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-      >
-        {placeholder && <option value="" className="bg-[#111]">{placeholder}</option>}
-        {options.map(o => <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>)}
-      </select>
-    </div>
-  );
 
   const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
     <div>
@@ -89,19 +69,24 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Conta" : "Nova Conta Bancária"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {selectField("Banco", "bank_name", BANKS.map(b => ({ value: b, label: b })), "Selecione o banco...")}
+          {inputField("Banco", "bank_name", "text", "Ex: Nubank, Itaú, Bradesco...")}
           <div className="grid grid-cols-2 gap-3">
             {inputField("Agência", "agency", "text", "0000")}
             {inputField("Nº Conta", "account_number", "text", "00000-0")}
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {selectField("Tipo", "account_type", [
-              { value: "Corrente", label: "Corrente" },
-              { value: "Poupança", label: "Poupança" },
-              { value: "Investimento", label: "Investimento" },
-              { value: "Digital", label: "Digital" },
-              { value: "Salário", label: "Salário" },
-            ])}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+              <select
+                value={form.account_type}
+                onChange={e => setForm(f => ({ ...f, account_type: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+              >
+                {["Corrente", "Poupança", "Investimento", "Digital", "Salário"].map(o => (
+                  <option key={o} value={o} className="bg-[#111]">{o}</option>
+                ))}
+              </select>
+            </div>
             {inputField("Saldo (R$)", "balance", "number", "0,00")}
           </div>
           {inputField("Limite de Crédito (R$)", "credit_limit", "number", "0,00")}

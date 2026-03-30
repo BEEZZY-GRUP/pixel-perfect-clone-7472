@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { VaultUser } from "@/hooks/useVaultAuth";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -12,14 +12,15 @@ interface VaultSystemUser {
   name: string;
   role: string;
   email: string;
+  password: string;
   active: boolean;
 }
 
 const INITIAL_USERS: VaultSystemUser[] = [
-  { id: "1", username: "beezzygroup", name: "Admin Geral", role: "superadmin", email: "admin@beezzy.com", active: true },
-  { id: "2", username: "financeiro", name: "Ana Lima", role: "financeiro", email: "ana@beezzy.com", active: true },
-  { id: "3", username: "operacional", name: "Carlos Mendes", role: "operacional", email: "carlos@beezzy.com", active: true },
-  { id: "4", username: "visitante", name: "Visitante", role: "visualizador", email: "visit@beezzy.com", active: false },
+  { id: "1", username: "beezzygroup", name: "Admin Geral", role: "superadmin", email: "admin@beezzy.com", password: "1milhaoMRR", active: true },
+  { id: "2", username: "financeiro", name: "Ana Lima", role: "financeiro", email: "ana@beezzy.com", password: "fin123", active: true },
+  { id: "3", username: "operacional", name: "Carlos Mendes", role: "operacional", email: "carlos@beezzy.com", password: "op123", active: true },
+  { id: "4", username: "visitante", name: "Visitante", role: "visualizador", email: "visit@beezzy.com", password: "vis123", active: false },
 ];
 
 const ROLES = ["superadmin", "financeiro", "operacional", "visualizador"];
@@ -31,24 +32,29 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
   });
   const [modal, setModal] = useState<{ open: boolean; user?: VaultSystemUser }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string; name: string }>({ open: false, id: "", name: "" });
-  const [form, setForm] = useState({ name: "", username: "", email: "", role: "visualizador", active: true });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "", role: "visualizador", active: true });
+  const [showPassword, setShowPassword] = useState(false);
 
   const persist = (next: VaultSystemUser[]) => { setUsers(next); sessionStorage.setItem("vault_system_users", JSON.stringify(next)); };
 
   const openNew = () => {
-    setForm({ name: "", username: "", email: "", role: "visualizador", active: true });
+    setForm({ name: "", username: "", email: "", password: "", role: "visualizador", active: true });
+    setShowPassword(false);
     setModal({ open: true });
   };
   const openEdit = (u: VaultSystemUser) => {
-    setForm({ name: u.name, username: u.username, email: u.email, role: u.role, active: u.active });
+    setForm({ name: u.name, username: u.username, email: u.email, password: u.password, role: u.role, active: u.active });
+    setShowPassword(false);
     setModal({ open: true, user: u });
   };
   const handleSave = () => {
     if (!form.name || !form.username || !form.email) { toast.error("Preencha todos os campos"); return; }
+    if (!form.password || form.password.length < 4) { toast.error("Senha deve ter no mínimo 4 caracteres"); return; }
     if (modal.user) {
       persist(users.map(u => u.id === modal.user!.id ? { ...u, ...form } : u));
       toast.success("Usuário atualizado");
     } else {
+      if (users.some(u => u.username === form.username)) { toast.error("Usuário já existe"); return; }
       persist([...users, { id: crypto.randomUUID(), ...form }]);
       toast.success("Usuário criado");
     }
@@ -157,6 +163,22 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
               </div>
             ))}
             <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Senha</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={e => setForm(fo => ({ ...fo, password: e.target.value }))}
+                  placeholder="Mínimo 4 caracteres"
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none pr-10"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-white/10">
+                  {showPassword ? <EyeOff size={14} style={{ color: "rgba(242,240,232,0.4)" }} /> : <Eye size={14} style={{ color: "rgba(242,240,232,0.4)" }} />}
+                </button>
+              </div>
+            </div>
+            <div>
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Perfil</label>
               <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
@@ -164,7 +186,7 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 rounded" />
+              <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 rounded accent-[#FFD600]" />
               <label className="text-xs">Ativo</label>
             </div>
           </div>
