@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { VaultUser } from "@/hooks/useVaultAuth";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,63 +8,70 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
 
-interface VaultSystemUser {
-  id: string;
-  username: string;
-  name: string;
-  role: string;
-  email: string;
-  password: string;
-  active: boolean;
-}
-
-const INITIAL_USERS: VaultSystemUser[] = [
-  { id: "1", username: "beezzygroup", name: "Admin Geral", role: "superadmin", email: "admin@beezzy.com", password: "1milhaoMRR", active: true },
-  { id: "2", username: "financeiro", name: "Ana Lima", role: "financeiro", email: "ana@beezzy.com", password: "fin123", active: true },
-  { id: "3", username: "operacional", name: "Carlos Mendes", role: "operacional", email: "carlos@beezzy.com", password: "op123", active: true },
-  { id: "4", username: "visitante", name: "Visitante", role: "visualizador", email: "visit@beezzy.com", password: "vis123", active: false },
-];
-
 const ROLES = ["superadmin", "financeiro", "operacional", "visualizador"];
 
 const VaultUsersPage = ({ user }: { user: VaultUser }) => {
-  const [users, setUsers] = useState<VaultSystemUser[]>(() => {
-    const saved = sessionStorage.getItem("vault_system_users");
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+  const qc = useQueryClient();
+
+  const { data: users } = useQuery({
+    queryKey: ["vault_users"],
+    queryFn: async () => {
+      const { data } = await supabase.from("vault_users").select("*").order("created_at");
+      return data ?? [];
+    },
   });
-  const [modal, setModal] = useState<{ open: boolean; user?: VaultSystemUser }>({ open: false });
+
+  const [modal, setModal] = useState<{ open: boolean; userId?: string }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string; name: string }>({ open: false, id: "", name: "" });
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "", role: "visualizador", active: true });
   const [showPassword, setShowPassword] = useState(false);
-
-  const persist = (next: VaultSystemUser[]) => { setUsers(next); sessionStorage.setItem("vault_system_users", JSON.stringify(next)); };
+  const [saving, setSaving] = useState(false);
 
   const openNew = () => {
     setForm({ name: "", username: "", email: "", password: "", role: "visualizador", active: true });
     setShowPassword(false);
     setModal({ open: true });
   };
-  const openEdit = (u: VaultSystemUser) => {
+
+  const openEdit = (u: any) => {
     setForm({ name: u.name, username: u.username, email: u.email, password: u.password, role: u.role, active: u.active });
     setShowPassword(false);
-    setModal({ open: true, user: u });
+    setModal({ open: true, userId: u.id });
   };
-  const handleSave = () => {
+
+  const handleSave = async () => {
     if (!form.name || !form.username || !form.email) { toast.error("Preencha todos os campos"); return; }
     if (!form.password || form.password.length < 4) { toast.error("Senha deve ter no mínimo 4 caracteres"); return; }
-    if (modal.user) {
-      persist(users.map(u => u.id === modal.user!.id ? { ...u, ...form } : u));
+    setSaving(true);
+
+    if (modal.userId) {
+      const { error } = await supabase.from("vault_users").update({
+        name: form.name, username: form.username, email: form.email,
+        password: form.password, role: form.role, active: form.active,
+      }).eq("id", modal.userId);
+      setSaving(false);
+      if (error) { toast.error(error.message); return; }
       toast.success("Usuário atualizado");
     } else {
-      if (users.some(u => u.username === form.username)) { toast.error("Usuário já existe"); return; }
-      persist([...users, { id: crypto.randomUUID(), ...form }]);
+      const existing = users?.find((u: any) => u.username === form.username);
+      if (existing) { setSaving(false); toast.error("Usuário já existe"); return; }
+      const { error } = await supabase.from("vault_users").insert({
+        name: form.name, username: form.username, email: form.email,
+        password: form.password, role: form.role, active: form.active,
+      });
+      setSaving(false);
+      if (error) { toast.error(error.message); return; }
       toast.success("Usuário criado");
     }
+    qc.invalidateQueries({ queryKey: ["vault_users"] });
     setModal({ open: false });
   };
-  const handleDelete = (id: string) => {
-    persist(users.filter(u => u.id !== id));
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("vault_users").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
     toast.success("Usuário excluído");
+    qc.invalidateQueries({ queryKey: ["vault_users"] });
   };
 
   const roleBadge = (role: string) => {
@@ -72,6 +81,8 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
     };
     return <span className={`inline-flex text-[10px] font-medium px-2 py-0.5 rounded ${c[role] ?? "bg-white/5 text-white/40"}`}>{role.charAt(0).toUpperCase() + role.slice(1)}</span>;
   };
+
+  const usersList = users ?? [];
 
   return (
     <div>
@@ -87,10 +98,10 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
         {[
-          { label: "Total", value: String(users.length) },
-          { label: "Ativos", value: String(users.filter(u => u.active).length), pos: true },
-          { label: "Super Admins", value: String(users.filter(u => u.role === "superadmin").length), accent: true },
-          { label: "Inativos", value: String(users.filter(u => !u.active).length), neg: true },
+          { label: "Total", value: String(usersList.length) },
+          { label: "Ativos", value: String(usersList.filter((u: any) => u.active).length), pos: true },
+          { label: "Super Admins", value: String(usersList.filter((u: any) => u.role === "superadmin").length), accent: true },
+          { label: "Inativos", value: String(usersList.filter((u: any) => !u.active).length), neg: true },
         ].map((k, i) => (
           <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
             <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
@@ -112,7 +123,8 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
             </tr>
           </thead>
           <tbody>
-            {users.map(u => (
+            {usersList.length === 0 && <tr><td colSpan={6} className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum usuário</td></tr>}
+            {usersList.map((u: any) => (
               <tr key={u.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-4 py-2.5 text-xs font-medium">{u.name}</td>
                 <td className="px-4 py-2.5 text-xs font-mono" style={{ color: "rgba(242,240,232,0.4)" }}>{u.username}</td>
@@ -153,7 +165,7 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
       {/* User CRUD Modal */}
       <Dialog open={modal.open} onOpenChange={() => setModal({ open: false })}>
         <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
-          <DialogHeader><DialogTitle className="text-[#F2F0E8]">{modal.user ? "Editar Usuário" : "Novo Usuário"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="text-[#F2F0E8]">{modal.userId ? "Editar Usuário" : "Novo Usuário"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             {[{ label: "Nome", key: "name" }, { label: "Usuário (login)", key: "username" }, { label: "E-mail", key: "email" }].map(f => (
               <div key={f.key}>
@@ -192,7 +204,7 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
           </div>
           <div className="flex justify-end gap-2 mt-3">
             <Button variant="ghost" onClick={() => setModal({ open: false })} className="text-[#F2F0E8]/60">Cancelar</Button>
-            <Button onClick={handleSave} className="bg-[#FFD600] text-black hover:bg-[#E6C200]">Salvar</Button>
+            <Button onClick={handleSave} disabled={saving} className="bg-[#FFD600] text-black hover:bg-[#E6C200]">{saving ? "Salvando..." : "Salvar"}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -201,7 +213,7 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
         open={deleteModal.open}
         title={`Excluir ${deleteModal.name}?`}
         description="O usuário perderá acesso ao sistema. Esta ação não pode ser desfeita."
-        onConfirm={async () => { handleDelete(deleteModal.id); }}
+        onConfirm={async () => { await handleDelete(deleteModal.id); }}
         onClose={() => setDeleteModal(d => ({ ...d, open: false }))}
       />
     </div>
