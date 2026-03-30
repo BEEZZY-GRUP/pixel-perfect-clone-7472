@@ -971,34 +971,45 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
   const comparison = previousDiagnostic ? generateComparativeSummary(diagnostic, previousDiagnostic) : null;
 
   const challenges = diagnostic.main_challenges || [];
-  const commercialSolutions = challenges
-    .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || { solution: "Consultoria Personalizada", description: "Análise e desenvolvimento de solução sob medida para este desafio específico." }) }));
+  const defaultSolution: BeezzySolution = { solution: "Consultoria Personalizada", module: "Parceiro Estratégico", description: "Análise e desenvolvimento de solução sob medida para este desafio específico.", deliverables: ["Diagnóstico personalizado", "Plano de ação customizado", "Acompanhamento semanal"], methodology_pillar: "Pilar 01 — Diagnóstico" };
+  
+  const commercialSolutions: Array<{ pain: string } & BeezzySolution> = challenges
+    .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || defaultSolution) }));
 
-  // Additional solutions based on other fields
+  // Additional solutions based on biggest_pain free text
   if (diagnostic.biggest_pain) {
     const painLower = diagnostic.biggest_pain.toLowerCase();
-    if (painLower.includes("vend") || painLower.includes("comercial") || painLower.includes("cliente")) {
-      if (!commercialSolutions.find(s => s.solution === "Reestruturação Comercial")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Reestruturação Comercial", description: "Pipeline estruturado, CRM, metas e treinamento de equipe comercial para maximizar conversões." });
-      }
-    }
-    if (painLower.includes("financ") || painLower.includes("caixa") || painLower.includes("lucr") || painLower.includes("prejuízo")) {
-      if (!commercialSolutions.find(s => s.solution === "Gestão Financeira")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." });
-      }
-    }
-    if (painLower.includes("equipe") || painLower.includes("time") || painLower.includes("pessoas") || painLower.includes("funcionário")) {
-      if (!commercialSolutions.find(s => s.solution === "Gestão de Pessoas")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." });
+    const painMappings: Array<{ keywords: string[]; challengeKey: string; fallbackSolution: string }> = [
+      { keywords: ["vend", "comercial", "cliente", "receita", "faturamento baixo"], challengeKey: "Time de vendas desorganizado", fallbackSolution: "Reestruturação Comercial Completa" },
+      { keywords: ["financ", "caixa", "lucr", "prejuízo", "custo", "margem"], challengeKey: "Gestão financeira precária", fallbackSolution: "Gestão Financeira & Controle" },
+      { keywords: ["equipe", "time", "pessoas", "funcionário", "colaborador", "rh"], challengeKey: "Retenção de talentos", fallbackSolution: "Gestão de Pessoas & Employer Branding" },
+      { keywords: ["líder", "gestor", "gestão", "gerente", "direção"], challengeKey: "Falta de liderança", fallbackSolution: "Desenvolvimento de Liderança & Governance" },
+      { keywords: ["digital", "tecnolog", "sistema", "software", "automaç"], challengeKey: "Transformação digital", fallbackSolution: "Transformação Digital & Automação" },
+      { keywords: ["marketing", "marca", "divulg", "rede social", "instagram"], challengeKey: "Falta de presença digital", fallbackSolution: "Posicionamento Digital Estratégico" },
+      { keywords: ["cresc", "escal", "expand"], challengeKey: "Não consegue escalar", fallbackSolution: "Aceleração & Escalabilidade" },
+      { keywords: ["process", "organiz", "bagunça", "caos"], challengeKey: "Falta de processos definidos", fallbackSolution: "Gestão de Processos" },
+      { keywords: ["comunic", "alinha", "feedback"], challengeKey: "Comunicação interna ruim", fallbackSolution: "Comunicação Organizacional Integrada" },
+    ];
+    for (const mapping of painMappings) {
+      if (mapping.keywords.some(k => painLower.includes(k)) && !commercialSolutions.find(s => s.solution === (PAIN_SOLUTIONS[mapping.challengeKey]?.solution || mapping.fallbackSolution))) {
+        const sol = PAIN_SOLUTIONS[mapping.challengeKey] || defaultSolution;
+        commercialSolutions.push({ pain: `Dor principal: "${diagnostic.biggest_pain}"`, ...sol });
       }
     }
   }
 
+  // Auto-detect from diagnostic flags
   if (!diagnostic.has_defined_processes && !commercialSolutions.find(s => s.pain === "Falta de processos definidos")) {
-    commercialSolutions.push({ pain: "Sem processos definidos", solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais com acompanhamento contínuo." });
+    commercialSolutions.push({ pain: "Empresa sem processos definidos", ...PAIN_SOLUTIONS["Falta de processos definidos"] });
   }
-  if (!diagnostic.has_marketing_strategy && !commercialSolutions.find(s => s.solution === "MarTech & Aquisição")) {
-    commercialSolutions.push({ pain: "Sem estratégia de marketing", solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound, funis de conversão, automação e campanhas de performance." });
+  if (!diagnostic.has_marketing_strategy && !commercialSolutions.find(s => s.solution.includes("MarTech"))) {
+    commercialSolutions.push({ pain: "Sem estratégia de marketing ativa", ...PAIN_SOLUTIONS["Dificuldade em gerar leads"] });
+  }
+  if (!diagnostic.has_sales_team && !commercialSolutions.find(s => s.solution.includes("Comercial"))) {
+    commercialSolutions.push({ pain: "Sem time comercial estruturado", ...PAIN_SOLUTIONS["Time de vendas desorganizado"] });
+  }
+  if (diagnostic.digital_presence_level && ["Inexistente", "Básico"].includes(diagnostic.digital_presence_level) && !commercialSolutions.find(s => s.solution.includes("Digital"))) {
+    commercialSolutions.push({ pain: `Presença digital ${diagnostic.digital_presence_level.toLowerCase()}`, ...PAIN_SOLUTIONS["Falta de presença digital"] });
   }
 
   const sections = [
