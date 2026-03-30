@@ -13,6 +13,7 @@ interface Activity {
   activity_type: string;
   description: string;
   scheduled_at: string | null;
+  is_automatic: boolean;
 }
 
 const ACTIVITY_TYPES = [
