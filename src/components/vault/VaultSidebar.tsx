@@ -5,7 +5,7 @@ import {
   FileText, Target, UserCircle,
 } from "lucide-react";
 
-export type GlobalView = "dashboard" | "lancamentos" | "relatorios" | "planejamento" | "rh" | "notifications" | "settings" | "usuarios" | "perfil";
+export type GlobalView = "dashboard" | "lancamentos" | "relatorios" | "planejamento" | "notifications" | "settings" | "usuarios" | "perfil";
 
 const COMPANY_TABS = [
   { icon: LayoutDashboard, label: "Dashboard" },
