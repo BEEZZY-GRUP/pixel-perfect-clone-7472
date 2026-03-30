@@ -283,7 +283,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
           {globalView === "usuarios" && <VaultUsersPage user={user} />}
           {globalView === "perfil" && <VaultProfilePage user={user} />}
           {selectedCompany && company && (
-            <VaultCompanyView company={company} tab={companyTab} onTabChange={setCompanyTab} hasPerm={hasPerm} />
+            <VaultCompanyView company={company} tab={companyTab} onTabChange={setCompanyTab} hasPerm={hasPerm} onDeleteCompany={() => { setSelectedCompany(null); setGlobalView("dashboard"); }} />
           )}
         </div>
       </div>
