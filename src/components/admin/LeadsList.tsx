@@ -6,7 +6,7 @@ import { STATUS_OPTIONS, PRIORITY_OPTIONS, SOURCE_OPTIONS, type Lead } from "./t
 import LeadDetailModal from "./LeadDetailModal";
 import AddLeadModal from "./AddLeadModal";
 
-export default function LeadsList() {
+export default function LeadsList({ consoleRole = "admin" }: { consoleRole?: string }) {
   const { leads, deleteLead } = useLeads();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [addOpen, setAddOpen] = useState(false);
