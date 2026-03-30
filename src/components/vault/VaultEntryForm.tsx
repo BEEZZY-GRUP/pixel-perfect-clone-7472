@@ -10,27 +10,48 @@ interface Props {
   onClose: () => void;
   companyId: string;
   entry?: any;
+  defaultType?: "despesa" | "faturamento";
 }
 
-const VaultEntryForm = ({ open, onClose, companyId, entry }: Props) => {
+const CATEGORIES_DESPESA = [
+  "Aluguel", "Salários", "Impostos", "Marketing", "Fornecedores", "Energia",
+  "Água", "Internet/Telecom", "Contabilidade", "Jurídico", "Transporte",
+  "Material de Escritório", "Software/Assinatura", "Manutenção", "Seguros",
+  "Alimentação", "Outros",
+];
+
+const CATEGORIES_FATURAMENTO = [
+  "Serviços", "Produtos", "Consultoria", "Licenciamento", "Comissões",
+  "Recorrência/Assinatura", "Projeto", "Outros",
+];
+
+const PAYMENT_METHODS = [
+  "Pix", "Boleto", "Cartão de Crédito", "Cartão de Débito", "Transferência",
+  "Dinheiro", "Cheque", "Débito Automático",
+];
+
+const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!entry;
   const [form, setForm] = useState({
     description: entry?.description ?? "",
-    entry_type: entry?.entry_type ?? "despesa",
+    entry_type: entry?.entry_type ?? defaultType ?? "despesa",
     category: entry?.category ?? "",
     amount: entry?.amount?.toString() ?? "",
     due_date: entry?.due_date ?? "",
+    entry_date: entry?.entry_date ?? new Date().toISOString().split("T")[0],
     status: entry?.status ?? "pendente",
+    payment_method: entry?.payment_method ?? "",
     notes: entry?.notes ?? "",
   });
   const [loading, setLoading] = useState(false);
 
+  const categories = form.entry_type === "faturamento" ? CATEGORIES_FATURAMENTO : CATEGORIES_DESPESA;
+
   const handleSave = async () => {
-    if (!form.description || !form.amount) {
-      toast.error("Preencha descrição e valor");
-      return;
-    }
+    if (!form.description) { toast.error("Preencha a descrição"); return; }
+    if (!form.amount || Number(form.amount) <= 0) { toast.error("Informe um valor válido"); return; }
+    if (!form.category) { toast.error("Selecione uma categoria"); return; }
     setLoading(true);
     const payload = {
       company_id: companyId,
@@ -39,7 +60,9 @@ const VaultEntryForm = ({ open, onClose, companyId, entry }: Props) => {
       category: form.category || null,
       amount: Number(form.amount),
       due_date: form.due_date || null,
+      entry_date: form.entry_date || null,
       status: form.status,
+      payment_method: form.payment_method || null,
       notes: form.notes || null,
     };
     const { error } = isEdit
@@ -52,25 +75,30 @@ const VaultEntryForm = ({ open, onClose, companyId, entry }: Props) => {
     onClose();
   };
 
-  const field = (label: string, key: string, type = "text", options?: string[]) => (
+  const selectField = (label: string, key: string, options: { value: string; label: string }[], placeholder?: string) => (
     <div>
       <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      {options ? (
-        <select
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        >
-          {options.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
-        </select>
-      ) : (
-        <input
-          type={type}
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        />
-      )}
+      <select
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+      >
+        {placeholder && <option value="" className="bg-[#111]">{placeholder}</option>}
+        {options.map(o => <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>)}
+      </select>
+    </div>
+  );
+
+  const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
+    <div>
+      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+      />
     </div>
   );
 
@@ -81,17 +109,28 @@ const VaultEntryForm = ({ open, onClose, companyId, entry }: Props) => {
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Lançamento" : "Novo Lançamento"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {field("Descrição", "description")}
+          {inputField("Descrição", "description", "text", "Ex: Pagamento fornecedor X")}
           <div className="grid grid-cols-2 gap-3">
-            {field("Tipo", "entry_type", "text", ["faturamento", "despesa"])}
-            {field("Categoria", "category")}
+            {selectField("Tipo", "entry_type", [
+              { value: "despesa", label: "Despesa" },
+              { value: "faturamento", label: "Faturamento" },
+            ])}
+            {selectField("Categoria", "category", categories.map(c => ({ value: c, label: c })), "Selecione...")}
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {field("Valor (R$)", "amount", "number")}
-            {field("Vencimento", "due_date", "date")}
+            {inputField("Valor (R$)", "amount", "number", "0,00")}
+            {inputField("Vencimento", "due_date", "date")}
           </div>
-          {field("Status", "status", "text", ["pendente", "pago", "vencido"])}
-          {field("Observações", "notes")}
+          <div className="grid grid-cols-2 gap-3">
+            {inputField("Data Lançamento", "entry_date", "date")}
+            {selectField("Forma de Pagamento", "payment_method", PAYMENT_METHODS.map(m => ({ value: m, label: m })), "Selecione...")}
+          </div>
+          {selectField("Status", "status", [
+            { value: "pendente", label: "Pendente" },
+            { value: "pago", label: "Pago" },
+            { value: "vencido", label: "Vencido" },
+          ])}
+          {inputField("Observações", "notes", "text", "Notas adicionais...")}
         </div>
         <div className="flex justify-end gap-2 mt-3">
           <Button variant="ghost" onClick={onClose} className="text-[#F2F0E8]/60">Cancelar</Button>

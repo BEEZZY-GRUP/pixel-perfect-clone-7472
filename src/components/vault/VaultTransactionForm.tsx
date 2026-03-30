@@ -13,6 +13,12 @@ interface Props {
   transaction?: any;
 }
 
+const TRANSACTION_CATEGORIES = [
+  "Vendas", "Serviços", "Fornecedores", "Salários", "Impostos",
+  "Aluguel", "Marketing", "Transferência Interna", "Empréstimo",
+  "Investimento", "Dividendos", "Outros",
+];
+
 const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transaction }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!transaction;
@@ -28,7 +34,10 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!form.description || !form.amount) { toast.error("Preencha descrição e valor"); return; }
+    if (!form.description) { toast.error("Preencha a descrição"); return; }
+    if (!form.amount || Number(form.amount) <= 0) { toast.error("Informe um valor válido"); return; }
+    if (!form.bank_account_id) { toast.error("Selecione uma conta bancária"); return; }
+    if (!form.category) { toast.error("Selecione uma categoria"); return; }
     setLoading(true);
     const payload = {
       company_id: companyId,
@@ -50,25 +59,30 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
     onClose();
   };
 
-  const field = (label: string, key: string, type = "text", options?: { value: string; label: string }[]) => (
+  const selectField = (label: string, key: string, options: { value: string; label: string }[], placeholder?: string) => (
     <div>
       <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      {options ? (
-        <select
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        >
-          {options.map(o => <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>)}
-        </select>
-      ) : (
-        <input
-          type={type}
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        />
-      )}
+      <select
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+      >
+        {placeholder && <option value="" className="bg-[#111]">{placeholder}</option>}
+        {options.map(o => <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>)}
+      </select>
+    </div>
+  );
+
+  const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
+    <div>
+      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+      />
     </div>
   );
 
@@ -79,23 +93,23 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Transação" : "Nova Transação"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {field("Descrição", "description")}
+          {inputField("Descrição", "description", "text", "Ex: Pagamento fornecedor")}
           <div className="grid grid-cols-2 gap-3">
-            {field("Tipo", "transaction_type", "text", [
+            {selectField("Tipo", "transaction_type", [
               { value: "receita", label: "Receita" },
               { value: "despesa", label: "Despesa" },
               { value: "transferencia", label: "Transferência" },
             ])}
-            {field("Valor (R$)", "amount", "number")}
+            {inputField("Valor (R$)", "amount", "number", "0,00")}
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {field("Data", "transaction_date", "date")}
-            {field("Conta", "bank_account_id", "text", [
-              { value: "", label: "Selecione..." },
-              ...bankAccounts.map((a: any) => ({ value: a.id, label: `${a.bank_name} - ${a.account_number || "S/N"}` })),
-            ])}
+            {inputField("Data", "transaction_date", "date")}
+            {selectField("Conta", "bank_account_id", bankAccounts.map((a: any) => ({
+              value: a.id,
+              label: `${a.bank_name} - ${a.account_number || "S/N"}`,
+            })), "Selecione a conta...")}
           </div>
-          {field("Categoria", "category")}
+          {selectField("Categoria", "category", TRANSACTION_CATEGORIES.map(c => ({ value: c, label: c })), "Selecione...")}
           <label className="flex items-center gap-2 text-xs cursor-pointer">
             <input
               type="checkbox"

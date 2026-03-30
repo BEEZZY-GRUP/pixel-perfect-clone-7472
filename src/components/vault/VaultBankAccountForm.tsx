@@ -12,6 +12,12 @@ interface Props {
   account?: any;
 }
 
+const BANKS = [
+  "Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa Econômica",
+  "Nubank", "Inter", "C6 Bank", "BTG Pactual", "Safra", "Sicoob",
+  "Sicredi", "PagBank", "Mercado Pago", "Stone", "Outro",
+];
+
 const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!account;
@@ -27,7 +33,7 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!form.bank_name) { toast.error("Nome do banco é obrigatório"); return; }
+    if (!form.bank_name) { toast.error("Selecione o banco"); return; }
     setLoading(true);
     const payload = {
       company_id: companyId,
@@ -49,25 +55,30 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
     onClose();
   };
 
-  const field = (label: string, key: string, type = "text", options?: string[]) => (
+  const selectField = (label: string, key: string, options: { value: string; label: string }[], placeholder?: string) => (
     <div>
       <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      {options ? (
-        <select
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        >
-          {options.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
-        </select>
-      ) : (
-        <input
-          type={type}
-          value={(form as any)[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-        />
-      )}
+      <select
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+      >
+        {placeholder && <option value="" className="bg-[#111]">{placeholder}</option>}
+        {options.map(o => <option key={o.value} value={o.value} className="bg-[#111]">{o.label}</option>)}
+      </select>
+    </div>
+  );
+
+  const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
+    <div>
+      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={(form as any)[key]}
+        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+      />
     </div>
   );
 
@@ -78,16 +89,31 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Conta" : "Nova Conta Bancária"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {field("Banco", "bank_name")}
+          {selectField("Banco", "bank_name", BANKS.map(b => ({ value: b, label: b })), "Selecione o banco...")}
           <div className="grid grid-cols-2 gap-3">
-            {field("Agência", "agency")}
-            {field("Nº Conta", "account_number")}
+            {inputField("Agência", "agency", "text", "0000")}
+            {inputField("Nº Conta", "account_number", "text", "00000-0")}
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {field("Tipo", "account_type", "text", ["Corrente", "Poupança", "Investimento", "Digital"])}
-            {field("Saldo (R$)", "balance", "number")}
+            {selectField("Tipo", "account_type", [
+              { value: "Corrente", label: "Corrente" },
+              { value: "Poupança", label: "Poupança" },
+              { value: "Investimento", label: "Investimento" },
+              { value: "Digital", label: "Digital" },
+              { value: "Salário", label: "Salário" },
+            ])}
+            {inputField("Saldo (R$)", "balance", "number", "0,00")}
           </div>
-          {field("Limite de Crédito (R$)", "credit_limit", "number")}
+          {inputField("Limite de Crédito (R$)", "credit_limit", "number", "0,00")}
+          <label className="flex items-center gap-2 text-xs cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.active}
+              onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
+              className="accent-[#FFD600]"
+            />
+            Conta ativa
+          </label>
         </div>
         <div className="flex justify-end gap-2 mt-3">
           <Button variant="ghost" onClick={onClose} className="text-[#F2F0E8]/60">Cancelar</Button>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, CheckCircle, XCircle, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, CheckCircle, XCircle, Save, DollarSign, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -38,7 +38,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
   const qc = useQueryClient();
 
   // Modals
-  const [entryModal, setEntryModal] = useState<{ open: boolean; entry?: any }>({ open: false });
+  const [entryModal, setEntryModal] = useState<{ open: boolean; entry?: any; defaultType?: "despesa" | "faturamento" }>({ open: false });
   const [employeeModal, setEmployeeModal] = useState<{ open: boolean; employee?: any }>({ open: false });
   const [bankAccountModal, setBankAccountModal] = useState<{ open: boolean; account?: any }>({ open: false });
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
@@ -89,6 +89,11 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
   const activeAccounts = bankAccounts?.filter((a: any) => a.active).length ?? 0;
   const unconciledCount = bankTransactions?.filter((t: any) => !t.reconciled).length ?? 0;
 
+  // Filtered entries
+  const despesas = entries?.filter((e: any) => e.entry_type === "despesa") ?? [];
+  const faturamentos = entries?.filter((e: any) => e.entry_type === "faturamento") ?? [];
+  const contasAPagar = despesas.filter((e: any) => e.status === "pendente" || e.status === "vencido");
+
   const handleDelete = (table: string, id: string, label: string, queryKey: string) => {
     setDeleteModal({
       open: true, title: `Excluir ${label}?`, desc: "Esta ação não pode ser desfeita.",
@@ -106,6 +111,13 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
     if (error) { toast.error(error.message); return; }
     toast.success(val ? "Conciliado" : "Desconciliado");
     qc.invalidateQueries({ queryKey: ["vault_bank_transactions", coId] });
+  };
+
+  const handlePayEntry = async (id: string) => {
+    const { error } = await supabase.from("vault_entries").update({ status: "pago", payment_date: new Date().toISOString().split("T")[0] }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Marcado como pago");
+    qc.invalidateQueries({ queryKey: ["vault_entries", coId] });
   };
 
   const addBtn = (label: string, onClick: () => void) => (
@@ -134,7 +146,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
     { key: "email", label: "E-mail", type: "text" },
     { key: "phone", label: "Telefone", type: "text" },
     { key: "address", label: "Endereço", type: "text" },
-    { key: "main_bank", label: "Banco Principal", type: "text" },
+    { key: "main_bank", label: "Banco Principal", type: "select", options: ["Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa Econômica", "Nubank", "Inter", "C6 Bank", "BTG Pactual", "Outro"] },
     { key: "agency", label: "Agência", type: "text" },
     { key: "account_number", label: "Conta", type: "text" },
     { key: "pix_key", label: "Chave Pix", type: "text" },
@@ -170,6 +182,51 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
     return { name: `${mo}/${y}`, Faturamento: Number(m.revenue), Despesas: Number(m.expenses), Resultado: Number(m.revenue) - Number(m.expenses) };
   }) ?? [];
 
+  // Entries table renderer
+  const renderEntriesTable = (data: any[], title: string, emptyMsg: string, showPayBtn = false) => (
+    <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+        <span className="text-xs font-medium">{title} — {company.name}</span>
+        <span className="text-[10px] px-2 py-0.5 rounded bg-white/5" style={{ color: "rgba(242,240,232,0.5)" }}>{data.length} registro(s)</span>
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-white/5">
+            {["Descrição", "Categoria", "Valor", "Vencimento", "Pagamento", "Status", "Ações"].map(h => (
+              <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.length === 0 && <tr><td colSpan={7} className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>{emptyMsg}</td></tr>}
+          {data.map((e: any) => (
+            <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+              <td className="px-4 py-2.5 text-xs">{e.description}</td>
+              <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.category || "—"}</td>
+              <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(e.amount))}</td>
+              <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.due_date)}</td>
+              <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.payment_date)}</td>
+              <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
+              <td className="px-4 py-2.5">
+                <div className="flex gap-1">
+                  {showPayBtn && e.status !== "pago" && hasPerm("fin") && (
+                    <button onClick={() => handlePayEntry(e.id)} className="p-1 rounded hover:bg-green-500/20 transition-colors" title="Marcar como pago">
+                      <CheckCircle size={12} className="text-green-400" />
+                    </button>
+                  )}
+                  {hasPerm("fin") && actionBtns(
+                    () => setEntryModal({ open: true, entry: e }),
+                    () => handleDelete("vault_entries", e.id, "Lançamento", "vault_entries")
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <div>
       {/* Header */}
@@ -179,7 +236,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
         {company.is_holding && (
           <span className="text-[9px] font-bold px-2 py-0.5 rounded" style={{ background: "rgba(255,214,0,0.15)", color: "#FFD600" }}>HOLDING</span>
         )}
-        <span className="text-[11px] ml-2" style={{ color: "rgba(242,240,232,0.35)" }}>CNPJ: {company.cnpj} • {company.regime}</span>
+        <span className="text-[11px] ml-2" style={{ color: "rgba(242,240,232,0.35)" }}>CNPJ: {company.cnpj || "—"} • {company.regime}</span>
       </div>
 
       {/* Tab 0: Dashboard */}
@@ -229,7 +286,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
               { label: "Colaboradores", value: String(activeEmps) },
               { label: "Folha Mensal", value: fmtK(payroll) },
               { label: "Saldo Bancário", value: fmtK(totalBalance), cls: "text-green-400" },
-              { label: "Contas Ativas", value: String(activeAccounts) },
+              { label: "Contas a Pagar", value: String(contasAPagar.length), cls: contasAPagar.length > 0 ? "text-amber-400" : "" },
             ].map((k, i) => (
               <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
                 <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
@@ -240,46 +297,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
         </div>
       )}
 
-      {/* Tab 1: Lançamentos */}
+      {/* Tab 1: Controle Bancário */}
       {tab === 1 && (
-        <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
-          <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-            <span className="text-xs font-medium">Lançamentos — {company.name}</span>
-            {hasPerm("fin") && addBtn("Novo Lançamento", () => setEntryModal({ open: true }))}
-          </div>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/5">
-                {["Descrição", "Tipo", "Categoria", "Valor", "Vencimento", "Status", "Ações"].map(h => (
-                  <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {entries?.length === 0 && <tr><td colSpan={7} className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum lançamento</td></tr>}
-              {entries?.map((e: any) => (
-                <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                  <td className="px-4 py-2.5 text-xs">{e.description}</td>
-                  <td className="px-4 py-2.5 text-xs capitalize" style={{ color: e.entry_type === "faturamento" ? "#22c55e" : "#ef4444" }}>{e.entry_type}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.category}</td>
-                  <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(e.amount))}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.due_date)}</td>
-                  <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
-                  <td className="px-4 py-2.5">
-                    {hasPerm("fin") && actionBtns(
-                      () => setEntryModal({ open: true, entry: e }),
-                      () => handleDelete("vault_entries", e.id, "Lançamento", "vault_entries")
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Tab 2: Contas Bancárias & Transações */}
-      {tab === 2 && (
         <div className="space-y-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {[
@@ -295,6 +314,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
             ))}
           </div>
 
+          {/* Bank Accounts */}
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
               <span className="text-xs font-medium">Contas Bancárias</span>
@@ -331,6 +351,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
             </table>
           </div>
 
+          {/* Transactions */}
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
               <span className="text-xs font-medium">Transações Bancárias</span>
@@ -380,47 +401,128 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
         </div>
       )}
 
-      {/* Tab 3: Pessoas & RH */}
-      {tab === 3 && (
-        <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
-          <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-            <span className="text-xs font-medium">Equipe — {company.name}</span>
-            {hasPerm("ops") && addBtn("Novo Colaborador", () => setEmployeeModal({ open: true }))}
+      {/* Tab 2: Lançar Despesa */}
+      {tab === 2 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-heading text-sm font-semibold">Lançar Despesa — {company.name}</h2>
+              <p className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>Registre uma nova despesa para esta empresa</p>
+            </div>
           </div>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/5">
-                {["Nome", "Cargo", "Departamento", "Tipo", "Salário", "Admissão", "Status", "Ações"].map(h => (
-                  <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {employees?.length === 0 && <tr><td colSpan={8} className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum colaborador</td></tr>}
-              {employees?.map((e: any) => (
-                <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                  <td className="px-4 py-2.5 text-xs font-medium">{e.name}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.position}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.department}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.employment_type}</td>
-                  <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(e.salary))}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.admission_date)}</td>
-                  <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
-                  <td className="px-4 py-2.5">
-                    {hasPerm("ops") && actionBtns(
-                      () => setEmployeeModal({ open: true, employee: e }),
-                      () => handleDelete("vault_employees", e.id, "Colaborador", "vault_employees")
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mb-5">
+            {[
+              { label: "Total Despesas", value: fmtK(despesas.reduce((a: number, e: any) => a + Number(e.amount), 0)) },
+              { label: "Pendentes", value: String(despesas.filter((e: any) => e.status === "pendente").length), cls: "text-amber-400" },
+              { label: "Vencidas", value: String(despesas.filter((e: any) => e.status === "vencido").length), cls: "text-red-400" },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center mb-5">
+            <Button onClick={() => setEntryModal({ open: true, defaultType: "despesa" })}
+              className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-10 px-6 text-sm font-medium">
+              <DollarSign size={16} className="mr-2" /> Nova Despesa
+            </Button>
+          </div>
+
+          {despesas.length > 0 && renderEntriesTable(despesas, "Despesas Registradas", "Nenhuma despesa", true)}
         </div>
       )}
 
-      {/* Tab 4: Relatórios */}
+      {/* Tab 3: Lançar Faturamento */}
+      {tab === 3 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-heading text-sm font-semibold">Lançar Faturamento — {company.name}</h2>
+              <p className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>Registre uma nova receita para esta empresa</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mb-5">
+            {[
+              { label: "Total Faturado", value: fmtK(faturamentos.reduce((a: number, e: any) => a + Number(e.amount), 0)), cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
+              { label: "Pendentes", value: String(faturamentos.filter((e: any) => e.status === "pendente").length), cls: "text-amber-400" },
+              { label: "Recebidos", value: String(faturamentos.filter((e: any) => e.status === "pago").length), cls: "text-green-400" },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center mb-5">
+            <Button onClick={() => setEntryModal({ open: true, defaultType: "faturamento" })}
+              className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-10 px-6 text-sm font-medium">
+              <CreditCard size={16} className="mr-2" /> Novo Faturamento
+            </Button>
+          </div>
+
+          {faturamentos.length > 0 && renderEntriesTable(faturamentos, "Faturamentos Registrados", "Nenhum faturamento")}
+        </div>
+      )}
+
+      {/* Tab 4: Contas a Pagar */}
       {tab === 4 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-heading text-sm font-semibold">Contas a Pagar — {company.name}</h2>
+            {hasPerm("fin") && addBtn("Nova Despesa", () => setEntryModal({ open: true, defaultType: "despesa" }))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
+            {[
+              { label: "Total Pendente", value: fmtK(contasAPagar.reduce((a: number, e: any) => a + Number(e.amount), 0)), cls: "text-amber-400" },
+              { label: "Vencidas", value: String(contasAPagar.filter((e: any) => e.status === "vencido").length), cls: "text-red-400" },
+              { label: "A Vencer", value: String(contasAPagar.filter((e: any) => e.status === "pendente").length) },
+              { label: "Total Pagas", value: fmtK(despesas.filter((e: any) => e.status === "pago").reduce((a: number, e: any) => a + Number(e.amount), 0)), cls: "text-green-400" },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {renderEntriesTable(contasAPagar, "Contas Pendentes", "Nenhuma conta pendente", true)}
+        </div>
+      )}
+
+      {/* Tab 5: Faturamentos */}
+      {tab === 5 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-heading text-sm font-semibold">Faturamentos — {company.name}</h2>
+            {hasPerm("fin") && addBtn("Novo Faturamento", () => setEntryModal({ open: true, defaultType: "faturamento" }))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
+            {[
+              { label: "Total Faturado", value: fmtK(faturamentos.reduce((a: number, e: any) => a + Number(e.amount), 0)), cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
+              { label: "Recebidos", value: fmtK(faturamentos.filter((e: any) => e.status === "pago").reduce((a: number, e: any) => a + Number(e.amount), 0)), cls: "text-green-400" },
+              { label: "Pendentes", value: String(faturamentos.filter((e: any) => e.status === "pendente").length), cls: "text-amber-400" },
+              { label: "Imposto Est.", value: fmtK(faturamentos.reduce((a: number, e: any) => a + Number(e.amount), 0) * Number(company.aliquota) / 100), cls: "text-red-400" },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {renderEntriesTable(faturamentos, "Todos os Faturamentos", "Nenhum faturamento")}
+        </div>
+      )}
+
+      {/* Tab 6: Relatórios */}
+      {tab === 6 && (
         <div className="space-y-5">
           <h2 className="font-heading text-sm font-semibold text-[#F2F0E8]">Relatórios — {company.name}</h2>
 
@@ -479,8 +581,47 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
         </div>
       )}
 
-      {/* Tab 5: Configurações (Editable) */}
-      {tab === 5 && (
+      {/* Tab 7: Pessoas & RH */}
+      {tab === 7 && (
+        <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+          <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+            <span className="text-xs font-medium">Equipe — {company.name}</span>
+            {hasPerm("ops") && addBtn("Novo Colaborador", () => setEmployeeModal({ open: true }))}
+          </div>
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/5">
+                {["Nome", "Cargo", "Departamento", "Tipo", "Salário", "Admissão", "Status", "Ações"].map(h => (
+                  <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {employees?.length === 0 && <tr><td colSpan={8} className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum colaborador</td></tr>}
+              {employees?.map((e: any) => (
+                <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                  <td className="px-4 py-2.5 text-xs font-medium">{e.name}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.position || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.department || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.employment_type}</td>
+                  <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(e.salary))}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.admission_date)}</td>
+                  <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
+                  <td className="px-4 py-2.5">
+                    {hasPerm("ops") && actionBtns(
+                      () => setEmployeeModal({ open: true, employee: e }),
+                      () => handleDelete("vault_employees", e.id, "Colaborador", "vault_employees")
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Tab 8: Configurações (Editable) */}
+      {tab === 8 && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading text-sm font-semibold">Configurações — {company.name}</h2>
@@ -506,6 +647,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
                   f.type === "select" ? (
                     <select value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
                       className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
+                      <option value="" className="bg-[#111]">Selecione...</option>
                       {f.options?.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
                     </select>
                   ) : f.type === "color" ? (
@@ -533,7 +675,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
 
       {/* Modals */}
       {entryModal.open && (
-        <VaultEntryForm open companyId={coId} entry={entryModal.entry} onClose={() => setEntryModal({ open: false })} />
+        <VaultEntryForm open companyId={coId} entry={entryModal.entry} defaultType={entryModal.defaultType} onClose={() => setEntryModal({ open: false })} />
       )}
       {employeeModal.open && (
         <VaultEmployeeForm open companyId={coId} employee={employeeModal.employee} onClose={() => setEmployeeModal({ open: false })} />
