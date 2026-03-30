@@ -147,7 +147,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: "thin" }}>
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-gold">
           {globalView === "dashboard" && <VaultDashboard companies={companies ?? []} onSelectCompany={handleSelectCompany} />}
           {globalView === "lancamentos" && <VaultGlobalEntries />}
           {globalView === "relatorios" && <VaultGlobalReports />}
