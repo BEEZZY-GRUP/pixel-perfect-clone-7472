@@ -11,7 +11,7 @@ import VaultBankAccountForm from "./VaultBankAccountForm";
 import VaultTransactionForm from "./VaultTransactionForm";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
 import { EmployeeProfile } from "./VaultGlobalHR";
-import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber } from "@/lib/masks";
+import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   company: any;
@@ -805,7 +805,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                     setVacForm({ start_date: "", return_date: "", days: 0, leave_type: "Férias", status: "aprovado" });
                   }}
                   onSaveSalary={async () => {
-                    const newSal = Number(salaryForm.new_salary);
+                     const newSal = Number(unmaskCurrency(salaryForm.new_salary));
                     if (!newSal) return;
                     await supabase.from("vault_salary_history").insert({
                       employee_id: selectedRHEmployee.id,

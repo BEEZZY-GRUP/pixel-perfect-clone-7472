@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useMemo } from "react";
 import { Gift, Cake, User, Plus, ArrowLeft, Calendar, DollarSign, TrendingUp, TrendingDown, Minus, X } from "lucide-react";
@@ -444,7 +445,7 @@ export const EmployeeProfile = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-3">
                 <div>
                   <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Novo Salário (R$)</label>
-                  <input type="number" value={salaryForm.new_salary} onChange={e => setSalaryForm({ ...salaryForm, new_salary: e.target.value })} placeholder={String(employee.salary)} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none placeholder:text-white/15" />
+                  <input type="text" value={salaryForm.new_salary} onChange={e => setSalaryForm({ ...salaryForm, new_salary: maskCurrency(e.target.value) })} placeholder="R$ 0,00" className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none placeholder:text-white/15" />
                 </div>
                 <div>
                   <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Data</label>
@@ -460,9 +461,9 @@ export const EmployeeProfile = ({
               </div>
               {salaryForm.new_salary && (
                 <div className="text-[10px] mb-3 flex items-center gap-2" style={{ color: "rgba(242,240,232,0.4)" }}>
-                  De <strong className="text-white/70">{fmt(Number(employee.salary))}</strong> para <strong className="text-[#FFD600]">{fmt(Number(salaryForm.new_salary))}</strong>
+                  De <strong className="text-white/70">{fmt(Number(employee.salary))}</strong> para <strong className="text-[#FFD600]">{fmt(Number(unmaskCurrency(salaryForm.new_salary)))}</strong>
                   {(() => {
-                    const diff = Number(salaryForm.new_salary) - Number(employee.salary);
+                    const diff = Number(unmaskCurrency(salaryForm.new_salary)) - Number(employee.salary);
                     const pct = Number(employee.salary) > 0 ? ((diff / Number(employee.salary)) * 100).toFixed(1) : "0";
                     return <span className={diff > 0 ? "text-green-400" : diff < 0 ? "text-red-400" : ""}>({diff > 0 ? "+" : ""}{pct}%)</span>;
                   })()}
@@ -470,7 +471,7 @@ export const EmployeeProfile = ({
               )}
               <button
                 onClick={onSaveSalary}
-                disabled={!salaryForm.new_salary || Number(salaryForm.new_salary) === Number(employee.salary)}
+                disabled={!salaryForm.new_salary || Number(unmaskCurrency(salaryForm.new_salary)) === Number(employee.salary)}
                 className="text-[10px] font-medium px-4 py-1.5 rounded-lg bg-[#FFD600] text-black hover:bg-[#FFD600]/90 transition-colors disabled:opacity-30"
               >Salvar Alteração</button>
             </div>
