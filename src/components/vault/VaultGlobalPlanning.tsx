@@ -210,6 +210,9 @@ const VaultGlobalPlanning = () => {
                     </tr>
                   </thead>
                   <tbody>
+                    {coBudgets.length === 0 && (
+                      <tr><td colSpan={6} className="text-center py-6 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum budget cadastrado para esta empresa</td></tr>
+                    )}
                     {coBudgets.map((b: any) => {
                       const realized = entries?.filter((e: any) => e.company_id === c.id && e.category === b.category).reduce((a: number, e: any) => a + Number(e.amount), 0) ?? 0;
                       const u = pct(realized, Number(b.amount));
