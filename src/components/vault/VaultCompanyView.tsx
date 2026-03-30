@@ -663,9 +663,24 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                       <input type="color" value={settingsForm[f.key] ?? "#888"} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))} className="w-8 h-8 rounded border-0 bg-transparent cursor-pointer" />
                       <span className="text-sm">{settingsForm[f.key]}</span>
                     </div>
-                  ) : (
-                    <input type={f.type} value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
-                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                  ) : (() => {
+                    const maskMap: Record<string, (v: string) => string> = {
+                      cnpj: maskCNPJ, phone: maskPhone, cnae: maskCNAE,
+                      agency: maskAgency, account_number: maskAccountNumber,
+                    };
+                    const mask = maskMap[f.key];
+                    const maxLenMap: Record<string, number> = { cnpj: 18, phone: 15, cnae: 9, agency: 6, account_number: 15 };
+                    return (
+                      <input
+                        type={f.type}
+                        inputMode={mask ? "numeric" : undefined}
+                        maxLength={maxLenMap[f.key]}
+                        value={settingsForm[f.key] ?? ""}
+                        onChange={e => setSettingsForm(s => ({ ...s, [f.key]: mask ? mask(e.target.value) : e.target.value }))}
+                        className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none"
+                      />
+                    );
+                  })()
                   )
                 ) : (
                   <div className="text-sm">{f.type === "color" ? (
