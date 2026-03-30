@@ -114,7 +114,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
-      <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
+      <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Lançamento" : "Novo Lançamento"}</DialogTitle>
         </DialogHeader>
