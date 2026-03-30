@@ -318,7 +318,7 @@ export default function DiagnosticsList() {
       .from("diagnostics")
       .select("*")
       .eq("lead_id", leadId)
-      .order("meeting_date", { ascending: false });
+      .order("meeting_date", { ascending: true });
     setDiagnostics((data as unknown as Diagnostic[]) || []);
     setLoading(false);
   };
@@ -395,7 +395,7 @@ export default function DiagnosticsList() {
   // ───── Viewing a Single Diagnostic Result ─────
   if (viewDiag) {
     const diagIdx = diagnostics.findIndex(d => d.id === viewDiag.id);
-    const previousDiag = diagIdx < diagnostics.length - 1 ? diagnostics[diagIdx + 1] : null;
+    const previousDiag = diagIdx > 0 ? diagnostics[diagIdx - 1] : null;
     return (
       <DiagnosticResult
         diagnostic={viewDiag}
@@ -469,7 +469,7 @@ export default function DiagnosticsList() {
               desqualificado: "text-red-400 bg-red-500/10 border-red-500/30",
             };
             const colorClass = classColors[diag.classification] || classColors.frio;
-            const prevDiag = i < diagnostics.length - 1 ? diagnostics[i + 1] : null;
+            const prevDiag = i > 0 ? diagnostics[i - 1] : null;
             const scoreDiff = prevDiag ? diag.score - prevDiag.score : null;
             return (
               <motion.button
@@ -492,7 +492,7 @@ export default function DiagnosticsList() {
                       <p className="font-heading text-[10px] text-muted-foreground/50">
                         {diag.meeting_type === "online" ? "Reunião Online" : diag.meeting_type === "presencial" ? "Presencial" : "Telefone"}
                         {diag.commercial_name && ` · ${diag.commercial_name}`}
-                        {i === 0 && diagnostics.length > 1 && <span className="text-gold/60 ml-2">· Mais recente</span>}
+                        {i === diagnostics.length - 1 && diagnostics.length > 1 && <span className="text-gold/60 ml-2">· Mais recente</span>}
                       </p>
                     </div>
                   </div>
