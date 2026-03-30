@@ -22,6 +22,7 @@ const ACTIVITY_TYPES = [
   { key: "reuniao", label: "Reunião", icon: Video, color: "text-purple-400" },
   { key: "email", label: "E-mail", icon: Send, color: "text-green-400" },
   { key: "tarefa", label: "Tarefa", icon: CheckCircle, color: "text-gold" },
+  { key: "movimentacao", label: "Movimentação", icon: ArrowRight, color: "text-orange-400" },
 ];
 
 interface Props {
