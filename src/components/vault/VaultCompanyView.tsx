@@ -244,7 +244,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {/* Tab 0: Dashboard */}
       {tab === 0 && (
         <div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
+          {/* KPI Row 1 - Financial */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-4">
             {[
               { label: "Faturamento", value: fmtK(rev), accent: true },
               { label: `Imposto (${company.aliquota}%)`, value: fmtK(tax), neg: true },
@@ -261,29 +262,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
             ))}
           </div>
 
-          {(goals?.length ?? 0) > 0 && (
-            <div className="rounded-xl border border-white/5 p-4 mb-5" style={{ background: "#0e0e0a" }}>
-              <h3 className="text-xs font-medium mb-3">Metas 2026</h3>
-              <div className="space-y-3">
-                {goals?.map((g: any) => {
-                  const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
-                  return (
-                    <div key={g.id}>
-                      <div className="flex justify-between text-[11px] mb-1">
-                        <span>{g.description}</span>
-                        <span style={{ color: "#FFD600" }}>{p}%</span>
-                      </div>
-                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                        <div className="h-full rounded-full" style={{ width: `${Math.min(p, 100)}%`, background: company.color }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          {/* KPI Row 2 - Operations */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
             {[
               { label: "Colaboradores", value: String(activeEmps) },
               { label: "Folha Mensal", value: fmtK(payroll) },
@@ -296,6 +276,143 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
               </div>
             ))}
           </div>
+
+          {/* Chart + Goals Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            {/* Revenue Chart */}
+            <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Faturamento vs Despesas</h3>
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                    <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.35)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "rgba(242,240,232,0.25)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => fmtK(v)} />
+                    <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 11 }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
+                    <Bar dataKey="Faturamento" fill={company.color} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Despesas" fill="#ef4444" radius={[4, 4, 0, 0]} opacity={0.6} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[180px] text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Sem dados mensais</div>
+              )}
+            </div>
+
+            {/* Goals */}
+            <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Metas {new Date().getFullYear()}</h3>
+              {(goals?.length ?? 0) > 0 ? (
+                <div className="space-y-3">
+                  {goals?.map((g: any) => {
+                    const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
+                    return (
+                      <div key={g.id}>
+                        <div className="flex justify-between text-[11px] mb-1">
+                          <span className="truncate mr-2">{g.description || g.goal_type}</span>
+                          <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                          <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(p, 100)}%`, background: p >= 100 ? "#22c55e" : company.color }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-[140px] text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Row: Upcoming Payments + Recent Entries */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Upcoming Payments */}
+            <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+              <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                <span className="text-xs font-medium">Próximos Vencimentos</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-white/5" style={{ color: "rgba(242,240,232,0.5)" }}>{contasAPagar.length}</span>
+              </div>
+              {contasAPagar.length === 0 ? (
+                <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma conta pendente 🎉</div>
+              ) : (
+                <div className="divide-y divide-white/5">
+                  {contasAPagar.slice(0, 5).map((e: any) => {
+                    const isOverdue = e.status === "vencido";
+                    return (
+                      <div key={e.id} className="px-4 py-2.5 flex items-center justify-between">
+                        <div className="min-w-0 flex-1 mr-3">
+                          <div className="text-xs truncate">{e.description}</div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "rgba(242,240,232,0.35)" }}>{e.category || "Sem categoria"} • Vence {fmtDate(e.due_date)}</div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className={`text-xs font-semibold ${isOverdue ? "text-red-400" : ""}`}>{fmt(Number(e.amount))}</div>
+                          {statusBadge(e.status)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {contasAPagar.length > 5 && (
+                    <div className="px-4 py-2 text-center">
+                      <button onClick={() => onTabChange(5)} className="text-[10px] text-[#FFD600] hover:underline">Ver todas ({contasAPagar.length})</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Recent Entries */}
+            <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+              <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                <span className="text-xs font-medium">Últimos Lançamentos</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-white/5" style={{ color: "rgba(242,240,232,0.5)" }}>{entries?.length ?? 0}</span>
+              </div>
+              {(entries?.length ?? 0) === 0 ? (
+                <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum lançamento registrado</div>
+              ) : (
+                <div className="divide-y divide-white/5">
+                  {entries?.slice(0, 5).map((e: any) => {
+                    const isFat = e.entry_type === "faturamento";
+                    return (
+                      <div key={e.id} className="px-4 py-2.5 flex items-center justify-between">
+                        <div className="min-w-0 flex-1 mr-3">
+                          <div className="text-xs truncate">{e.description}</div>
+                          <div className="text-[10px] mt-0.5" style={{ color: "rgba(242,240,232,0.35)" }}>{e.category || "—"} • {fmtDate(e.entry_date || e.due_date)}</div>
+                        </div>
+                        <span className={`text-xs font-semibold flex-shrink-0 ${isFat ? "text-green-400" : "text-red-400"}`}>
+                          {isFat ? "+" : "-"}{fmt(Number(e.amount))}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {(entries?.length ?? 0) > 5 && (
+                    <div className="px-4 py-2 text-center">
+                      <button onClick={() => onTabChange(3)} className="text-[10px] text-[#FFD600] hover:underline">Ver todos ({entries?.length})</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bank Accounts Summary */}
+          {(bankAccounts?.length ?? 0) > 0 && (
+            <div className="rounded-xl border border-white/5 p-4 mt-5" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Contas Bancárias</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {bankAccounts?.filter((a: any) => a.active).map((a: any) => (
+                  <div key={a.id} className="rounded-lg border border-white/5 p-3 flex items-center gap-3" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                      <CreditCard size={14} className="text-[#FFD600]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[11px] font-medium truncate">{a.bank_name}</div>
+                      <div className="text-[10px]" style={{ color: "rgba(242,240,232,0.35)" }}>Ag {a.agency || "—"} • {a.account_type}</div>
+                    </div>
+                    <div className={`text-xs font-semibold ${Number(a.balance) >= 0 ? "text-green-400" : "text-red-400"}`}>{fmtK(Number(a.balance))}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
