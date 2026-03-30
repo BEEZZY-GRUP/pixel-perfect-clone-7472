@@ -34,7 +34,7 @@ const statusBadge = (status: string) => {
   return <span className={`inline-flex text-[10px] font-medium px-2 py-0.5 rounded ${colors[status] ?? "bg-white/5 text-white/40"}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
 };
 
-const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
+const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany }: Props) => {
   const coId = company.id;
   const qc = useQueryClient();
 
