@@ -9,10 +9,13 @@ export type GlobalView = "dashboard" | "lancamentos" | "relatorios" | "planejame
 
 const COMPANY_TABS = [
   { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: DollarSign, label: "Lançamentos" },
-  { icon: CreditCard, label: "Contas Bancárias" },
-  { icon: Users, label: "Pessoas & RH" },
+  { icon: CreditCard, label: "Controle Bancário" },
+  { icon: DollarSign, label: "Lançar Despesa" },
+  { icon: DollarSign, label: "Lançar Faturamento" },
+  { icon: FileText, label: "Contas a Pagar" },
+  { icon: FileText, label: "Faturamentos" },
   { icon: BarChart3, label: "Relatórios" },
+  { icon: Users, label: "Pessoas & RH" },
   { icon: Wrench, label: "Configurações" },
 ];
 
