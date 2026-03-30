@@ -625,7 +625,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {tab === 8 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-heading text-sm font-semibold">Configurações — {company.name}</h2>
+            <h2 className="font-heading text-sm font-semibold">Configurações | {company.name}</h2>
             {!editSettings ? (
               <Button size="sm" onClick={startEditSettings} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
                 <Pencil size={12} className="mr-1" /> Editar
