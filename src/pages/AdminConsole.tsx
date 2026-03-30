@@ -13,11 +13,11 @@ import AddLeadModal from "@/components/admin/AddLeadModal";
 import ConsoleUsersTab from "@/components/admin/ConsoleUsersTab";
 
 const TABS = [
-  { key: "Dashboard", label: "DASHBOARD", icon: BarChart3 },
-  { key: "Funil", label: "FUNIL", icon: LayoutGrid },
-  { key: "Leads", label: "LEADS", icon: List },
-  { key: "Diagnosticos", label: "DIAGNÓSTICOS", icon: FileText },
-  { key: "Lixeira", label: "LIXEIRA", icon: Trash2 },
+  { key: "Dashboard", label: "DASHBOARD", icon: BarChart3, adminOnly: false },
+  { key: "Funil", label: "FUNIL", icon: LayoutGrid, adminOnly: false },
+  { key: "Leads", label: "LEADS", icon: List, adminOnly: false },
+  { key: "Diagnosticos", label: "DIAGNÓSTICOS", icon: FileText, adminOnly: false },
+  { key: "Lixeira", label: "LIXEIRA", icon: Trash2, adminOnly: false },
   { key: "Usuarios", label: "USUÁRIOS", icon: Users, adminOnly: true },
 ] as const;
 
