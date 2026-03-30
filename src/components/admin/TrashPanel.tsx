@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Trash2, RotateCcw, AlertTriangle, Search } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 
-export default function TrashPanel() {
+export default function TrashPanel({ consoleRole = "admin" }: { consoleRole?: string }) {
   const { archivedLeads, restoreLead, permanentDelete } = useLeads();
   const [search, setSearch] = useState("");
   const [confirmId, setConfirmId] = useState<string | null>(null);
