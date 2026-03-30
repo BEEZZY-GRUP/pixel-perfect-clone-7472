@@ -445,7 +445,7 @@ export const EmployeeProfile = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mb-3">
                 <div>
                   <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Novo Salário (R$)</label>
-                  <input type="number" value={salaryForm.new_salary} onChange={e => setSalaryForm({ ...salaryForm, new_salary: e.target.value })} placeholder={String(employee.salary)} className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none placeholder:text-white/15" />
+                  <input type="text" value={salaryForm.new_salary} onChange={e => setSalaryForm({ ...salaryForm, new_salary: maskCurrency(e.target.value) })} placeholder="R$ 0,00" className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-[11px] text-[#F2F0E8] outline-none placeholder:text-white/15" />
                 </div>
                 <div>
                   <label className="text-[9px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.3)" }}>Data</label>
