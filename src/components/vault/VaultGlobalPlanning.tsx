@@ -45,7 +45,10 @@ const VaultGlobalPlanning = () => {
     if (!form.description || !form.target_value) { toast.error("Preencha descrição e meta"); return; }
     const companyId = goalModal.companyId || companies?.[0]?.id;
     if (!companyId) return;
-    const payload = { company_id: companyId, description: form.description, goal_type: form.goal_type || "Meta", target_value: Number(form.target_value), current_value: Number(form.current_value) || 0, year: Number(form.year) || 2026 };
+    const targetVal = form.unit_type === "valor" ? Number(unmaskCurrency(form.target_value)) : Number(form.target_value);
+    const currentVal = form.unit_type === "valor" ? Number(unmaskCurrency(form.current_value)) : Number(form.current_value) || 0;
+    const goalType = form.goal_type || "Meta";
+    const payload = { company_id: companyId, description: form.description, goal_type: `${goalType}|${form.unit_type}`, target_value: targetVal, current_value: currentVal, year: Number(form.year) || 2026 };
     const { error } = goalModal.goal ? await supabase.from("vault_goals").update(payload).eq("id", goalModal.goal.id) : await supabase.from("vault_goals").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(goalModal.goal ? "Meta atualizada" : "Meta criada");
