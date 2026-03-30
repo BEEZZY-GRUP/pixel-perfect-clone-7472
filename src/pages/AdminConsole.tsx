@@ -40,6 +40,8 @@ function ConsoleContent() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("bzy_auth");
+    sessionStorage.removeItem("bzy_role");
+    sessionStorage.removeItem("bzy_user_name");
     navigate("/adminconsole/login");
   };
 
