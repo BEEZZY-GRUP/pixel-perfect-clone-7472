@@ -5,6 +5,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SALT = "_vault_secure_salt_2026";
+
+async function hashPassword(password: string): Promise<string> {
+  const data = new TextEncoder().encode(password + SALT);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -27,11 +36,13 @@ Deno.serve(async (req) => {
         });
       }
 
+      const hashedPassword = await hashPassword(password);
+
       const { data, error } = await supabase
         .from("vault_users")
         .select("id, username, name, email, role, active")
         .eq("username", username)
-        .eq("password", password)
+        .eq("password", hashedPassword)
         .eq("active", true)
         .maybeSingle();
 
@@ -68,7 +79,6 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Check uniqueness
       const { data: existing } = await supabase
         .from("vault_users")
         .select("id")
@@ -82,8 +92,10 @@ Deno.serve(async (req) => {
         });
       }
 
+      const hashedPassword = await hashPassword(password);
+
       const { data, error } = await supabase.from("vault_users").insert({
-        name, username, email, password, role: role || "visualizador", active: active ?? true,
+        name, username, email, password: hashedPassword, role: role || "visualizador", active: active ?? true,
       }).select("id, username, name, email, role, active, created_at, updated_at").single();
 
       if (error) throw error;
@@ -105,7 +117,7 @@ Deno.serve(async (req) => {
       if (name !== undefined) updateData.name = name;
       if (username !== undefined) updateData.username = username;
       if (email !== undefined) updateData.email = email;
-      if (password !== undefined) updateData.password = password;
+      if (password !== undefined) updateData.password = await hashPassword(password);
       if (role !== undefined) updateData.role = role;
       if (active !== undefined) updateData.active = active;
 
