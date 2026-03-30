@@ -269,7 +269,22 @@ const VaultGlobalReports = () => {
       {/* Fluxo de Caixa */}
       {activeTab === 1 && (
         <div className="space-y-5">
-          {cashflowData.length > 0 && (
+          {compareMode && compareCashflowData.length > 0 ? (
+            <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Comparativo de Saldo Mensal</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={compareCashflowData}>
+                  <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
+                  <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  {filterCo.map((cid, idx) => {
+                    const co = companies?.find((c: any) => c.id === cid);
+                    return <Line key={cid} type="monotone" dataKey={co?.name ?? ""} stroke={co?.color ?? CHART_COLORS[idx]} strokeWidth={2} dot={{ r: 3 }} />;
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : cashflowData.length > 0 && (
             <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
               <h3 className="text-xs font-medium mb-3">Fluxo de Caixa Acumulado</h3>
               <ResponsiveContainer width="100%" height={250}>
