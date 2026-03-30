@@ -17,7 +17,7 @@ const VaultGlobalPlanning = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [goalModal, setGoalModal] = useState<{ open: boolean; goal?: any; companyId?: string }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
-  const [form, setForm] = useState({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" });
+  const [form, setForm] = useState({ description: "", goal_type: "", unit_type: "valor", target_value: "", current_value: "", year: "2026" });
 
   // Budget modal
   const [budgetModal, setBudgetModal] = useState<{ open: boolean; budget?: any; companyId?: string }>({ open: false });
