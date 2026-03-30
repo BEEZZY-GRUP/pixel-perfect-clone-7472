@@ -203,7 +203,7 @@ const VaultGlobalReports = () => {
                 <BarChart data={compareData}>
                   <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
                   <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                   {filterCo.map((cid, idx) => {
                     const co = companies?.find((c: any) => c.id === cid);
                     return <Bar key={cid} dataKey={co?.name ?? ""} fill={co?.color ?? CHART_COLORS[idx]} radius={[4,4,0,0]} />;
@@ -218,7 +218,7 @@ const VaultGlobalReports = () => {
                 <BarChart data={chartData}>
                   <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
                   <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                   <Bar dataKey="Faturamento" fill="#FFD600" radius={[4,4,0,0]} />
                   <Bar dataKey="Despesas" fill="#ef4444" radius={[4,4,0,0]} />
                 </BarChart>
@@ -276,7 +276,7 @@ const VaultGlobalReports = () => {
                 <LineChart data={compareCashflowData}>
                   <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
                   <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                   {filterCo.map((cid, idx) => {
                     const co = companies?.find((c: any) => c.id === cid);
                     return <Line key={cid} type="monotone" dataKey={co?.name ?? ""} stroke={co?.color ?? CHART_COLORS[idx]} strokeWidth={2} dot={{ r: 3 }} />;
@@ -291,7 +291,7 @@ const VaultGlobalReports = () => {
                 <LineChart data={cashflowData}>
                   <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
                   <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                   <Line type="monotone" dataKey="Entradas" stroke="#22c55e" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="Saídas" stroke="#ef4444" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="Acumulado" stroke="#FFD600" strokeWidth={2} dot={{ fill: "#FFD600", r: 3 }} />
@@ -339,7 +339,7 @@ const VaultGlobalReports = () => {
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                     {pieData.map((entry: any, idx: number) => <Cell key={idx} fill={entry.color || CHART_COLORS[idx % CHART_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                 </PieChart>
               </ResponsiveContainer>
             </div>

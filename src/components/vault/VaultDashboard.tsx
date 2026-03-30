@@ -171,7 +171,7 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
               <BarChart data={trendData} barGap={2}>
                 <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} labelStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
                 <Bar dataKey="Faturamento" fill="#FFD600" radius={[4,4,0,0]} />
                 <Bar dataKey="Despesas" fill="#ef4444" radius={[4,4,0,0]} opacity={0.7} />
               </BarChart>
