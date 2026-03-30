@@ -1289,7 +1289,7 @@ ScrollTrigger.create({trigger:'#numeros',start:'top 80%',once:true,
     gsap.to('.nums-eyebrow,.nums-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
     gsap.to('.num-card',{opacity:1,y:0,stagger:.08,duration:.9,ease:'power3.out',delay:.2});
     /* Animate numbers */
-    [{id:'nc1',end:47,s:'+'},{id:'nc2',end:94,s:'%'},{id:'nc3',end:3,s:'x'},{id:'nc4',end:12,s:''}].forEach(({id,end,s})=>{
+    [{id:'nc1',end:350,s:'+'},{id:'nc2',end:5,s:'+'},{id:'nc3',end:9.7,s:'',dec:1},{id:'nc4',end:6,s:'+'}].forEach(({id,end,s,dec})=>{
       const el=document.getElementById(id);if(!el)return;
       const start=Math.floor(end*.7),o={v:start};
       el.innerHTML=start+(s?'<span>'+s+'</span>':'');
