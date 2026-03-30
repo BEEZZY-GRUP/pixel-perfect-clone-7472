@@ -263,7 +263,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                           </div>
                         </td>
                         <td className="px-4 py-2.5 text-xs font-mono" style={{ color: "rgba(242,240,232,0.4)" }}>{co.slug}</td>
-                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.cnpj || "—"}</td>
+                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.cnpj || "-"}</td>
                         <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.regime}</td>
                         <td className="px-4 py-2.5 text-xs">{co.aliquota}%</td>
                         <td className="px-4 py-2.5">
