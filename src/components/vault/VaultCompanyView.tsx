@@ -10,6 +10,7 @@ import VaultEmployeeForm from "./VaultEmployeeForm";
 import VaultBankAccountForm from "./VaultBankAccountForm";
 import VaultTransactionForm from "./VaultTransactionForm";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
+import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber } from "@/lib/masks";
 
 interface Props {
   company: any;
