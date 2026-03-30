@@ -172,7 +172,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               </div>
             </div>
           )}
-          {globalView === "integrations" && <VaultIntegrationsPage />}
+          
 
           {/* Settings - Editable */}
           {globalView === "settings" && (
