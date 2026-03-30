@@ -1,23 +1,884 @@
-import { motion } from "framer-motion";
-import { FileText } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, Search, Calendar, ChevronRight, Plus, ArrowLeft, Check, ChevronDown, ChevronUp, Building2, User, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useLeads } from "./LeadsContext";
+import type { Lead } from "./types";
+import { toast } from "sonner";
 
+interface Diagnostic {
+  id: string;
+  lead_id: string;
+  created_at: string;
+  meeting_date: string;
+  meeting_type: string;
+  commercial_name: string | null;
+  company_segment: string | null;
+  company_size: string | null;
+  employees_count: string | null;
+  annual_revenue: string | null;
+  years_in_market: string | null;
+  main_challenges: string[] | null;
+  current_tools: string | null;
+  has_defined_processes: boolean;
+  has_marketing_strategy: boolean;
+  has_sales_team: boolean;
+  digital_presence_level: string | null;
+  short_term_goals: string | null;
+  long_term_goals: string | null;
+  revenue_goal: string | null;
+  growth_timeline: string | null;
+  biggest_pain: string | null;
+  tried_solutions: string | null;
+  investment_capacity: string | null;
+  decision_urgency: string | null;
+  decision_maker: string | null;
+  decision_process: string | null;
+  stakeholders_count: string | null;
+  budget_defined: boolean;
+  budget_range: string | null;
+  competitor_analysis: string | null;
+  additional_notes: string | null;
+  next_steps: string | null;
+  score: number;
+  classification: string;
+  summary: string | null;
+}
+
+// ───── Questionnaire Configuration ─────
+const CHALLENGES_OPTIONS = [
+  "Falta de processos definidos",
+  "Dificuldade em gerar leads",
+  "Time de vendas desorganizado",
+  "Falta de presença digital",
+  "Não consegue escalar",
+  "Gestão financeira precária",
+  "Falta de liderança",
+  "Comunicação interna ruim",
+  "Retenção de talentos",
+  "Transformação digital",
+];
+
+const SEGMENTS = ["Tecnologia", "Varejo", "Serviços", "Indústria", "Saúde", "Educação", "Alimentação", "Construção", "Consultoria", "Outro"];
+const COMPANY_SIZES = ["MEI", "ME", "EPP", "Pequena", "Média", "Grande"];
+const EMPLOYEES = ["1-5", "6-15", "16-50", "51-100", "101-500", "500+"];
+const REVENUES = ["Até R$ 100k", "R$ 100k-500k", "R$ 500k-1M", "R$ 1M-5M", "R$ 5M-20M", "R$ 20M+"];
+const YEARS = ["Menos de 1 ano", "1-3 anos", "3-5 anos", "5-10 anos", "10+ anos"];
+const DIGITAL_LEVELS = ["Inexistente", "Básico", "Intermediário", "Avançado"];
+const TIMELINES = ["Imediato (1-3 meses)", "Curto prazo (3-6 meses)", "Médio prazo (6-12 meses)", "Longo prazo (12+ meses)"];
+const URGENCIES = ["Muito urgente", "Urgente", "Moderado", "Sem pressa"];
+const BUDGET_RANGES = ["Até R$ 5k/mês", "R$ 5k-15k/mês", "R$ 15k-50k/mês", "R$ 50k-100k/mês", "R$ 100k+/mês"];
+const INVESTMENT_OPTIONS = ["Muito baixa", "Baixa", "Moderada", "Alta", "Muito alta"];
+const STAKEHOLDERS = ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6+ pessoas"];
+const DECISION_PROCESSES = ["Decisão individual", "Sócios decidem juntos", "Conselho/comitê", "Processo complexo"];
+
+function calculateScore(form: Record<string, any>): { score: number; classification: string; summary: string } {
+  let score = 0;
+
+  // Company maturity (max 20)
+  const years = YEARS.indexOf(form.years_in_market || "");
+  score += Math.min(years * 4, 16);
+  if (form.has_defined_processes) score += 4;
+
+  // Digital & Strategy (max 20)
+  const digital = DIGITAL_LEVELS.indexOf(form.digital_presence_level || "");
+  score += digital * 5;
+  if (form.has_marketing_strategy) score += 5;
+
+  // Pain & Urgency (max 20)
+  const urgency = URGENCIES.indexOf(form.decision_urgency || "");
+  score += (3 - urgency) * 5;
+  const challenges = (form.main_challenges || []).length;
+  score += Math.min(challenges * 2, 10);
+
+  // Budget & Decision (max 20)
+  if (form.budget_defined) score += 8;
+  const budgetIdx = BUDGET_RANGES.indexOf(form.budget_range || "");
+  score += Math.min(budgetIdx * 3, 12);
+
+  // Investment capacity (max 20)
+  const inv = INVESTMENT_OPTIONS.indexOf(form.investment_capacity || "");
+  score += inv * 5;
+
+  score = Math.min(Math.max(score, 0), 100);
+
+  let classification = "frio";
+  let summary = "";
+
+  if (score >= 80) {
+    classification = "quente";
+    summary = "Lead altamente qualificado. Alta urgência, orçamento definido e maturidade empresarial elevada. Recomenda-se proposta comercial imediata.";
+  } else if (score >= 60) {
+    classification = "morno";
+    summary = "Lead com bom potencial. Possui interesse e capacidade de investimento moderada. Recomenda-se nurturing direcionado e follow-up em 1-2 semanas.";
+  } else if (score >= 40) {
+    classification = "frio";
+    summary = "Lead em fase inicial. Necessita amadurecimento antes de avançar no funil. Recomenda-se conteúdo educativo e acompanhamento mensal.";
+  } else {
+    classification = "desqualificado";
+    summary = "Lead com baixo potencial no momento. Orçamento limitado ou baixa urgência. Recomenda-se manter na base e reavaliar em 3-6 meses.";
+  }
+
+  return { score, classification, summary };
+}
+
+// ───── Main Component ─────
 export default function DiagnosticsList() {
+  const { leads } = useLeads();
+  const [search, setSearch] = useState("");
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [viewDiag, setViewDiag] = useState<Diagnostic | null>(null);
+
+  const filteredLeads = useMemo(() => {
+    const q = search.toLowerCase();
+    if (!q) return leads;
+    return leads.filter((l) =>
+      l.name.toLowerCase().includes(q) || l.company.toLowerCase().includes(q) || l.email.toLowerCase().includes(q)
+    );
+  }, [leads, search]);
+
+  const loadDiagnostics = async (leadId: string) => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("diagnostics")
+      .select("*")
+      .eq("lead_id", leadId)
+      .order("meeting_date", { ascending: false });
+    setDiagnostics((data as unknown as Diagnostic[]) || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (selectedLead) loadDiagnostics(selectedLead.id);
+  }, [selectedLead]);
+
+  // ───── Lead List View ─────
+  if (!selectedLead) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <p className="section-eyebrow">Diagnósticos</p>
+          <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
+            Selecione um cliente para ver os diagnósticos
+          </h2>
+        </div>
+
+        <div className="relative max-w-md">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar cliente..."
+            className="w-full bg-card/20 border border-border/40 rounded-lg pl-9 pr-4 py-2.5 text-sm font-heading text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-gold-border transition-colors"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {filteredLeads.map((lead, i) => (
+            <motion.button
+              key={lead.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03 }}
+              onClick={() => setSelectedLead(lead)}
+              className="text-left rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-4 hover:border-gold-border/50 hover:bg-card/20 transition-all group"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold-border/30 flex items-center justify-center font-heading text-gold text-xs font-bold">
+                    {lead.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-heading text-sm text-foreground font-semibold group-hover:text-gold transition-colors">{lead.name}</p>
+                    <p className="font-heading text-[10px] text-muted-foreground/50">{lead.company}</p>
+                  </div>
+                </div>
+                <ChevronRight size={14} className="text-muted-foreground/30 group-hover:text-gold/60 transition-colors mt-1" />
+              </div>
+              <div className="flex items-center gap-3 mt-3 pt-2 border-t border-border/20">
+                <span className="font-heading text-[9px] text-muted-foreground/40 flex items-center gap-1">
+                  <Building2 size={9} /> {lead.cnpj}
+                </span>
+                <span className="font-heading text-[9px] text-muted-foreground/40 flex items-center gap-1">
+                  <Calendar size={9} /> {new Date(lead.created_at).toLocaleDateString("pt-BR")}
+                </span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+
+        {filteredLeads.length === 0 && (
+          <div className="border border-border/30 rounded-lg bg-card/10 p-12 flex flex-col items-center gap-3">
+            <FileText size={28} className="text-muted-foreground/20" />
+            <p className="font-heading text-sm text-muted-foreground/40">Nenhum cliente encontrado.</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ───── Viewing a Single Diagnostic Result ─────
+  if (viewDiag) {
+    return (
+      <DiagnosticResult
+        diagnostic={viewDiag}
+        lead={selectedLead}
+        onBack={() => setViewDiag(null)}
+      />
+    );
+  }
+
+  // ───── Diagnostic Form ─────
+  if (showForm) {
+    return (
+      <DiagnosticForm
+        lead={selectedLead}
+        onBack={() => setShowForm(false)}
+        onSaved={() => {
+          setShowForm(false);
+          loadDiagnostics(selectedLead.id);
+        }}
+      />
+    );
+  }
+
+  // ───── Lead Diagnostics List ─────
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="font-mono text-xs tracking-[0.2em] text-primary font-semibold">DIAGNÓSTICOS</h2>
-        <p className="font-mono text-[10px] text-muted-foreground mt-1">Em breve</p>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setSelectedLead(null)} className="p-2 text-muted-foreground/50 hover:text-gold transition-colors rounded-lg hover:bg-gold-dim">
+            <ArrowLeft size={16} />
+          </button>
+          <div>
+            <p className="section-eyebrow">Diagnósticos</p>
+            <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
+              {selectedLead.name} — {selectedLead.company}
+            </h2>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2.5 bg-gold/90 text-background hover:bg-gold transition-all rounded-lg font-bold shadow-[0_0_20px_hsl(var(--gold)/0.15)]"
+        >
+          <Plus size={13} /> NOVO DIAGNÓSTICO
+        </button>
       </div>
 
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+        </div>
+      ) : diagnostics.length === 0 ? (
+        <div className="border border-border/30 rounded-lg bg-card/10 p-12 flex flex-col items-center gap-4">
+          <FileText size={32} className="text-muted-foreground/20" />
+          <p className="font-heading text-sm text-muted-foreground/40">Nenhum diagnóstico realizado.</p>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2.5 border border-gold-border text-gold hover:bg-gold-dim transition-all rounded-lg font-semibold"
+          >
+            <Plus size={13} /> CRIAR PRIMEIRO DIAGNÓSTICO
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {diagnostics.map((diag, i) => {
+            const classColors: Record<string, string> = {
+              quente: "text-green-400 bg-green-500/10 border-green-500/30",
+              morno: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
+              frio: "text-blue-400 bg-blue-500/10 border-blue-500/30",
+              desqualificado: "text-red-400 bg-red-500/10 border-red-500/30",
+            };
+            const colorClass = classColors[diag.classification] || classColors.frio;
+            return (
+              <motion.button
+                key={diag.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                onClick={() => setViewDiag(diag)}
+                className="w-full text-left rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-4 hover:border-gold-border/50 hover:bg-card/20 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold-border/30 flex items-center justify-center">
+                      <FileText size={16} className="text-gold/70" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-sm text-foreground font-semibold">
+                        Diagnóstico — {new Date(diag.meeting_date).toLocaleDateString("pt-BR")}
+                      </p>
+                      <p className="font-heading text-[10px] text-muted-foreground/50">
+                        {diag.meeting_type === "online" ? "Reunião Online" : "Presencial"}
+                        {diag.commercial_name && ` · ${diag.commercial_name}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="font-heading text-lg font-bold text-gold">{diag.score}<span className="text-xs text-muted-foreground/40">/100</span></p>
+                    </div>
+                    <span className={`font-heading text-[9px] tracking-[0.1em] px-2.5 py-1 rounded border font-semibold uppercase ${colorClass}`}>
+                      {diag.classification}
+                    </span>
+                    <ChevronRight size={14} className="text-muted-foreground/30 group-hover:text-gold/60 transition-colors" />
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ───── Diagnostic Form Component ─────
+function DiagnosticForm({ lead, onBack, onSaved }: { lead: Lead; onBack: () => void; onSaved: () => void }) {
+  const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<Record<string, any>>({
+    meeting_date: new Date().toISOString().split("T")[0],
+    meeting_type: "online",
+    commercial_name: "",
+    company_segment: "",
+    company_size: "",
+    employees_count: "",
+    annual_revenue: "",
+    years_in_market: "",
+    main_challenges: [] as string[],
+    current_tools: "",
+    has_defined_processes: false,
+    has_marketing_strategy: false,
+    has_sales_team: false,
+    digital_presence_level: "",
+    short_term_goals: "",
+    long_term_goals: "",
+    revenue_goal: "",
+    growth_timeline: "",
+    biggest_pain: "",
+    tried_solutions: "",
+    investment_capacity: "",
+    decision_urgency: "",
+    decision_maker: "",
+    decision_process: "",
+    stakeholders_count: "",
+    budget_defined: false,
+    budget_range: "",
+    competitor_analysis: "",
+    additional_notes: "",
+    next_steps: "",
+  });
+
+  const update = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
+  const toggleChallenge = (c: string) => {
+    const current = form.main_challenges || [];
+    update("main_challenges", current.includes(c) ? current.filter((x: string) => x !== c) : [...current, c]);
+  };
+
+  const inputClass = "w-full bg-card/20 border border-border/40 rounded-lg px-3 py-2.5 text-sm font-heading text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-gold-border transition-colors";
+  const labelClass = "font-heading text-[10px] tracking-[0.15em] text-muted-foreground/70 mb-1.5 block font-semibold";
+  const selectClass = inputClass + " appearance-none cursor-pointer";
+
+  const steps = [
+    { title: "Informações da Reunião", icon: "📋" },
+    { title: "Perfil da Empresa", icon: "🏢" },
+    { title: "Situação Atual", icon: "📊" },
+    { title: "Metas & Objetivos", icon: "🎯" },
+    { title: "Dores & Soluções", icon: "💡" },
+    { title: "Tomada de Decisão", icon: "🤝" },
+    { title: "Observações Finais", icon: "📝" },
+  ];
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { score, classification, summary } = calculateScore(form);
+    const payload = {
+      lead_id: lead.id,
+      ...form,
+      score,
+      classification,
+      summary,
+    };
+    const { error } = await supabase.from("diagnostics").insert(payload as any);
+    setSaving(false);
+    if (error) {
+      toast.error("Erro ao salvar diagnóstico");
+      return;
+    }
+    toast.success("Diagnóstico salvo com sucesso!");
+    onSaved();
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} className="p-2 text-muted-foreground/50 hover:text-gold transition-colors rounded-lg hover:bg-gold-dim">
+          <ArrowLeft size={16} />
+        </button>
+        <div>
+          <p className="section-eyebrow">Novo Diagnóstico</p>
+          <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
+            {lead.name} — {lead.company}
+          </h2>
+        </div>
+      </div>
+
+      {/* Step indicator */}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pb-2">
+        {steps.map((s, i) => (
+          <button
+            key={i}
+            onClick={() => setStep(i)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-heading text-[9px] tracking-[0.1em] font-semibold whitespace-nowrap transition-all ${
+              step === i ? "bg-gold/15 text-gold border border-gold-border" : "text-muted-foreground/40 hover:text-muted-foreground/60 border border-transparent"
+            }`}
+          >
+            <span>{s.icon}</span>
+            <span className="hidden md:inline">{s.title}</span>
+            <span className="md:hidden">{i + 1}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Form content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+          className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-6"
+        >
+          <h3 className="font-heading text-sm text-gold font-semibold mb-5 flex items-center gap-2">
+            <span className="text-lg">{steps[step].icon}</span>
+            {steps[step].title}
+          </h3>
+
+          {step === 0 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className={labelClass}>DATA DA REUNIÃO</label>
+                  <input type="date" value={form.meeting_date} onChange={(e) => update("meeting_date", e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>TIPO</label>
+                  <select value={form.meeting_type} onChange={(e) => update("meeting_type", e.target.value)} className={selectClass}>
+                    <option value="online">Online (Meet/Zoom)</option>
+                    <option value="presencial">Presencial</option>
+                    <option value="telefone">Telefone</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>COMERCIAL RESPONSÁVEL</label>
+                  <input value={form.commercial_name} onChange={(e) => update("commercial_name", e.target.value)} className={inputClass} placeholder="Nome do comercial" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>SEGMENTO</label>
+                  <select value={form.company_segment} onChange={(e) => update("company_segment", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {SEGMENTS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>PORTE</label>
+                  <select value={form.company_size} onChange={(e) => update("company_size", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {COMPANY_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className={labelClass}>COLABORADORES</label>
+                  <select value={form.employees_count} onChange={(e) => update("employees_count", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {EMPLOYEES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>FATURAMENTO ANUAL</label>
+                  <select value={form.annual_revenue} onChange={(e) => update("annual_revenue", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {REVENUES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>TEMPO DE MERCADO</label>
+                  <select value={form.years_in_market} onChange={(e) => update("years_in_market", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {YEARS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>PRINCIPAIS DESAFIOS (selecione todos que se aplicam)</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                  {CHALLENGES_OPTIONS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => toggleChallenge(c)}
+                      className={`text-left px-3 py-2.5 rounded-lg border font-heading text-xs transition-all ${
+                        (form.main_challenges || []).includes(c)
+                          ? "border-gold-border bg-gold/10 text-gold"
+                          : "border-border/30 text-muted-foreground/60 hover:border-border/60"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {(form.main_challenges || []).includes(c) && <Check size={12} />}
+                        {c}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>FERRAMENTAS ATUAIS</label>
+                <input value={form.current_tools} onChange={(e) => update("current_tools", e.target.value)} className={inputClass} placeholder="Ex: Excel, ERP, CRM..." />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={form.has_defined_processes} onChange={(e) => update("has_defined_processes", e.target.checked)} className="accent-[hsl(var(--gold))]" />
+                  <span className="font-heading text-xs text-foreground/70">Processos definidos</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={form.has_marketing_strategy} onChange={(e) => update("has_marketing_strategy", e.target.checked)} className="accent-[hsl(var(--gold))]" />
+                  <span className="font-heading text-xs text-foreground/70">Estratégia de marketing</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={form.has_sales_team} onChange={(e) => update("has_sales_team", e.target.checked)} className="accent-[hsl(var(--gold))]" />
+                  <span className="font-heading text-xs text-foreground/70">Time comercial</span>
+                </label>
+              </div>
+              <div>
+                <label className={labelClass}>PRESENÇA DIGITAL</label>
+                <select value={form.digital_presence_level} onChange={(e) => update("digital_presence_level", e.target.value)} className={selectClass}>
+                  <option value="">Selecione</option>
+                  {DIGITAL_LEVELS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>METAS DE CURTO PRAZO (3-6 meses)</label>
+                <textarea value={form.short_term_goals} onChange={(e) => update("short_term_goals", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="O que o cliente quer atingir nos próximos meses?" />
+              </div>
+              <div>
+                <label className={labelClass}>METAS DE LONGO PRAZO (1-3 anos)</label>
+                <textarea value={form.long_term_goals} onChange={(e) => update("long_term_goals", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Qual a visão de futuro do cliente?" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>META DE FATURAMENTO</label>
+                  <input value={form.revenue_goal} onChange={(e) => update("revenue_goal", e.target.value)} className={inputClass} placeholder="Ex: R$ 2M/ano" />
+                </div>
+                <div>
+                  <label className={labelClass}>PRAZO PARA CRESCIMENTO</label>
+                  <select value={form.growth_timeline} onChange={(e) => update("growth_timeline", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {TIMELINES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>MAIOR DOR DO CLIENTE</label>
+                <textarea value={form.biggest_pain} onChange={(e) => update("biggest_pain", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Qual o principal problema que tira o sono do cliente?" />
+              </div>
+              <div>
+                <label className={labelClass}>SOLUÇÕES JÁ TENTADAS</label>
+                <textarea value={form.tried_solutions} onChange={(e) => update("tried_solutions", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="O que já foi tentado para resolver?" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>CAPACIDADE DE INVESTIMENTO</label>
+                  <select value={form.investment_capacity} onChange={(e) => update("investment_capacity", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {INVESTMENT_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>URGÊNCIA DA DECISÃO</label>
+                  <select value={form.decision_urgency} onChange={(e) => update("decision_urgency", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {URGENCIES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 5 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>DECISOR PRINCIPAL</label>
+                  <input value={form.decision_maker} onChange={(e) => update("decision_maker", e.target.value)} className={inputClass} placeholder="Quem toma a decisão final?" />
+                </div>
+                <div>
+                  <label className={labelClass}>PROCESSO DECISÓRIO</label>
+                  <select value={form.decision_process} onChange={(e) => update("decision_process", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {DECISION_PROCESSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>STAKEHOLDERS ENVOLVIDOS</label>
+                  <select value={form.stakeholders_count} onChange={(e) => update("stakeholders_count", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {STAKEHOLDERS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>FAIXA DE ORÇAMENTO</label>
+                  <select value={form.budget_range} onChange={(e) => update("budget_range", e.target.value)} className={selectClass}>
+                    <option value="">Selecione</option>
+                    {BUDGET_RANGES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={form.budget_defined} onChange={(e) => update("budget_defined", e.target.checked)} className="accent-[hsl(var(--gold))]" />
+                <span className="font-heading text-xs text-foreground/70">O cliente já tem orçamento definido para este projeto?</span>
+              </label>
+            </div>
+          )}
+
+          {step === 6 && (
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>ANÁLISE DE CONCORRENTES</label>
+                <textarea value={form.competitor_analysis} onChange={(e) => update("competitor_analysis", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Quem são os concorrentes? Qual o diferencial do cliente?" />
+              </div>
+              <div>
+                <label className={labelClass}>OBSERVAÇÕES ADICIONAIS</label>
+                <textarea value={form.additional_notes} onChange={(e) => update("additional_notes", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Notas gerais sobre a reunião..." />
+              </div>
+              <div>
+                <label className={labelClass}>PRÓXIMOS PASSOS</label>
+                <textarea value={form.next_steps} onChange={(e) => update("next_steps", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="O que foi combinado para dar seguimento?" />
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => step > 0 ? setStep(step - 1) : onBack()}
+          className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2.5 border border-border/40 text-muted-foreground hover:text-foreground hover:border-border transition-all rounded-lg font-semibold"
+        >
+          <ArrowLeft size={12} /> {step > 0 ? "ANTERIOR" : "CANCELAR"}
+        </button>
+        <div className="font-heading text-[10px] text-muted-foreground/40">
+          {step + 1} de {steps.length}
+        </div>
+        {step < steps.length - 1 ? (
+          <button
+            onClick={() => setStep(step + 1)}
+            className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2.5 bg-gold/15 text-gold border border-gold-border hover:bg-gold/25 transition-all rounded-lg font-semibold"
+          >
+            PRÓXIMO <ChevronRight size={12} />
+          </button>
+        ) : (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-5 py-2.5 bg-gold/90 text-background hover:bg-gold transition-all rounded-lg font-bold shadow-[0_0_20px_hsl(var(--gold)/0.15)] disabled:opacity-50"
+          >
+            <Check size={12} /> {saving ? "SALVANDO..." : "FINALIZAR DIAGNÓSTICO"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ───── Diagnostic Result View ─────
+function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic; lead: Lead; onBack: () => void }) {
+  const classColors: Record<string, { bg: string; text: string; border: string; label: string }> = {
+    quente: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/30", label: "LEAD QUENTE 🔥" },
+    morno: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30", label: "LEAD MORNO ☀️" },
+    frio: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/30", label: "LEAD FRIO ❄️" },
+    desqualificado: { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/30", label: "DESQUALIFICADO ⛔" },
+  };
+  const cc = classColors[diagnostic.classification] || classColors.frio;
+
+  const sections = [
+    {
+      title: "Perfil da Empresa",
+      items: [
+        { label: "Segmento", value: diagnostic.company_segment },
+        { label: "Porte", value: diagnostic.company_size },
+        { label: "Colaboradores", value: diagnostic.employees_count },
+        { label: "Faturamento", value: diagnostic.annual_revenue },
+        { label: "Tempo de mercado", value: diagnostic.years_in_market },
+      ],
+    },
+    {
+      title: "Situação Atual",
+      items: [
+        { label: "Desafios", value: (diagnostic.main_challenges || []).join(", ") },
+        { label: "Ferramentas", value: diagnostic.current_tools },
+        { label: "Processos definidos", value: diagnostic.has_defined_processes ? "Sim" : "Não" },
+        { label: "Estratégia de marketing", value: diagnostic.has_marketing_strategy ? "Sim" : "Não" },
+        { label: "Time comercial", value: diagnostic.has_sales_team ? "Sim" : "Não" },
+        { label: "Presença digital", value: diagnostic.digital_presence_level },
+      ],
+    },
+    {
+      title: "Metas & Objetivos",
+      items: [
+        { label: "Curto prazo", value: diagnostic.short_term_goals },
+        { label: "Longo prazo", value: diagnostic.long_term_goals },
+        { label: "Meta de faturamento", value: diagnostic.revenue_goal },
+        { label: "Prazo", value: diagnostic.growth_timeline },
+      ],
+    },
+    {
+      title: "Dores & Soluções",
+      items: [
+        { label: "Maior dor", value: diagnostic.biggest_pain },
+        { label: "Soluções tentadas", value: diagnostic.tried_solutions },
+        { label: "Capacidade de investimento", value: diagnostic.investment_capacity },
+        { label: "Urgência", value: diagnostic.decision_urgency },
+      ],
+    },
+    {
+      title: "Tomada de Decisão",
+      items: [
+        { label: "Decisor", value: diagnostic.decision_maker },
+        { label: "Processo", value: diagnostic.decision_process },
+        { label: "Stakeholders", value: diagnostic.stakeholders_count },
+        { label: "Orçamento definido", value: diagnostic.budget_defined ? "Sim" : "Não" },
+        { label: "Faixa de orçamento", value: diagnostic.budget_range },
+      ],
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} className="p-2 text-muted-foreground/50 hover:text-gold transition-colors rounded-lg hover:bg-gold-dim">
+          <ArrowLeft size={16} />
+        </button>
+        <div>
+          <p className="section-eyebrow">Resultado do Diagnóstico</p>
+          <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
+            {lead.name} — {new Date(diagnostic.meeting_date).toLocaleDateString("pt-BR")}
+          </h2>
+        </div>
+      </div>
+
+      {/* Score card */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="border border-border bg-card/20 p-12 flex flex-col items-center justify-center gap-4"
+        className={`rounded-lg border ${cc.border} ${cc.bg} p-6`}
       >
-        <FileText size={32} className="text-muted-foreground/30" />
-        <p className="font-mono text-sm text-muted-foreground">Nenhum diagnóstico disponível.</p>
-        <p className="font-mono text-[10px] text-muted-foreground/50">Esta funcionalidade será liberada em breve.</p>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <p className={`font-heading text-lg font-bold ${cc.text}`}>{cc.label}</p>
+            <p className="font-heading text-sm text-foreground/70 mt-1 max-w-lg">{diagnostic.summary}</p>
+          </div>
+          <div className="text-center">
+            <div className="relative w-24 h-24">
+              <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--border))" strokeWidth="6" />
+                <motion.circle
+                  cx="50" cy="50" r="40" fill="none"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${diagnostic.score * 2.51} 251`}
+                  className={cc.text}
+                  initial={{ strokeDasharray: "0 251" }}
+                  animate={{ strokeDasharray: `${diagnostic.score * 2.51} 251` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={`font-heading text-2xl font-bold ${cc.text}`}>{diagnostic.score}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </motion.div>
+
+      {/* Detail sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {sections.map((section, si) => (
+          <motion.div
+            key={section.title}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: si * 0.05 }}
+            className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-5"
+          >
+            <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">{section.title.toUpperCase()}</p>
+            <div className="space-y-2.5">
+              {section.items.map((item) => (
+                <div key={item.label} className="flex justify-between items-start gap-2">
+                  <span className="font-heading text-[10px] text-muted-foreground/50 shrink-0">{item.label}</span>
+                  <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "—"}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Additional notes */}
+      {(diagnostic.additional_notes || diagnostic.next_steps || diagnostic.competitor_analysis) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {diagnostic.competitor_analysis && (
+            <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">CONCORRENTES</p>
+              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.competitor_analysis}</p>
+            </div>
+          )}
+          {diagnostic.next_steps && (
+            <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">PRÓXIMOS PASSOS</p>
+              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.next_steps}</p>
+            </div>
+          )}
+          {diagnostic.additional_notes && (
+            <div className="rounded-lg border border-border/40 bg-card/10 p-5 lg:col-span-2">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">OBSERVAÇÕES</p>
+              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.additional_notes}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
