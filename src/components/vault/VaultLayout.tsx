@@ -176,7 +176,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
             const getTargetView = (type: string): GlobalView | null => {
               if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
               if (type === "relatorio") return "relatorios";
-              if (type === "rh" || type === "admissao" || type === "ferias" || type === "birthday") return "dashboard";
+              if (type === "rh" || type === "admissao" || type === "ferias" || type === "birthday") return "rh";
               if (type === "planejamento" || type === "meta") return "planejamento";
               if (type === "config") return "settings";
               return null;
