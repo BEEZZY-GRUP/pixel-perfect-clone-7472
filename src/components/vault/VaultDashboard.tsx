@@ -312,9 +312,8 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
       <h2 className="font-heading text-sm font-semibold mb-3">Empresas</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {companies.map((co: any) => {
-          const coMonth = currentMonth.find((m: any) => m.company_id === co.id);
-          const coRevenue = Number(coMonth?.revenue ?? 0);
-          const coExpenses = Number(coMonth?.expenses ?? 0);
+          const coRevenue = currentMonth.filter(m => m.company_id === co.id).reduce((a, m) => a + m.revenue, 0);
+          const coExpenses = currentMonth.filter(m => m.company_id === co.id).reduce((a, m) => a + m.expenses, 0);
           const coResult = coRevenue - coExpenses;
           const coEmployees = employees?.filter((e: any) => e.company_id === co.id && e.status === "ativo").length ?? 0;
           const coGoal = goals?.find((g: any) => g.company_id === co.id);
