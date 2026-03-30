@@ -163,16 +163,34 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               <h1 className="font-heading text-lg font-semibold mb-4">Notificações</h1>
               <div className="space-y-2">
                 {notifications?.length === 0 && <div className="text-center py-12 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação</div>}
-                {notifications?.map((n: any) => (
-                  <div key={n.id} className="p-3 rounded-lg border border-white/5 flex items-start gap-3" style={{ background: "#0e0e0a" }}>
-                    <span className="text-lg">{n.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
-                      {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
-                    </div>
-                    {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
-                  </div>
-                ))}
+                {notifications?.map((n: any) => {
+                  const getTargetView = (type: string): GlobalView | null => {
+                    if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
+                    if (type === "relatorio") return "relatorios";
+                    if (type === "rh" || type === "admissao" || type === "ferias") return "rh";
+                    if (type === "planejamento" || type === "meta") return "planejamento";
+                    if (type === "config") return "settings";
+                    return null;
+                  };
+                  const targetView = getTargetView(n.notification_type);
+                  return (
+                    <button key={n.id} onClick={async () => {
+                      if (!n.read) {
+                        await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
+                        qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                      }
+                      if (targetView) handleGlobalView(targetView);
+                    }}
+                      className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
+                      <span className="text-lg">{n.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
+                        {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
+                      </div>
+                      {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
