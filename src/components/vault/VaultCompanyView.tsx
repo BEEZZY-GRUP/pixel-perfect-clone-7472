@@ -49,6 +49,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
 
   // RH tab state
   const [selectedRHEmployee, setSelectedRHEmployee] = useState<any>(null);
+  const [hrSubTab, setHrSubTab] = useState(0);
   const [showVacForm, setShowVacForm] = useState(false);
   const [showSalaryForm, setShowSalaryForm] = useState(false);
   const [vacForm, setVacForm] = useState({ start_date: "", return_date: "", days: 0, leave_type: "Férias", status: "aprovado" });
