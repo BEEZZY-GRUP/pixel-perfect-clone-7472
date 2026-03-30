@@ -29,6 +29,9 @@ function ConsoleContent() {
   const [tab, setTab] = useState<TabKey>("Dashboard");
   const [addOpen, setAddOpen] = useState(false);
 
+  const consoleRole = sessionStorage.getItem("bzy_role") || "comercial";
+  const isAdmin = consoleRole === "admin";
+
   useEffect(() => {
     if (sessionStorage.getItem("bzy_auth") !== "1") {
       navigate("/adminconsole/login");
