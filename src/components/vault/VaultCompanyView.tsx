@@ -222,10 +222,10 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   };
 
   // Chart data for company reports
-  const chartData = monthlyData?.map((m: any) => {
-    const [y, mo] = (m.month_date as string).split("-");
-    return { name: `${mo}/${y}`, Faturamento: Number(m.revenue), Despesas: Number(m.expenses), Resultado: Number(m.revenue) - Number(m.expenses) };
-  }) ?? [];
+  const chartData = computedMonthly.map(m => {
+    const [y, mo] = m.month_date.split("-");
+    return { name: `${mo}/${y}`, Faturamento: m.revenue, Despesas: m.expenses, Resultado: m.revenue - m.expenses };
+  });
 
   // Entries table renderer
   const renderEntriesTable = (data: any[], title: string, emptyMsg: string, showPayBtn = false) => (
