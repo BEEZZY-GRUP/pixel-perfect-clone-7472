@@ -52,6 +52,12 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
   const [newActivity, setNewActivity] = useState({ activity_type: "nota", description: "", scheduled_at: "" });
   const [savingActivity, setSavingActivity] = useState(false);
 
+  // Notes state
+  const [notes, setNotes] = useState<LeadNote[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [showAddNote, setShowAddNote] = useState(false);
+  const [newNoteContent, setNewNoteContent] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const update = (field: keyof Lead, value: any) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleSave = async () => {
