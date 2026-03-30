@@ -93,8 +93,38 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
     setLoadingActivities(false);
   };
 
+  const loadNotes = async () => {
+    setLoadingNotes(true);
+    const { data } = await supabase
+      .from("lead_notes")
+      .select("*")
+      .eq("lead_id", lead.id)
+      .order("created_at", { ascending: false });
+    setNotes((data as unknown as LeadNote[]) || []);
+    setLoadingNotes(false);
+  };
+
+  const handleAddNote = async () => {
+    if (!newNoteContent.trim()) { toast.error("Escreva a nota"); return; }
+    setSavingNote(true);
+    const { error } = await supabase.from("lead_notes").insert({ lead_id: lead.id, content: newNoteContent } as any);
+    setSavingNote(false);
+    if (error) { toast.error("Erro ao salvar nota"); return; }
+    toast.success("Nota adicionada!");
+    setNewNoteContent("");
+    setShowAddNote(false);
+    loadNotes();
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    const { error } = await supabase.from("lead_notes").delete().eq("id", id);
+    if (error) { toast.error("Erro ao excluir nota"); return; }
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
   useEffect(() => {
     if (activeTab === "activity") loadActivities();
+    if (activeTab === "notes") loadNotes();
   }, [activeTab]);
 
   const handleAddActivity = async () => {
