@@ -61,7 +61,7 @@ const VaultGlobalPlanning = () => {
     if (!finalCategory || !budgetForm.amount) { toast.error("Preencha categoria e valor"); return; }
     const companyId = budgetModal.companyId || companies?.[0]?.id;
     if (!companyId) return;
-    const payload = { company_id: companyId, category: finalCategory, amount: Number(budgetForm.amount), year: Number(budgetForm.year) || 2026 };
+    const payload = { company_id: companyId, category: finalCategory, amount: Number(unmaskCurrency(budgetForm.amount)), year: Number(budgetForm.year) || 2026 };
     const { error } = budgetModal.budget ? await supabase.from("vault_budgets").update(payload).eq("id", budgetModal.budget.id) : await supabase.from("vault_budgets").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(budgetModal.budget ? "Budget atualizado" : "Budget criado");
