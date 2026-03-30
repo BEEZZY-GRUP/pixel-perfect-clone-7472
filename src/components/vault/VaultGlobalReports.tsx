@@ -190,7 +190,6 @@ const VaultGlobalReports = () => {
       <select value={filterYear} onChange={e => setFilterYear(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
         <option value="" className="bg-[#111]">Todos os anos</option>
         {years.map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
-        {!years.includes("2026") && <option value="2026" className="bg-[#111]">2026</option>}
       </select>
       <div className="flex items-center gap-1 flex-wrap">
         {companies?.map((c: any) => (
