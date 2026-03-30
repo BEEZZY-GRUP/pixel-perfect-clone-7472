@@ -235,8 +235,14 @@ const VaultGlobalHR = () => {
           </table>
         </div>
       )}
+
+      {/* Tab 3: Aniversários */}
+      {activeTab === 3 && (
+        <BirthdayTab employees={filtered} companies={companies} getCoName={getCoName} getCoColor={getCoColor} />
+      )}
     </div>
   );
+};
 };
 
 export default VaultGlobalHR;
