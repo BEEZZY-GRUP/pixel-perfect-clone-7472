@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect, useMemo } from "react";
 import { Gift, Cake, User, Plus, ArrowLeft, Calendar, DollarSign, TrendingUp, TrendingDown, Minus, X } from "lucide-react";
