@@ -168,6 +168,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
           {globalView === "lancamentos" && <VaultGlobalEntries />}
           {globalView === "relatorios" && <VaultGlobalReports />}
           {globalView === "planejamento" && <VaultGlobalPlanning />}
+          {globalView === "rh" && <VaultGlobalHR />}
           
           {globalView === "notifications" && (() => {
             const unread = notifications?.filter((n: any) => !n.read) ?? [];
