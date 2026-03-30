@@ -327,6 +327,41 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string
+          id: string
+          lead_id: string
+          scheduled_at: string | null
+        }
+        Insert: {
+          activity_type?: string
+          created_at?: string
+          description: string
+          id?: string
+          lead_id: string
+          scheduled_at?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          lead_id?: string
+          scheduled_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           archived: boolean
