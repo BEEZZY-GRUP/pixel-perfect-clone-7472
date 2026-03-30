@@ -1037,6 +1037,88 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
         onConfirm={deleteModal.onConfirm}
         onClose={() => setDeleteModal(d => ({ ...d, open: false }))}
       />
+
+      {/* Goal Modal */}
+      <Dialog open={goalModal.open} onOpenChange={() => setGoalModal({ open: false })}>
+        <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#F2F0E8]">{goalModal.goal ? "Editar Meta" : "Nova Meta"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+              <select
+                value={goalForm.goal_type}
+                onChange={e => setGoalForm(f => ({ ...f, goal_type: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+              >
+                <option value="" className="bg-[#111]">Selecione...</option>
+                {["Faturamento", "Clientes", "Margem", "Redução de Custos", "Outros"].map(t => (
+                  <option key={t} value={t} className="bg-[#111]">{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
+              <input
+                type="text"
+                placeholder="Ex: Atingir R$ 100k de faturamento"
+                value={goalForm.description}
+                onChange={e => setGoalForm(f => ({ ...f, description: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Alvo</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={goalForm.target_value}
+                  onChange={e => setGoalForm(f => ({ ...f, target_value: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Atual</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={goalForm.current_value}
+                  onChange={e => setGoalForm(f => ({ ...f, current_value: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-3">
+            <Button variant="ghost" onClick={() => setGoalModal({ open: false })} className="text-[#F2F0E8]/60">Cancelar</Button>
+            <Button
+              className="bg-[#FFD600] text-black hover:bg-[#E6C200]"
+              onClick={async () => {
+                if (!goalForm.goal_type) { toast.error("Selecione o tipo da meta"); return; }
+                const payload = {
+                  company_id: coId,
+                  goal_type: goalForm.goal_type,
+                  description: goalForm.description || null,
+                  target_value: Number(goalForm.target_value) || 0,
+                  current_value: Number(goalForm.current_value) || 0,
+                  year: new Date().getFullYear(),
+                };
+                const { error } = goalModal.goal
+                  ? await supabase.from("vault_goals").update(payload).eq("id", goalModal.goal.id)
+                  : await supabase.from("vault_goals").insert(payload);
+                if (error) { toast.error(error.message); return; }
+                toast.success(goalModal.goal ? "Meta atualizada" : "Meta criada");
+                qc.invalidateQueries({ queryKey: ["vault_goals", coId] });
+                setGoalModal({ open: false });
+              }}
+            >
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
