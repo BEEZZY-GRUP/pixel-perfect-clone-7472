@@ -173,7 +173,7 @@ const VaultGlobalReports = () => {
 
       <div className="flex gap-1 mb-5 border-b border-white/5 pb-2 overflow-x-auto">
         {tabs.map((t, i) => (
-          <button key={t} onClick={() => setActiveTab(i)}
+          <button key={t} onClick={() => handleTabChange(i)}
             className={`px-3 py-1.5 rounded-md text-[11px] whitespace-nowrap transition-colors ${activeTab === i ? "bg-[rgba(255,214,0,0.1)] text-[#FFD600]" : "text-white/40 hover:text-white/60"}`}
           >{t}</button>
         ))}
