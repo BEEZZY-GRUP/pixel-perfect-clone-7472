@@ -47,6 +47,13 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; title: string; desc: string; onConfirm: () => Promise<void> }>({ open: false, title: "", desc: "", onConfirm: async () => {} });
 
+  // RH tab state
+  const [selectedRHEmployee, setSelectedRHEmployee] = useState<any>(null);
+  const [showVacForm, setShowVacForm] = useState(false);
+  const [showSalaryForm, setShowSalaryForm] = useState(false);
+  const [vacForm, setVacForm] = useState({ start_date: "", return_date: "", days: 0, leave_type: "Férias", status: "aprovado" });
+  const [salaryForm, setSalaryForm] = useState({ new_salary: "", change_date: new Date().toISOString().split("T")[0], reason: "" });
+
   // Editable settings state
   const [editSettings, setEditSettings] = useState(false);
   const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
