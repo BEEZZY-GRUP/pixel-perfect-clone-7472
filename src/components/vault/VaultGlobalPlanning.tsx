@@ -302,11 +302,19 @@ const VaultGlobalPlanning = () => {
             </div>
             <div>
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Categoria</label>
-              <select value={budgetForm.category} onChange={e => setBudgetForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+              <select value={budgetForm.category} onChange={e => setBudgetForm(f => ({ ...f, category: e.target.value, customCategory: e.target.value !== "Outros" ? "" : f.customCategory }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Selecione</option>
-                {["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"].map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                {BUDGET_CATS.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
               </select>
             </div>
+            {budgetForm.category === "Outros" && (
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Nome da Categoria</label>
+                <input type="text" placeholder="Ex: Treinamentos, Eventos..." value={budgetForm.customCategory}
+                  onChange={e => setBudgetForm(f => ({ ...f, customCategory: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Orçado</label>
