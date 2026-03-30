@@ -80,6 +80,20 @@ const VaultGlobalReports = () => {
     });
   }, [compareMode, filterCo, months, filteredMonthly, companies]);
 
+  // Compare cashflow (saldo por empresa)
+  const compareCashflowData = useMemo(() => {
+    if (!compareMode || filterCo.length < 2) return [];
+    return months.map(m => {
+      const row: any = { name: (m as string).split("-").reverse().slice(0, 2).join("/") };
+      filterCo.forEach(cid => {
+        const co = companies?.find((c: any) => c.id === cid);
+        const md = filteredMonthly.find((d: any) => d.company_id === cid && d.month_date === m);
+        if (co) row[co.name] = Number(md?.revenue ?? 0) - Number(md?.expenses ?? 0);
+      });
+      return row;
+    });
+  }, [compareMode, filterCo, months, filteredMonthly, companies]);
+
   // Pie data
   const lastMonth = months[months.length - 1] as string | undefined;
   const pieData = companies?.map((c: any) => {
