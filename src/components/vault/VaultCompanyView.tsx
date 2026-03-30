@@ -739,8 +739,100 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
         </div>
       )}
 
-      {/* Tab 8: Configurações (Editable) */}
+      {/* Tab 8: RH */}
       {tab === 8 && (
+        <div>
+          {selectedRHEmployee ? (
+            <EmployeeProfile
+              employee={selectedRHEmployee}
+              vacations={companyVacations?.filter((v: any) => v.employee_id === selectedRHEmployee.id) ?? []}
+              salaryHistory={companySalaryHistory?.filter((s: any) => s.employee_id === selectedRHEmployee.id) ?? []}
+              getCoName={() => company.name}
+              getCoColor={() => company.color}
+              onBack={() => { setSelectedRHEmployee(null); setShowVacForm(false); setShowSalaryForm(false); }}
+              showVacForm={showVacForm}
+              setShowVacForm={setShowVacForm}
+              vacForm={vacForm}
+              setVacForm={setVacForm}
+              showSalaryForm={showSalaryForm}
+              setShowSalaryForm={setShowSalaryForm}
+              salaryForm={salaryForm}
+              setSalaryForm={setSalaryForm}
+              onSaveVacation={async () => {
+                const days = Math.max(1, Math.ceil((new Date(vacForm.return_date).getTime() - new Date(vacForm.start_date).getTime()) / 86400000));
+                await supabase.from("vault_vacations").insert({
+                  employee_id: selectedRHEmployee.id,
+                  company_id: coId,
+                  start_date: vacForm.start_date,
+                  return_date: vacForm.return_date,
+                  days,
+                  leave_type: vacForm.leave_type,
+                  status: vacForm.status,
+                });
+                qc.invalidateQueries({ queryKey: ["vault_vacations_co", coId] });
+                qc.invalidateQueries({ queryKey: ["vault_employees", coId] });
+                setShowVacForm(false);
+                setVacForm({ start_date: "", return_date: "", days: 0, leave_type: "Férias", status: "aprovado" });
+              }}
+              onSaveSalary={async () => {
+                const newSal = Number(salaryForm.new_salary);
+                if (!newSal) return;
+                await supabase.from("vault_salary_history").insert({
+                  employee_id: selectedRHEmployee.id,
+                  company_id: coId,
+                  previous_salary: Number(selectedRHEmployee.salary),
+                  new_salary: newSal,
+                  change_date: salaryForm.change_date,
+                  reason: salaryForm.reason || null,
+                });
+                await supabase.from("vault_employees").update({ salary: newSal }).eq("id", selectedRHEmployee.id);
+                setSelectedRHEmployee({ ...selectedRHEmployee, salary: newSal });
+                qc.invalidateQueries({ queryKey: ["vault_salary_history_co", coId] });
+                qc.invalidateQueries({ queryKey: ["vault_employees", coId] });
+                setShowSalaryForm(false);
+                setSalaryForm({ new_salary: "", change_date: new Date().toISOString().split("T")[0], reason: "" });
+              }}
+            />
+          ) : (
+            <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+              <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+                <User size={14} className="text-[#FFD600]" />
+                <span className="text-xs font-medium">Perfis de RH | {company.name}</span>
+              </div>
+              <div className="divide-y divide-white/5">
+                {employees?.length === 0 && <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum colaborador</div>}
+                {employees?.map((e: any) => {
+                  const empVacs = companyVacations?.filter((v: any) => v.employee_id === e.id) ?? [];
+                  const empSalary = companySalaryHistory?.filter((s: any) => s.employee_id === e.id) ?? [];
+                  const activeVac = empVacs.find((v: any) => new Date(v.start_date) <= new Date() && new Date(v.return_date) >= new Date());
+                  return (
+                    <button
+                      key={e.id}
+                      onClick={() => setSelectedRHEmployee(e)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors text-left"
+                    >
+                      <div className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: `${company.color}20`, color: company.color }}>
+                        {e.name?.charAt(0)?.toUpperCase() ?? "?"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium truncate">{e.name}</div>
+                        <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{e.position ?? "-"} · {e.department ?? "-"}</span>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        {activeVac && <span className="text-[9px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium">Em férias</span>}
+                        <div className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{empVacs.length} férias · {empSalary.length} alterações</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab 9: Configurações (Editable) */}
+      {tab === 9 && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading text-sm font-semibold">Configurações | {company.name}</h2>
