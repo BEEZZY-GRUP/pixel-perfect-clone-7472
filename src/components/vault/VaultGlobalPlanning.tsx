@@ -20,7 +20,7 @@ const VaultGlobalPlanning = () => {
 
   // Budget modal
   const [budgetModal, setBudgetModal] = useState<{ open: boolean; budget?: any; companyId?: string }>({ open: false });
-  const [budgetForm, setBudgetForm] = useState({ category: "", amount: "", year: "2026" });
+  const [budgetForm, setBudgetForm] = useState({ category: "", customCategory: "", amount: "", year: "2026" });
   const [deleteBudgetModal, setDeleteBudgetModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
 
   const { data: companies } = useQuery({
