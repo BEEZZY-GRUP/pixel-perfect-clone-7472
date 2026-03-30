@@ -39,6 +39,7 @@ const VaultEmployeeForm = ({ open, onClose, companyId, employee }: Props) => {
     employment_type: employee?.employment_type ?? "CLT",
     salary: initCurrency(employee?.salary),
     admission_date: employee?.admission_date ?? "",
+    birth_date: employee?.birth_date ?? "",
     status: employee?.status ?? "ativo",
     email: employee?.email ?? "",
     cpf: employee?.cpf ?? "",
