@@ -41,23 +41,20 @@ export function useVaultAuth() {
   });
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    const { data, error } = await supabase
-      .from("vault_users")
-      .select("*")
-      .eq("username", username)
-      .eq("password", password)
-      .eq("active", true)
-      .maybeSingle();
+    const { data, error } = await supabase.functions.invoke("vault-auth", {
+      body: { action: "login", username, password },
+    });
 
-    if (error || !data) return false;
+    if (error || !data?.user) return false;
 
-    const role = data.role as VaultRole;
+    const u = data.user;
+    const role = u.role as VaultRole;
     const vaultUser: VaultUser = {
-      id: data.id,
-      username: data.username,
-      name: data.name,
+      id: u.id,
+      username: u.username,
+      name: u.name,
       role,
-      avatar: data.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase(),
+      avatar: u.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase(),
       color: ROLE_COLORS[role] ?? "#888",
       perms: PERMS_MAP[role] ?? "view",
     };
