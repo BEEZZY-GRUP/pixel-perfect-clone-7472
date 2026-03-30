@@ -129,9 +129,10 @@ function ConsoleContent() {
           >
             {tab === "Dashboard" && <SalesDashboard />}
             {tab === "Funil" && <KanbanBoard />}
-            {tab === "Leads" && <LeadsList />}
+            {tab === "Leads" && <LeadsList consoleRole={consoleRole} />}
             {tab === "Diagnosticos" && <DiagnosticsList />}
-            {tab === "Lixeira" && <TrashPanel />}
+            {tab === "Lixeira" && <TrashPanel consoleRole={consoleRole} />}
+            {tab === "Usuarios" && isAdmin && <ConsoleUsersTab />}
           </motion.div>
         </AnimatePresence>
       </main>
