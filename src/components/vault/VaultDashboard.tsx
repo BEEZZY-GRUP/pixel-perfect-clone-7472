@@ -192,7 +192,7 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
                   labelLine={false}>
                   {revByCompany.map((entry, idx) => <Cell key={idx} fill={entry.color || COLORS[idx % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
