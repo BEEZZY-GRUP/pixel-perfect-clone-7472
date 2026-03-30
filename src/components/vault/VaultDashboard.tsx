@@ -188,7 +188,7 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie data={revByCompany} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={40}
-                  label={({ name, percent }: any) => `${name.length > 8 ? name.slice(0,8) + "…" : name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                   labelLine={false}>
                   {revByCompany.map((entry, idx) => <Cell key={idx} fill={entry.color || COLORS[idx % COLORS.length]} />)}
                 </Pie>
