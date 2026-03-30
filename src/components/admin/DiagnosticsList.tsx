@@ -411,7 +411,7 @@ export default function DiagnosticsList() {
     return (
       <DiagnosticForm
         lead={selectedLead}
-        lastDiagnostic={diagnostics.length > 0 ? diagnostics[0] : null}
+        lastDiagnostic={diagnostics.length > 0 ? diagnostics[diagnostics.length - 1] : null}
         onBack={() => setShowForm(false)}
         onSaved={() => {
           setShowForm(false);
