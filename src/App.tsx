@@ -10,6 +10,7 @@ import HiveCommunity from "./pages/HiveCommunity.tsx";
 import SetupPassword from "./pages/SetupPassword.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import AdminConsole from "./pages/AdminConsole.tsx";
+import VaultPage from "./pages/VaultPage.tsx";
 import CustomCursor from "./components/CustomCursor.tsx";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/the-hive/community/profile/:userId" element={<HiveCommunity />} />
           <Route path="/adminconsole/login" element={<AdminLogin />} />
           <Route path="/adminconsole" element={<AdminConsole />} />
+          <Route path="/vault" element={<VaultPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
