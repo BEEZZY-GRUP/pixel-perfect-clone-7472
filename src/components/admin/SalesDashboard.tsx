@@ -104,13 +104,12 @@ export default function SalesDashboard() {
         >
           <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-6 font-semibold">FUNIL DE CONVERSÃO</p>
           <div className="flex flex-col items-center gap-1">
-            {STATUS_OPTIONS.map((s, i) => {
+            {STATUS_OPTIONS.filter(s => s.key !== "perdido").map((s, i, arr) => {
               const count = stats.byStatus[s.key] || 0;
               const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
-              // Funnel width: wider at top, narrower at bottom
               const maxWidth = 100;
-              const minWidth = 30;
-              const widthPct = maxWidth - ((maxWidth - minWidth) * (i / (STATUS_OPTIONS.length - 1)));
+              const minWidth = 35;
+              const widthPct = maxWidth - ((maxWidth - minWidth) * (i / (arr.length - 1)));
               
               return (
                 <motion.div
@@ -124,11 +123,11 @@ export default function SalesDashboard() {
                   <div
                     className="relative h-12 flex items-center justify-between px-4 overflow-hidden rounded-sm"
                     style={{
-                      background: `linear-gradient(90deg, hsl(50 100% 50% / ${0.35 - i * 0.04}), hsl(50 100% 50% / ${0.15 - i * 0.015}))`,
+                      background: `linear-gradient(90deg, hsl(50 100% 50% / ${0.35 - i * 0.05}), hsl(50 100% 50% / ${0.15 - i * 0.02}))`,
                       borderLeft: '2px solid hsl(50 100% 50% / 0.4)',
                       borderRight: '2px solid hsl(50 100% 50% / 0.4)',
                       ...(i === 0 ? { borderTop: '2px solid hsl(50 100% 50% / 0.4)', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' } : {}),
-                      ...(i === STATUS_OPTIONS.length - 1 ? { borderBottom: '2px solid hsl(50 100% 50% / 0.4)', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' } : {}),
+                      ...(i === arr.length - 1 ? { borderBottom: '2px solid hsl(50 100% 50% / 0.4)', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' } : {}),
                     }}
                   >
                     <div className="flex items-center gap-2">
@@ -144,6 +143,37 @@ export default function SalesDashboard() {
               );
             })}
           </div>
+
+          {/* Perdido - fora do funil */}
+          {(() => {
+            const perdido = STATUS_OPTIONS.find(s => s.key === "perdido")!;
+            const count = stats.byStatus.perdido || 0;
+            const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.4 }}
+                className="mt-5 pt-4 border-t border-border/20"
+              >
+                <div className="flex items-center justify-between px-4 py-3 rounded-lg border border-red-500/15 bg-red-500/5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-red-500/15 flex items-center justify-center">
+                      <AlertCircle size={12} className="text-red-400" />
+                    </div>
+                    <div>
+                      <span className="font-heading text-[10px] tracking-[0.1em] text-red-400 font-semibold">PERDIDOS</span>
+                      <span className="font-heading text-[9px] text-muted-foreground/40 ml-2">fora do funil</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-heading text-lg font-bold text-red-400">{count}</span>
+                    <span className="font-heading text-[9px] text-muted-foreground/60">({pct.toFixed(0)}%)</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()}
         </motion.div>
 
         {/* Daily chart */}
