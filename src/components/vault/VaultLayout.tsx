@@ -44,12 +44,18 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [companyTab, setCompanyTab] = useState(0);
 
-  // Settings state
+  // Settings state - loaded from DB
   const [editingSettings, setEditingSettings] = useState(false);
-  const [settingsForm, setSettingsForm] = useState<Record<string, string>>(() => {
-    const saved = sessionStorage.getItem("vault_group_settings");
-    return saved ? JSON.parse(saved) : {};
+  const { data: dbSettings } = useQuery({
+    queryKey: ["vault_settings"],
+    queryFn: async () => {
+      const { data } = await supabase.from("vault_settings").select("*");
+      const map: Record<string, string> = {};
+      data?.forEach((s: any) => { map[s.key] = s.value; });
+      return map;
+    },
   });
+  const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
 
   // Company CRUD
   const [companyModal, setCompanyModal] = useState<{ open: boolean; company?: any }>({ open: false });
@@ -81,9 +87,19 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
   const breadcrumb = selectedCompany ? `${company?.name ?? selectedCompany}` : VIEW_LABELS[globalView ?? "dashboard"] ?? "Dashboard";
 
   // Settings handlers
-  const getSettingValue = (key: string) => settingsForm[key] || SETTINGS_FIELDS.find(f => f.key === key)?.default || "";
-  const handleSaveSettings = () => {
-    sessionStorage.setItem("vault_group_settings", JSON.stringify(settingsForm));
+  const getSettingValue = (key: string) => settingsForm[key] || dbSettings?.[key] || SETTINGS_FIELDS.find(f => f.key === key)?.default || "";
+  const startEditSettings = () => {
+    const f: Record<string, string> = {};
+    SETTINGS_FIELDS.forEach(sf => { f[sf.key] = dbSettings?.[sf.key] || sf.default || ""; });
+    setSettingsForm(f);
+    setEditingSettings(true);
+  };
+  const handleSaveSettings = async () => {
+    for (const sf of SETTINGS_FIELDS) {
+      const val = settingsForm[sf.key] || sf.default || "";
+      await supabase.from("vault_settings").upsert({ key: sf.key, value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    }
+    qc.invalidateQueries({ queryKey: ["vault_settings"] });
     setEditingSettings(false);
     toast.success("Configurações salvas");
   };
@@ -255,7 +271,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                   <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Dados gerais e empresas do grupo</p>
                 </div>
                 {!editingSettings ? (
-                  <Button size="sm" onClick={() => setEditingSettings(true)} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+                  <Button size="sm" onClick={startEditSettings} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
                     <Pencil size={12} className="mr-1" /> Editar
                   </Button>
                 ) : (
