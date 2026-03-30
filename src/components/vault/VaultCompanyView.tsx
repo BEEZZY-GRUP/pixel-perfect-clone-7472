@@ -146,7 +146,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
     { key: "email", label: "E-mail", type: "text" },
     { key: "phone", label: "Telefone", type: "text" },
     { key: "address", label: "Endereço", type: "text" },
-    { key: "main_bank", label: "Banco Principal", type: "select", options: ["Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa Econômica", "Nubank", "Inter", "C6 Bank", "BTG Pactual", "Outro"] },
+    { key: "main_bank", label: "Banco Principal", type: "dynamic_select" },
     { key: "agency", label: "Agência", type: "text" },
     { key: "account_number", label: "Conta", type: "text" },
     { key: "pix_key", label: "Chave Pix", type: "text" },

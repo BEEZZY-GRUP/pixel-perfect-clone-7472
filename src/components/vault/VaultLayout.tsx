@@ -223,8 +223,15 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                   <div key={f.key} className="rounded-xl p-3 border border-white/5" style={{ background: "#0e0e0a" }}>
                     <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.3)" }}>{f.label}</div>
                     {editingSettings ? (
-                      <input value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
-                        className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                      f.type === "select" ? (
+                        <select value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
+                          {f.options?.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
+                        </select>
+                      ) : (
+                        <input value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                      )
                     ) : (
                       <div className="text-sm">{getSettingValue(f.key)}</div>
                     )}
