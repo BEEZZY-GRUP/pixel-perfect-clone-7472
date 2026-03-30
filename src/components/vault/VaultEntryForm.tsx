@@ -47,6 +47,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
     amount: initCurrency(entry?.amount),
     due_date: entry?.due_date ?? "",
     entry_date: entry?.entry_date ?? new Date().toISOString().split("T")[0],
+    payment_date: entry?.payment_date ?? "",
     status: entry?.status ?? "pendente",
     payment_method: entry?.payment_method ?? "",
     notes: entry?.notes ?? "",
