@@ -47,6 +47,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
     amount: initCurrency(entry?.amount),
     due_date: entry?.due_date ?? "",
     entry_date: entry?.entry_date ?? new Date().toISOString().split("T")[0],
+    payment_date: entry?.payment_date ?? "",
     status: entry?.status ?? "pendente",
     payment_method: entry?.payment_method ?? "",
     notes: entry?.notes ?? "",
@@ -69,6 +70,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
       amount: numAmount,
       due_date: form.due_date || null,
       entry_date: form.entry_date || null,
+      payment_date: form.payment_date || null,
       status: form.status,
       payment_method: form.payment_method || null,
       notes: form.notes || null,
@@ -139,15 +141,30 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
             </div>
             {inputField("Vencimento", "due_date", "date")}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {inputField("Data Lançamento", "entry_date", "date")}
+            {inputField("Data Pagamento", "payment_date", "date")}
             {selectField("Forma de Pagamento", "payment_method", PAYMENT_METHODS.map(m => ({ value: m, label: m })), "Selecione...")}
           </div>
-          {selectField("Status", "status", [
-            { value: "pendente", label: "Pendente" },
-            { value: "pago", label: "Pago" },
-            { value: "vencido", label: "Vencido" },
-          ])}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Status</label>
+            <select
+              value={form.status}
+              onChange={e => {
+                const newStatus = e.target.value;
+                setForm(f => ({
+                  ...f,
+                  status: newStatus,
+                  payment_date: newStatus === "pago" && !f.payment_date ? new Date().toISOString().split("T")[0] : f.payment_date,
+                }));
+              }}
+              className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+            >
+              <option value="pendente" className="bg-[#111]">Pendente</option>
+              <option value="pago" className="bg-[#111]">Pago</option>
+              <option value="vencido" className="bg-[#111]">Vencido</option>
+            </select>
+          </div>
           {inputField("Observações", "notes", "text", "Notas adicionais...")}
         </div>
         <div className="flex justify-end gap-2 mt-3">
