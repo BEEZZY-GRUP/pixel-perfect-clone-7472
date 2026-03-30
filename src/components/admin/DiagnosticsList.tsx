@@ -395,7 +395,7 @@ export default function DiagnosticsList() {
   // ───── Viewing a Single Diagnostic Result ─────
   if (viewDiag) {
     const diagIdx = diagnostics.findIndex(d => d.id === viewDiag.id);
-    const previousDiag = diagIdx < diagnostics.length - 1 ? diagnostics[diagIdx + 1] : null;
+    const previousDiag = diagIdx > 0 ? diagnostics[diagIdx - 1] : null;
     return (
       <DiagnosticResult
         diagnostic={viewDiag}
