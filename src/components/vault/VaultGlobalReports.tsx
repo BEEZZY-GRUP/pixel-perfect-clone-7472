@@ -150,14 +150,14 @@ const VaultGlobalReports = () => {
           >{c.name}</button>
         ))}
       </div>
-      {filterCo.length >= 2 && (
+      {comparableTabs.includes(activeTab) && filterCo.length >= 2 && (
         <label className="flex items-center gap-1 text-[10px] ml-2 cursor-pointer" style={{ color: "rgba(242,240,232,0.5)" }}>
           <input type="checkbox" checked={compareMode} onChange={e => setCompareMode(e.target.checked)} className="accent-[#FFD600] w-3 h-3" />
           Comparar empresas
         </label>
       )}
       {filterCo.length > 0 && (
-        <button onClick={() => setFilterCo([])} className="text-[10px] text-red-400 hover:text-red-300 ml-1">Limpar filtros</button>
+        <button onClick={() => { setFilterCo([]); setCompareMode(false); }} className="text-[10px] text-red-400 hover:text-red-300 ml-1">Limpar filtros</button>
       )}
     </div>
   );
