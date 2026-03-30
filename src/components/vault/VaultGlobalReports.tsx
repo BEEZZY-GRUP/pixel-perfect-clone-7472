@@ -133,8 +133,8 @@ const VaultGlobalReports = () => {
   // Pie data
   const lastMonth = months[months.length - 1] as string | undefined;
   const pieData = companies?.map((c: any) => {
-    const md = lastMonth ? filteredMonthly.find((d: any) => d.company_id === c.id && d.month_date === lastMonth) : null;
-    return { name: c.name, value: Number(md?.revenue ?? 0), color: c.color };
+    const md = lastMonth ? filteredMonthly.find(d => d.company_id === c.id && d.month_date === lastMonth) : null;
+    return { name: c.name, value: md?.revenue ?? 0, color: c.color };
   }).filter((d: any) => d.value > 0) ?? [];
 
   // Cashflow
