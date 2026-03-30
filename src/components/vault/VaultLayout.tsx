@@ -271,7 +271,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                   <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Dados gerais e empresas do grupo</p>
                 </div>
                 {!editingSettings ? (
-                  <Button size="sm" onClick={() => setEditingSettings(true)} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+                  <Button size="sm" onClick={startEditSettings} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
                     <Pencil size={12} className="mr-1" /> Editar
                   </Button>
                 ) : (
