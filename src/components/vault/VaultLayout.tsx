@@ -87,9 +87,19 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
   const breadcrumb = selectedCompany ? `${company?.name ?? selectedCompany}` : VIEW_LABELS[globalView ?? "dashboard"] ?? "Dashboard";
 
   // Settings handlers
-  const getSettingValue = (key: string) => settingsForm[key] || SETTINGS_FIELDS.find(f => f.key === key)?.default || "";
-  const handleSaveSettings = () => {
-    sessionStorage.setItem("vault_group_settings", JSON.stringify(settingsForm));
+  const getSettingValue = (key: string) => settingsForm[key] || dbSettings?.[key] || SETTINGS_FIELDS.find(f => f.key === key)?.default || "";
+  const startEditSettings = () => {
+    const f: Record<string, string> = {};
+    SETTINGS_FIELDS.forEach(sf => { f[sf.key] = dbSettings?.[sf.key] || sf.default || ""; });
+    setSettingsForm(f);
+    setEditingSettings(true);
+  };
+  const handleSaveSettings = async () => {
+    for (const sf of SETTINGS_FIELDS) {
+      const val = settingsForm[sf.key] || sf.default || "";
+      await supabase.from("vault_settings").upsert({ key: sf.key, value: val, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    }
+    qc.invalidateQueries({ queryKey: ["vault_settings"] });
     setEditingSettings(false);
     toast.success("Configurações salvas");
   };
