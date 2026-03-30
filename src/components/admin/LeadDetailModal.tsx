@@ -17,13 +17,22 @@ interface Activity {
 }
 
 const ACTIVITY_TYPES = [
-  { key: "nota", label: "Nota", icon: FileText, color: "text-muted-foreground" },
+  { key: "nota", label: "Nota", icon: StickyNote, color: "text-muted-foreground" },
   { key: "ligacao", label: "Ligação", icon: PhoneCall, color: "text-blue-400" },
   { key: "reuniao", label: "Reunião", icon: Video, color: "text-purple-400" },
   { key: "email", label: "E-mail", icon: Send, color: "text-green-400" },
   { key: "tarefa", label: "Tarefa", icon: CheckCircle, color: "text-gold" },
   { key: "movimentacao", label: "Movimentação", icon: ArrowRight, color: "text-orange-400" },
+  { key: "edicao", label: "Edição", icon: Edit, color: "text-cyan-400" },
+  { key: "diagnostico", label: "Diagnóstico", icon: Stethoscope, color: "text-emerald-400" },
 ];
+
+interface LeadNote {
+  id: string;
+  lead_id: string;
+  content: string;
+  created_at: string;
+}
 
 interface Props {
   lead: Lead;
