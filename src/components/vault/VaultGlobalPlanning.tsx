@@ -190,7 +190,6 @@ const VaultGlobalPlanning = () => {
         <div>
           {companies?.map((c: any) => {
             const coBudgets = budgets?.filter((b: any) => b.company_id === c.id) ?? [];
-            if (coBudgets.length === 0) return null;
             return (
               <div key={c.id} className="rounded-xl border border-white/5 mb-4 overflow-hidden" style={{ background: "#0e0e0a" }}>
                 <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
