@@ -62,7 +62,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
 
   const handleSave = async () => {
     setSaving(true);
-    await updateLead(lead.id, {
+     await updateLead(lead.id, {
       name: form.name,
       email: form.email,
       company: form.company,
@@ -70,7 +70,6 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
       phone: form.phone,
       message: form.message,
       challenge: form.challenge,
-      notes: form.notes,
       source: form.source,
       status: form.status,
       priority: form.priority,
