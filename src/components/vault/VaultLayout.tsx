@@ -153,42 +153,73 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
           {globalView === "relatorios" && <VaultGlobalReports />}
           {globalView === "planejamento" && <VaultGlobalPlanning />}
           {globalView === "rh" && <VaultGlobalHR />}
-          {globalView === "notifications" && (
-            <div>
-              <h1 className="font-heading text-lg font-semibold mb-4">Notificações</h1>
-              <div className="space-y-2">
-                {notifications?.length === 0 && <div className="text-center py-12 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação</div>}
-                {notifications?.map((n: any) => {
-                  const getTargetView = (type: string): GlobalView | null => {
-                    if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
-                    if (type === "relatorio") return "relatorios";
-                    if (type === "rh" || type === "admissao" || type === "ferias") return "rh";
-                    if (type === "planejamento" || type === "meta") return "planejamento";
-                    if (type === "config") return "settings";
-                    return null;
-                  };
-                  const targetView = getTargetView(n.notification_type);
-                  return (
-                    <button key={n.id} onClick={async () => {
-                      if (!n.read) {
-                        await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
-                        qc.invalidateQueries({ queryKey: ["vault_notifications"] });
-                      }
-                      if (targetView) handleGlobalView(targetView);
-                    }}
-                      className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
-                      <span className="text-lg">{n.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
-                        {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
-                      </div>
-                      {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
-                    </button>
-                  );
-                })}
+          {globalView === "notifications" && (() => {
+            const unread = notifications?.filter((n: any) => !n.read) ?? [];
+            const read = notifications?.filter((n: any) => n.read) ?? [];
+            const getTargetView = (type: string): GlobalView | null => {
+              if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
+              if (type === "relatorio") return "relatorios";
+              if (type === "rh" || type === "admissao" || type === "ferias" || type === "birthday") return "rh";
+              if (type === "planejamento" || type === "meta") return "planejamento";
+              if (type === "config") return "settings";
+              return null;
+            };
+            const renderNotif = (n: any) => {
+              const targetView = getTargetView(n.notification_type);
+              return (
+                <button key={n.id} onClick={async () => {
+                  if (!n.read) {
+                    await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
+                    qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                  }
+                  if (targetView) handleGlobalView(targetView);
+                }}
+                  className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
+                  <span className="text-lg">{n.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
+                    {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
+                  </div>
+                  {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
+                </button>
+              );
+            };
+            return (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h1 className="font-heading text-lg font-semibold">Notificações</h1>
+                  {unread.length > 0 && (
+                    <button onClick={async () => {
+                      const ids = unread.map((n: any) => n.id);
+                      for (const id of ids) { await supabase.from("vault_notifications").update({ read: true }).eq("id", id); }
+                      qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                    }} className="text-[11px] text-[#FFD600] hover:underline">Marcar todas como lidas</button>
+                  )}
+                </div>
+
+                {/* Não lidas */}
+                <div className="mb-2 text-[10px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Não lidas ({unread.length})
+                </div>
+                <div className="space-y-2 mb-6">
+                  {unread.length === 0 && <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação pendente 🎉</div>}
+                  {unread.map(renderNotif)}
+                </div>
+
+                {/* Lidas */}
+                {read.length > 0 && (
+                  <>
+                    <div className="mb-2 text-[10px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>
+                      Lidas ({read.length})
+                    </div>
+                    <div className="space-y-2">
+                      {read.map(renderNotif)}
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
           
 
           {/* Settings - Editable */}
