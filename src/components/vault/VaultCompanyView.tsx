@@ -350,7 +350,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                 {hasPerm("fin") && (
                   <button
                     onClick={() => {
-                      setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" });
+                      setGoalForm({ goal_type: "", description: "", unit_type: "valor", target_value: "", current_value: "", year: String(new Date().getFullYear()) });
                       setGoalModal({ open: true });
                     }}
                     className="p-1 rounded hover:bg-white/10 transition-colors"
@@ -364,15 +364,25 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                 <div className="space-y-3">
                   {goals?.map((g: any) => {
                     const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
+                    const parts = (g.goal_type ?? "").split("|");
+                    const unitType = parts[1] || "valor";
+                    const fmtGoalVal = (v: number) => unitType === "valor" ? fmtK(v) : unitType === "percentual" ? `${v}%` : String(v);
+                    const initCurr = (v: any) => { const n = Number(v); if (!v || n === 0) return ""; return maskCurrency(n.toFixed(2).replace(".", ",")); };
                     return (
                       <div key={g.id} className="group">
                         <div className="flex justify-between text-[11px] mb-1">
-                          <span className="truncate mr-2">{g.description || g.goal_type}</span>
+                          <span className="truncate mr-2">{g.description || parts[0]}</span>
                           <div className="flex items-center gap-1">
-                            <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                            <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtGoalVal(Number(g.current_value))} / {fmtGoalVal(Number(g.target_value))}</span>
+                            <span className="flex-shrink-0 ml-1" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
                             {hasPerm("fin") && (
                               <>
-                                <button onClick={() => { setGoalForm({ goal_type: g.goal_type, description: g.description || "", target_value: String(g.target_value), current_value: String(g.current_value) }); setGoalModal({ open: true, goal: g }); }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
+                                <button onClick={() => {
+                                  const tv = unitType === "valor" ? initCurr(g.target_value) : String(g.target_value);
+                                  const cv = unitType === "valor" ? initCurr(g.current_value) : String(g.current_value);
+                                  setGoalForm({ goal_type: parts[0] || "", description: g.description || "", unit_type: unitType, target_value: tv, current_value: cv, year: String(g.year) });
+                                  setGoalModal({ open: true, goal: g });
+                                }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
                                 <button onClick={() => handleDelete("vault_goals", g.id, "Meta", "vault_goals")} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/20 transition-all"><Trash2 size={10} className="text-red-400/60" /></button>
                               </>
                             )}
@@ -390,7 +400,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   <span className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</span>
                   {hasPerm("fin") && (
                     <button
-                      onClick={() => { setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" }); setGoalModal({ open: true }); }}
+                      onClick={() => { setGoalForm({ goal_type: "", description: "", unit_type: "valor", target_value: "", current_value: "", year: String(new Date().getFullYear()) }); setGoalModal({ open: true }); }}
                       className="text-[10px] px-3 py-1 rounded bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors"
                     >
                       + Criar meta
