@@ -422,6 +422,11 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className={`font-heading text-[10px] font-semibold ${color}`}>{label}</span>
+                                {(activity as any).is_automatic && (
+                                  <span className="inline-flex items-center gap-0.5 font-heading text-[8px] text-muted-foreground/40 bg-card/30 px-1.5 py-0.5 rounded border border-border/20">
+                                    <Bot size={8} /> AUTO
+                                  </span>
+                                )}
                                 <span className="font-heading text-[9px] text-muted-foreground/40">{timeAgo(activity.created_at)}</span>
                               </div>
                               <button
