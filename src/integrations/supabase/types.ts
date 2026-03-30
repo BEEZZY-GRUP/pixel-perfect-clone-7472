@@ -783,6 +783,7 @@ export type Database = {
       vault_employees: {
         Row: {
           admission_date: string | null
+          birth_date: string | null
           company_id: string
           cpf: string | null
           created_at: string
@@ -799,6 +800,7 @@ export type Database = {
         }
         Insert: {
           admission_date?: string | null
+          birth_date?: string | null
           company_id: string
           cpf?: string | null
           created_at?: string
@@ -815,6 +817,7 @@ export type Database = {
         }
         Update: {
           admission_date?: string | null
+          birth_date?: string | null
           company_id?: string
           cpf?: string | null
           created_at?: string

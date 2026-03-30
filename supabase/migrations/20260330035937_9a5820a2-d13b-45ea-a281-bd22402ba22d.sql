@@ -1,0 +1,1 @@
+ALTER TABLE public.vault_employees ADD COLUMN birth_date date;
