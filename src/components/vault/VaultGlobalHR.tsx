@@ -258,9 +258,7 @@ const getDaysUntilBirthday = (birthDateStr: string) => {
   return Math.ceil((next.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
 };
 
-/* ───── Employee Profile Sub-Component ───── */
-
-const EmployeeProfile = ({
+export const EmployeeProfile = ({
   employee, vacations, salaryHistory, getCoName, getCoColor, onBack,
   showVacForm, setShowVacForm, vacForm, setVacForm,
   showSalaryForm, setShowSalaryForm, salaryForm, setSalaryForm,
