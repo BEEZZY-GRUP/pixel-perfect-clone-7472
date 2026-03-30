@@ -73,11 +73,12 @@ export default function TrashPanel({ consoleRole = "admin" }: { consoleRole?: st
                         <RotateCcw size={10} /> RESTAURAR
                       </button>
                       {confirmId === lead.id ? (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => { permanentDelete(lead.id); setConfirmId(null); }}
-                            className="font-mono text-[9px] text-red-400 hover:text-red-300 px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
-                          >
+                        {consoleRole === "admin" && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => { permanentDelete(lead.id); setConfirmId(null); }}
+                              className="font-mono text-[9px] text-red-400 hover:text-red-300 px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
+                            >
                             CONFIRMAR
                           </button>
                           <button onClick={() => setConfirmId(null)} className="font-mono text-[9px] text-muted-foreground px-2 py-1">

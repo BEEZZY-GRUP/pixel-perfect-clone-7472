@@ -234,9 +234,11 @@ export default function LeadsList({ consoleRole = "admin" }: { consoleRole?: str
                     <button onClick={() => setSelectedLead(lead)} className="p-1.5 text-muted-foreground/40 hover:text-gold transition-colors rounded">
                       <Eye size={13} />
                     </button>
-                    <button onClick={() => deleteLead(lead.id)} className="p-1.5 text-muted-foreground/40 hover:text-red-400 transition-colors rounded">
-                      <Trash2 size={13} />
-                    </button>
+                    {consoleRole === "admin" && (
+                      <button onClick={() => deleteLead(lead.id)} className="p-1.5 text-muted-foreground/40 hover:text-red-400 transition-colors rounded">
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </td>
               </motion.tr>
