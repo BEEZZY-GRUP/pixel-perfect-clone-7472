@@ -88,6 +88,16 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
     queryFn: async () => { const { data } = await supabase.from("vault_bank_transactions").select("*").eq("company_id", coId).order("transaction_date", { ascending: false }); return data ?? []; },
   });
 
+  const { data: companyVacations } = useQuery({
+    queryKey: ["vault_vacations_co", coId],
+    queryFn: async () => { const { data } = await supabase.from("vault_vacations").select("*").eq("company_id", coId).order("start_date", { ascending: false }); return data ?? []; },
+  });
+
+  const { data: companySalaryHistory } = useQuery({
+    queryKey: ["vault_salary_history_co", coId],
+    queryFn: async () => { const { data } = await supabase.from("vault_salary_history").select("*").eq("company_id", coId).order("change_date", { ascending: false }); return data ?? []; },
+  });
+
   const current = monthlyData?.find((m: any) => m.month_date === "2026-03-01");
   const rev = Number(current?.revenue ?? 0);
   const exp = Number(current?.expenses ?? 0);
