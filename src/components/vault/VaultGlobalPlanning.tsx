@@ -69,14 +69,24 @@ const VaultGlobalPlanning = () => {
     setBudgetModal({ open: false });
   };
 
-  const openEdit = (g: any) => { setForm({ description: g.description ?? "", goal_type: g.goal_type, target_value: String(g.target_value), current_value: String(g.current_value), year: String(g.year) }); setGoalModal({ open: true, goal: g, companyId: g.company_id }); };
-  const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
+  const initCurrency = (v: any) => { const n = Number(v); if (!v || n === 0) return ""; return maskCurrency(n.toFixed(2).replace(".", ",")); };
+
+  const openEdit = (g: any) => {
+    const parts = (g.goal_type ?? "").split("|");
+    const goalType = parts[0] || "";
+    const unitType = parts[1] || "valor";
+    const tv = unitType === "valor" ? initCurrency(g.target_value) : String(g.target_value);
+    const cv = unitType === "valor" ? initCurrency(g.current_value) : String(g.current_value);
+    setForm({ description: g.description ?? "", goal_type: goalType, unit_type: unitType, target_value: tv, current_value: cv, year: String(g.year) });
+    setGoalModal({ open: true, goal: g, companyId: g.company_id });
+  };
+  const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", unit_type: "valor", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
 
   const BUDGET_CATS = ["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"];
   const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", customCategory: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
   const openEditBudget = (b: any) => {
     const isPreset = BUDGET_CATS.includes(b.category);
-    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: String(b.amount), year: String(b.year) });
+    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: initCurrency(b.amount), year: String(b.year) });
     setBudgetModal({ open: true, budget: b, companyId: b.company_id });
   };
 
