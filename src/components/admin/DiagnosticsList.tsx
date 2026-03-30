@@ -469,7 +469,7 @@ export default function DiagnosticsList() {
               desqualificado: "text-red-400 bg-red-500/10 border-red-500/30",
             };
             const colorClass = classColors[diag.classification] || classColors.frio;
-            const prevDiag = i < diagnostics.length - 1 ? diagnostics[i + 1] : null;
+            const prevDiag = i > 0 ? diagnostics[i - 1] : null;
             const scoreDiff = prevDiag ? diag.score - prevDiag.score : null;
             return (
               <motion.button
