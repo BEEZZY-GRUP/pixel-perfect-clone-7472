@@ -677,6 +677,33 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
               </div>
             ))}
           </div>
+
+          {/* Delete Company */}
+          <div className="mt-8 rounded-xl border border-red-500/20 p-4" style={{ background: "rgba(239,68,68,0.03)" }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold text-red-400">Zona de Perigo</div>
+                <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>Excluir permanentemente esta empresa e todos os seus dados</div>
+              </div>
+              <Button size="sm" variant="destructive"
+                onClick={() => setDeleteModal({
+                  open: true,
+                  title: `Excluir ${company.name}?`,
+                  desc: "Todos os dados desta empresa (lançamentos, colaboradores, contas bancárias) serão excluídos permanentemente. Esta ação não pode ser desfeita.",
+                  onConfirm: async () => {
+                    const { error } = await supabase.from("vault_companies").delete().eq("id", coId);
+                    if (error) throw error;
+                    toast.success("Empresa excluída");
+                    qc.invalidateQueries({ queryKey: ["vault_companies"] });
+                    onDeleteCompany?.(coId);
+                  }
+                })}
+                className="h-8 text-[11px] px-3 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+              >
+                <Trash2 size={12} className="mr-1" /> Excluir Empresa
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
