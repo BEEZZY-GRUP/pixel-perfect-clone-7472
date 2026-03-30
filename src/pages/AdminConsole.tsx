@@ -43,19 +43,21 @@ function ConsoleContent() {
       <PageBackground />
 
       {/* Top bar */}
-      <header className="relative z-10 border-b border-border px-2 sm:px-4 md:px-8 bg-background/80 backdrop-blur-md">
-        <div className="flex items-center justify-between py-0">
+      <header className="relative z-10 border-b border-gold-border/40 bg-background/70 backdrop-blur-xl">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between px-4 md:px-8">
           {/* Logo */}
-          <div className="flex items-center gap-2 sm:gap-3 py-3 sm:py-4 shrink-0">
-            <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_8px_hsl(var(--gold)/0.6)]" />
-            <p className="font-heading text-gold text-xs tracking-[0.3em] font-bold">BZY</p>
-            <span className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 hidden sm:inline font-semibold">
-              CONSOLE
+          <div className="flex items-center gap-3 py-4 shrink-0">
+            <div className="w-2 h-2 bg-gold rounded-full shadow-[0_0_10px_hsl(var(--gold)/0.5)]" />
+            <h1 className="font-heading text-gold text-[11px] tracking-[0.35em] font-bold select-none">
+              BEEZZY
+            </h1>
+            <span className="font-heading text-[9px] tracking-[0.2em] text-muted-foreground/40 font-semibold hidden sm:inline">
+              .CONSOLE
             </span>
           </div>
 
           {/* Tabs */}
-          <nav className="flex h-full overflow-x-auto scrollbar-none mx-1 sm:mx-2">
+          <nav className="flex h-full overflow-x-auto scrollbar-none mx-2">
             {TABS.map((t) => {
               const Icon = t.icon;
               const isActive = tab === t.key;
@@ -63,19 +65,19 @@ function ConsoleContent() {
                 <button
                   key={t.key}
                   onClick={() => setTab(t.key)}
-                  className={`relative flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 md:px-4 py-3 sm:py-4 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] transition-colors duration-200 whitespace-nowrap font-semibold ${
+                  className={`relative flex items-center gap-2 px-3 md:px-5 py-4 font-heading text-[9px] sm:text-[10px] tracking-[0.18em] transition-all duration-300 whitespace-nowrap font-semibold group ${
                     isActive
                       ? "text-gold"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground/60 hover:text-foreground/80"
                   }`}
                 >
-                  <Icon size={13} />
+                  <Icon size={14} className={isActive ? "text-gold" : "text-muted-foreground/40 group-hover:text-foreground/60 transition-colors"} />
                   <span className="hidden sm:inline">{t.label}</span>
                   {isActive && (
                     <motion.div
-                      layoutId="activeTab"
-                      className="absolute bottom-0 left-0 w-full h-px bg-gold"
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      layoutId="consoleActiveTab"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full bg-gradient-to-r from-gold/60 via-gold to-gold/60"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
                     />
                   )}
                 </button>
@@ -84,23 +86,24 @@ function ConsoleContent() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={() => setAddOpen(true)}
-              className="flex items-center gap-1.5 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] px-2 sm:px-3 py-1.5 sm:py-2 bg-gold text-background hover:bg-gold-light transition-colors rounded-lg font-bold"
+              className="flex items-center gap-1.5 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] px-3 sm:px-4 py-2 bg-gold/90 text-background hover:bg-gold transition-all duration-300 rounded-lg font-bold shadow-[0_0_20px_hsl(var(--gold)/0.15)] hover:shadow-[0_0_30px_hsl(var(--gold)/0.25)]"
             >
-              <Plus size={12} /> <span className="hidden sm:inline">NOVO</span>
+              <Plus size={12} /> <span className="hidden sm:inline">NOVO LEAD</span>
             </button>
             <button
               onClick={() => refresh()}
-              className="p-1.5 sm:p-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-2 text-muted-foreground/50 hover:text-gold/70 transition-colors rounded-lg hover:bg-gold-dim"
               title="Atualizar"
             >
-              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
+            <div className="w-px h-5 bg-border/30 mx-1 hidden sm:block" />
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 sm:gap-2 font-heading text-[9px] sm:text-[10px] text-muted-foreground hover:text-destructive tracking-[0.15em] transition-colors duration-200 py-3 sm:py-4 font-semibold"
+              className="flex items-center gap-2 font-heading text-[9px] sm:text-[10px] text-muted-foreground/50 hover:text-destructive tracking-[0.15em] transition-all duration-300 py-4 font-semibold"
             >
               <LogOut size={13} />
               <span className="hidden sm:inline">SAIR</span>
@@ -110,14 +113,14 @@ function ConsoleContent() {
       </header>
 
       {/* Content */}
-      <main className="relative z-10 p-2 sm:p-4 md:p-8">
+      <main className="relative z-10 max-w-[1600px] mx-auto p-4 md:p-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {tab === "Dashboard" && <SalesDashboard />}
             {tab === "Funil" && <KanbanBoard />}
