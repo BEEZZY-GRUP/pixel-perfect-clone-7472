@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
 const fmtK = (v: number) => v >= 1000 ? "R$ " + (v / 1000).toFixed(v % 1000 === 0 ? 0 : 1).replace(".", ",") + "k" : fmt(v);
@@ -16,7 +17,7 @@ const VaultGlobalPlanning = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [goalModal, setGoalModal] = useState<{ open: boolean; goal?: any; companyId?: string }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
-  const [form, setForm] = useState({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" });
+  const [form, setForm] = useState({ description: "", goal_type: "", unit_type: "valor", target_value: "", current_value: "", year: "2026" });
 
   // Budget modal
   const [budgetModal, setBudgetModal] = useState<{ open: boolean; budget?: any; companyId?: string }>({ open: false });
@@ -44,7 +45,10 @@ const VaultGlobalPlanning = () => {
     if (!form.description || !form.target_value) { toast.error("Preencha descrição e meta"); return; }
     const companyId = goalModal.companyId || companies?.[0]?.id;
     if (!companyId) return;
-    const payload = { company_id: companyId, description: form.description, goal_type: form.goal_type || "Meta", target_value: Number(form.target_value), current_value: Number(form.current_value) || 0, year: Number(form.year) || 2026 };
+    const targetVal = form.unit_type === "valor" ? Number(unmaskCurrency(form.target_value)) : Number(form.target_value);
+    const currentVal = form.unit_type === "valor" ? Number(unmaskCurrency(form.current_value)) : Number(form.current_value) || 0;
+    const goalType = form.goal_type || "Meta";
+    const payload = { company_id: companyId, description: form.description, goal_type: `${goalType}|${form.unit_type}`, target_value: targetVal, current_value: currentVal, year: Number(form.year) || 2026 };
     const { error } = goalModal.goal ? await supabase.from("vault_goals").update(payload).eq("id", goalModal.goal.id) : await supabase.from("vault_goals").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(goalModal.goal ? "Meta atualizada" : "Meta criada");
@@ -57,7 +61,7 @@ const VaultGlobalPlanning = () => {
     if (!finalCategory || !budgetForm.amount) { toast.error("Preencha categoria e valor"); return; }
     const companyId = budgetModal.companyId || companies?.[0]?.id;
     if (!companyId) return;
-    const payload = { company_id: companyId, category: finalCategory, amount: Number(budgetForm.amount), year: Number(budgetForm.year) || 2026 };
+    const payload = { company_id: companyId, category: finalCategory, amount: Number(unmaskCurrency(budgetForm.amount)), year: Number(budgetForm.year) || 2026 };
     const { error } = budgetModal.budget ? await supabase.from("vault_budgets").update(payload).eq("id", budgetModal.budget.id) : await supabase.from("vault_budgets").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(budgetModal.budget ? "Budget atualizado" : "Budget criado");
@@ -65,14 +69,24 @@ const VaultGlobalPlanning = () => {
     setBudgetModal({ open: false });
   };
 
-  const openEdit = (g: any) => { setForm({ description: g.description ?? "", goal_type: g.goal_type, target_value: String(g.target_value), current_value: String(g.current_value), year: String(g.year) }); setGoalModal({ open: true, goal: g, companyId: g.company_id }); };
-  const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
+  const initCurrency = (v: any) => { const n = Number(v); if (!v || n === 0) return ""; return maskCurrency(n.toFixed(2).replace(".", ",")); };
+
+  const openEdit = (g: any) => {
+    const parts = (g.goal_type ?? "").split("|");
+    const goalType = parts[0] || "";
+    const unitType = parts[1] || "valor";
+    const tv = unitType === "valor" ? initCurrency(g.target_value) : String(g.target_value);
+    const cv = unitType === "valor" ? initCurrency(g.current_value) : String(g.current_value);
+    setForm({ description: g.description ?? "", goal_type: goalType, unit_type: unitType, target_value: tv, current_value: cv, year: String(g.year) });
+    setGoalModal({ open: true, goal: g, companyId: g.company_id });
+  };
+  const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", unit_type: "valor", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
 
   const BUDGET_CATS = ["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"];
   const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", customCategory: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
   const openEditBudget = (b: any) => {
     const isPreset = BUDGET_CATS.includes(b.category);
-    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: String(b.amount), year: String(b.year) });
+    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: initCurrency(b.amount), year: String(b.year) });
     setBudgetModal({ open: true, budget: b, companyId: b.company_id });
   };
 
@@ -265,21 +279,65 @@ const VaultGlobalPlanning = () => {
                 {companies?.map((c: any) => <option key={c.id} value={c.id} className="bg-[#111]">{c.name}</option>)}
               </select>
             </div>
-            {[{ label: "Descrição", key: "description" }, { label: "Tipo (MRR, Churn...)", key: "goal_type" }].map(f => (
-              <div key={f.key}>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{f.label}</label>
-                <input value={(form as any)[f.key]} onChange={e => setForm(fo => ({ ...fo, [f.key]: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
-              </div>
-            ))}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
+              <input value={form.description} onChange={e => setForm(fo => ({ ...fo, description: e.target.value }))} placeholder="Ex: Atingir R$ 100k de MRR" className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Meta</label>
-                <input type="number" value={form.target_value} onChange={e => setForm(f => ({ ...f, target_value: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+                <select value={form.goal_type} onChange={e => setForm(f => ({ ...f, goal_type: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  <option value="" className="bg-[#111]">Selecione...</option>
+                  {["MRR", "Churn", "Receita", "Clientes", "NPS", "Conversão", "Leads", "Outro"].map(t => <option key={t} value={t} className="bg-[#111]">{t}</option>)}
+                </select>
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Realizado</label>
-                <input type="number" value={form.current_value} onChange={e => setForm(f => ({ ...f, current_value: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Unidade</label>
+                <select value={form.unit_type} onChange={e => {
+                  const newUnit = e.target.value;
+                  setForm(f => ({ ...f, unit_type: newUnit, target_value: "", current_value: "" }));
+                }} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  {[
+                    { value: "valor", label: "Valor (R$)" },
+                    { value: "quantidade", label: "Quantidade" },
+                    { value: "percentual", label: "Percentual (%)" },
+                  ].map(u => <option key={u.value} value={u.value} className="bg-[#111]">{u.label}</option>)}
+                </select>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Meta {form.unit_type === "percentual" ? "(%)" : form.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
+                <input
+                  type={form.unit_type === "valor" ? "text" : "number"}
+                  inputMode={form.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={form.unit_type === "valor" ? "R$ 0,00" : form.unit_type === "percentual" ? "0" : "0"}
+                  value={form.target_value}
+                  onChange={e => setForm(f => ({ ...f, target_value: form.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Realizado {form.unit_type === "percentual" ? "(%)" : form.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
+                <input
+                  type={form.unit_type === "valor" ? "text" : "number"}
+                  inputMode={form.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={form.unit_type === "valor" ? "R$ 0,00" : "0"}
+                  value={form.current_value}
+                  onChange={e => setForm(f => ({ ...f, current_value: form.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
+              <select value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                {["2025", "2026", "2027"].map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
+              </select>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-3">
@@ -318,7 +376,7 @@ const VaultGlobalPlanning = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Orçado</label>
-                <input type="number" value={budgetForm.amount} onChange={e => setBudgetForm(f => ({ ...f, amount: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <input type="text" inputMode="decimal" placeholder="R$ 0,00" value={budgetForm.amount} onChange={e => setBudgetForm(f => ({ ...f, amount: maskCurrency(e.target.value) }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
               </div>
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
