@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2, ArrowRight, Bot } from "lucide-react";
+import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2, ArrowRight, Bot, Edit, Stethoscope, StickyNote } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, CHALLENGE_OPTIONS, SOURCE_OPTIONS, type Lead } from "./types";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,13 +17,22 @@ interface Activity {
 }
 
 const ACTIVITY_TYPES = [
-  { key: "nota", label: "Nota", icon: FileText, color: "text-muted-foreground" },
+  { key: "nota", label: "Nota", icon: StickyNote, color: "text-muted-foreground" },
   { key: "ligacao", label: "Ligação", icon: PhoneCall, color: "text-blue-400" },
   { key: "reuniao", label: "Reunião", icon: Video, color: "text-purple-400" },
   { key: "email", label: "E-mail", icon: Send, color: "text-green-400" },
   { key: "tarefa", label: "Tarefa", icon: CheckCircle, color: "text-gold" },
   { key: "movimentacao", label: "Movimentação", icon: ArrowRight, color: "text-orange-400" },
+  { key: "edicao", label: "Edição", icon: Edit, color: "text-cyan-400" },
+  { key: "diagnostico", label: "Diagnóstico", icon: Stethoscope, color: "text-emerald-400" },
 ];
+
+interface LeadNote {
+  id: string;
+  lead_id: string;
+  content: string;
+  created_at: string;
+}
 
 interface Props {
   lead: Lead;
@@ -40,14 +49,20 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
-  const [newActivity, setNewActivity] = useState({ activity_type: "nota", description: "", scheduled_at: "" });
+  const [newActivity, setNewActivity] = useState({ activity_type: "ligacao", description: "", scheduled_at: "" });
   const [savingActivity, setSavingActivity] = useState(false);
 
+  // Notes state
+  const [notes, setNotes] = useState<LeadNote[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [showAddNote, setShowAddNote] = useState(false);
+  const [newNoteContent, setNewNoteContent] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const update = (field: keyof Lead, value: any) => setForm((f) => ({ ...f, [field]: value }));
 
   const handleSave = async () => {
     setSaving(true);
-    await updateLead(lead.id, {
+     await updateLead(lead.id, {
       name: form.name,
       email: form.email,
       company: form.company,
@@ -55,7 +70,6 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
       phone: form.phone,
       message: form.message,
       challenge: form.challenge,
-      notes: form.notes,
       source: form.source,
       status: form.status,
       priority: form.priority,
@@ -78,8 +92,38 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
     setLoadingActivities(false);
   };
 
+  const loadNotes = async () => {
+    setLoadingNotes(true);
+    const { data } = await supabase
+      .from("lead_notes")
+      .select("*")
+      .eq("lead_id", lead.id)
+      .order("created_at", { ascending: false });
+    setNotes((data as unknown as LeadNote[]) || []);
+    setLoadingNotes(false);
+  };
+
+  const handleAddNote = async () => {
+    if (!newNoteContent.trim()) { toast.error("Escreva a nota"); return; }
+    setSavingNote(true);
+    const { error } = await supabase.from("lead_notes").insert({ lead_id: lead.id, content: newNoteContent } as any);
+    setSavingNote(false);
+    if (error) { toast.error("Erro ao salvar nota"); return; }
+    toast.success("Nota adicionada!");
+    setNewNoteContent("");
+    setShowAddNote(false);
+    loadNotes();
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    const { error } = await supabase.from("lead_notes").delete().eq("id", id);
+    if (error) { toast.error("Erro ao excluir nota"); return; }
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
   useEffect(() => {
     if (activeTab === "activity") loadActivities();
+    if (activeTab === "notes") loadNotes();
   }, [activeTab]);
 
   const handleAddActivity = async () => {
@@ -101,7 +145,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
       return;
     }
     toast.success("Atividade adicionada!");
-    setNewActivity({ activity_type: "nota", description: "", scheduled_at: "" });
+    setNewActivity({ activity_type: "ligacao", description: "", scheduled_at: "" });
     setShowAddActivity(false);
     loadActivities();
   };
@@ -297,14 +341,86 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
 
             {activeTab === "notes" && (
               <div className="space-y-4">
-                <label className={labelClass}>NOTAS INTERNAS</label>
-                <textarea
-                  value={form.notes || ""}
-                  onChange={(e) => update("notes", e.target.value || null)}
-                  placeholder="Adicione observações sobre este lead..."
-                  className={`${inputClass} min-h-[200px] resize-y`}
-                />
-                <p className="font-heading text-[9px] text-muted-foreground/40">As notas são salvas ao clicar em SALVAR.</p>
+                {/* Add note button / form */}
+                {!showAddNote ? (
+                  <button
+                    onClick={() => setShowAddNote(true)}
+                    className="w-full flex items-center justify-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-3 border border-dashed border-gold-border/40 text-gold/70 hover:text-gold hover:border-gold-border hover:bg-gold-dim/30 transition-all rounded-lg font-semibold"
+                  >
+                    <Plus size={14} /> ADICIONAR NOTA
+                  </button>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-lg border border-gold-border/40 bg-gold-dim/10 p-4 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-heading text-[10px] tracking-[0.15em] text-gold font-semibold">NOVA NOTA</p>
+                      <button onClick={() => setShowAddNote(false)} className="text-muted-foreground/40 hover:text-foreground transition-colors">
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <textarea
+                      value={newNoteContent}
+                      onChange={(e) => setNewNoteContent(e.target.value)}
+                      placeholder="Escreva sua nota..."
+                      className={`${inputClass} min-h-[100px] resize-y`}
+                      autoFocus
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        onClick={handleAddNote}
+                        disabled={savingNote}
+                        className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2 bg-gold/90 text-background hover:bg-gold transition-all rounded-lg font-bold disabled:opacity-50"
+                      >
+                        <Plus size={12} /> {savingNote ? "SALVANDO..." : "ADICIONAR"}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Notes list */}
+                {loadingNotes ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                  </div>
+                ) : notes.length === 0 ? (
+                  <div className="border border-border/30 rounded-lg p-8 flex flex-col items-center justify-center gap-3">
+                    <StickyNote size={24} className="text-muted-foreground/20" />
+                    <p className="font-heading text-xs text-muted-foreground/40">Nenhuma nota registrada.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notes.map((note, i) => (
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03 }}
+                        className="rounded-lg border border-border/40 bg-card/10 p-4 group"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-heading text-xs text-foreground/80 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                            <div className="flex items-center gap-2 mt-2.5">
+                              <Clock size={9} className="text-muted-foreground/30" />
+                              <span className="font-heading text-[9px] text-muted-foreground/40">
+                                {new Date(note.created_at).toLocaleDateString("pt-BR")} às {new Date(note.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground/30 hover:text-red-400 shrink-0"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -333,7 +449,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
 
                     {/* Type selector */}
                     <div className="flex gap-1.5 flex-wrap">
-                      {ACTIVITY_TYPES.map((t) => {
+                      {ACTIVITY_TYPES.filter(t => !["movimentacao", "edicao", "diagnostico", "nota"].includes(t.key)).map((t) => {
                         const Icon = t.icon;
                         const isSelected = newActivity.activity_type === t.key;
                         return (
