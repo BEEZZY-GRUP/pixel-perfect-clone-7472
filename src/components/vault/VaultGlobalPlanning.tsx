@@ -231,12 +231,15 @@ const VaultGlobalPlanning = () => {
                 </div>
                 <div className="space-y-2">
                   {coGoals.map((g: any) => {
-                    const p = g.goal_type === "Churn" ? pct(Number(g.target_value), Number(g.current_value)) : pct(Number(g.current_value), Number(g.target_value));
+                    const parts = (g.goal_type ?? "").split("|");
+                    const unitType = parts[1] || "valor";
+                    const fmtGoalVal = (v: number) => unitType === "valor" ? fmtK(v) : unitType === "percentual" ? `${v}%` : String(v);
+                    const p = parts[0] === "Churn" ? pct(Number(g.target_value), Number(g.current_value)) : pct(Number(g.current_value), Number(g.target_value));
                     return (
                       <div key={g.id} className="flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0">
                         <div className="flex-1 text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>{g.description}</div>
                         <div className="text-[11px] font-medium min-w-[80px] text-right">
-                          {Number(g.current_value) < 100 ? g.current_value + (g.goal_type === "Churn" ? "%" : "") : fmtK(Number(g.current_value))} / {Number(g.target_value) < 100 ? g.target_value + (g.goal_type === "Churn" ? "%" : "") : fmtK(Number(g.target_value))}
+                          {fmtGoalVal(Number(g.current_value))} / {fmtGoalVal(Number(g.target_value))}
                         </div>
                         <div className="w-[70px] h-[3px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
                           <div className="h-full rounded-full" style={{ width: `${Math.min(p, 100)}%`, background: p >= 100 ? "#22c55e" : p >= 70 ? "#FFD600" : "#f59e0b" }} />
