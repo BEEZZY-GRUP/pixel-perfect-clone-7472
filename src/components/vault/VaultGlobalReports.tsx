@@ -80,6 +80,20 @@ const VaultGlobalReports = () => {
     });
   }, [compareMode, filterCo, months, filteredMonthly, companies]);
 
+  // Compare cashflow (saldo por empresa)
+  const compareCashflowData = useMemo(() => {
+    if (!compareMode || filterCo.length < 2) return [];
+    return months.map(m => {
+      const row: any = { name: (m as string).split("-").reverse().slice(0, 2).join("/") };
+      filterCo.forEach(cid => {
+        const co = companies?.find((c: any) => c.id === cid);
+        const md = filteredMonthly.find((d: any) => d.company_id === cid && d.month_date === m);
+        if (co) row[co.name] = Number(md?.revenue ?? 0) - Number(md?.expenses ?? 0);
+      });
+      return row;
+    });
+  }, [compareMode, filterCo, months, filteredMonthly, companies]);
+
   // Pie data
   const lastMonth = months[months.length - 1] as string | undefined;
   const pieData = companies?.map((c: any) => {
@@ -124,6 +138,15 @@ const VaultGlobalReports = () => {
 
   const tabs = ["DRE", "Fluxo de Caixa", "Por Empresa", "Categorias", "Impostos", "Folha", "Budget vs Realizado"];
 
+  // Tabs that support company comparison
+  const comparableTabs = [0, 1, 2]; // DRE, Fluxo de Caixa, Por Empresa
+
+  const handleTabChange = (idx: number) => {
+    setActiveTab(idx);
+    setFilterCo([]);
+    setCompareMode(false);
+  };
+
   // Filter bar
   const filterBar = (
     <div className="flex flex-wrap items-center gap-2 mb-5 p-3 rounded-xl border border-white/5" style={{ background: "#0e0e0a" }}>
@@ -141,14 +164,14 @@ const VaultGlobalReports = () => {
           >{c.name}</button>
         ))}
       </div>
-      {filterCo.length >= 2 && (
+      {comparableTabs.includes(activeTab) && filterCo.length >= 2 && (
         <label className="flex items-center gap-1 text-[10px] ml-2 cursor-pointer" style={{ color: "rgba(242,240,232,0.5)" }}>
           <input type="checkbox" checked={compareMode} onChange={e => setCompareMode(e.target.checked)} className="accent-[#FFD600] w-3 h-3" />
           Comparar empresas
         </label>
       )}
       {filterCo.length > 0 && (
-        <button onClick={() => setFilterCo([])} className="text-[10px] text-red-400 hover:text-red-300 ml-1">Limpar filtros</button>
+        <button onClick={() => { setFilterCo([]); setCompareMode(false); }} className="text-[10px] text-red-400 hover:text-red-300 ml-1">Limpar filtros</button>
       )}
     </div>
   );
@@ -164,7 +187,7 @@ const VaultGlobalReports = () => {
 
       <div className="flex gap-1 mb-5 border-b border-white/5 pb-2 overflow-x-auto">
         {tabs.map((t, i) => (
-          <button key={t} onClick={() => setActiveTab(i)}
+          <button key={t} onClick={() => handleTabChange(i)}
             className={`px-3 py-1.5 rounded-md text-[11px] whitespace-nowrap transition-colors ${activeTab === i ? "bg-[rgba(255,214,0,0.1)] text-[#FFD600]" : "text-white/40 hover:text-white/60"}`}
           >{t}</button>
         ))}
@@ -246,7 +269,22 @@ const VaultGlobalReports = () => {
       {/* Fluxo de Caixa */}
       {activeTab === 1 && (
         <div className="space-y-5">
-          {cashflowData.length > 0 && (
+          {compareMode && compareCashflowData.length > 0 ? (
+            <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Comparativo de Saldo Mensal</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={compareCashflowData}>
+                  <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
+                  <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  {filterCo.map((cid, idx) => {
+                    const co = companies?.find((c: any) => c.id === cid);
+                    return <Line key={cid} type="monotone" dataKey={co?.name ?? ""} stroke={co?.color ?? CHART_COLORS[idx]} strokeWidth={2} dot={{ r: 3 }} />;
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : cashflowData.length > 0 && (
             <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
               <h3 className="text-xs font-medium mb-3">Fluxo de Caixa Acumulado</h3>
               <ResponsiveContainer width="100%" height={250}>
