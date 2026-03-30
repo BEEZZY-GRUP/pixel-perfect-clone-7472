@@ -1,0 +1,1 @@
+ALTER TABLE public.lead_activities ADD COLUMN IF NOT EXISTS is_automatic boolean NOT NULL DEFAULT false;

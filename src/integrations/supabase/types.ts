@@ -333,6 +333,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          is_automatic: boolean
           lead_id: string
           scheduled_at: string | null
         }
@@ -341,6 +342,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          is_automatic?: boolean
           lead_id: string
           scheduled_at?: string | null
         }
@@ -349,6 +351,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          is_automatic?: boolean
           lead_id?: string
           scheduled_at?: string | null
         }
