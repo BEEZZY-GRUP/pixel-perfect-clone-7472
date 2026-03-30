@@ -342,14 +342,86 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
 
             {activeTab === "notes" && (
               <div className="space-y-4">
-                <label className={labelClass}>NOTAS INTERNAS</label>
-                <textarea
-                  value={form.notes || ""}
-                  onChange={(e) => update("notes", e.target.value || null)}
-                  placeholder="Adicione observações sobre este lead..."
-                  className={`${inputClass} min-h-[200px] resize-y`}
-                />
-                <p className="font-heading text-[9px] text-muted-foreground/40">As notas são salvas ao clicar em SALVAR.</p>
+                {/* Add note button / form */}
+                {!showAddNote ? (
+                  <button
+                    onClick={() => setShowAddNote(true)}
+                    className="w-full flex items-center justify-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-3 border border-dashed border-gold-border/40 text-gold/70 hover:text-gold hover:border-gold-border hover:bg-gold-dim/30 transition-all rounded-lg font-semibold"
+                  >
+                    <Plus size={14} /> ADICIONAR NOTA
+                  </button>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-lg border border-gold-border/40 bg-gold-dim/10 p-4 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-heading text-[10px] tracking-[0.15em] text-gold font-semibold">NOVA NOTA</p>
+                      <button onClick={() => setShowAddNote(false)} className="text-muted-foreground/40 hover:text-foreground transition-colors">
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <textarea
+                      value={newNoteContent}
+                      onChange={(e) => setNewNoteContent(e.target.value)}
+                      placeholder="Escreva sua nota..."
+                      className={`${inputClass} min-h-[100px] resize-y`}
+                      autoFocus
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        onClick={handleAddNote}
+                        disabled={savingNote}
+                        className="flex items-center gap-2 font-heading text-[10px] tracking-[0.15em] px-4 py-2 bg-gold/90 text-background hover:bg-gold transition-all rounded-lg font-bold disabled:opacity-50"
+                      >
+                        <Plus size={12} /> {savingNote ? "SALVANDO..." : "ADICIONAR"}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Notes list */}
+                {loadingNotes ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                  </div>
+                ) : notes.length === 0 ? (
+                  <div className="border border-border/30 rounded-lg p-8 flex flex-col items-center justify-center gap-3">
+                    <StickyNote size={24} className="text-muted-foreground/20" />
+                    <p className="font-heading text-xs text-muted-foreground/40">Nenhuma nota registrada.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notes.map((note, i) => (
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03 }}
+                        className="rounded-lg border border-border/40 bg-card/10 p-4 group"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-heading text-xs text-foreground/80 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                            <div className="flex items-center gap-2 mt-2.5">
+                              <Clock size={9} className="text-muted-foreground/30" />
+                              <span className="font-heading text-[9px] text-muted-foreground/40">
+                                {new Date(note.created_at).toLocaleDateString("pt-BR")} às {new Date(note.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground/30 hover:text-red-400 shrink-0"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
