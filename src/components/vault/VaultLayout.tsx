@@ -34,13 +34,8 @@ const VIEW_LABELS: Record<string, string> = {
 
 const SETTINGS_FIELDS = [
   { key: "group_name", label: "Nome do Grupo", default: "Beezzy Group" },
-  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro — Dezembro", type: "select", options: ["Janeiro — Dezembro", "Abril — Março", "Julho — Junho"] },
+  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro - Dezembro", type: "select", options: ["Janeiro - Dezembro", "Abril - Março", "Julho - Junho"] },
   { key: "tax_regime_default", label: "Regime Tributário Padrão", default: "Simples Nacional", type: "select", options: ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"] },
-  { key: "holding_name", label: "Empresa Holding", default: "" },
-  { key: "responsible", label: "Responsável Geral", default: "" },
-  { key: "contact_email", label: "E-mail de Contato", default: "" },
-  { key: "contact_phone", label: "Telefone de Contato", default: "" },
-  { key: "address", label: "Endereço Sede", default: "" },
 ];
 
 const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props) => {
