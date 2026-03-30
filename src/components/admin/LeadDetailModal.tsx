@@ -49,7 +49,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
-  const [newActivity, setNewActivity] = useState({ activity_type: "nota", description: "", scheduled_at: "" });
+  const [newActivity, setNewActivity] = useState({ activity_type: "ligacao", description: "", scheduled_at: "" });
   const [savingActivity, setSavingActivity] = useState(false);
 
   // Notes state
