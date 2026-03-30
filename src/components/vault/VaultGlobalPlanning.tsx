@@ -376,7 +376,7 @@ const VaultGlobalPlanning = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Orçado</label>
-                <input type="number" value={budgetForm.amount} onChange={e => setBudgetForm(f => ({ ...f, amount: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <input type="text" inputMode="decimal" placeholder="R$ 0,00" value={budgetForm.amount} onChange={e => setBudgetForm(f => ({ ...f, amount: maskCurrency(e.target.value) }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
               </div>
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
