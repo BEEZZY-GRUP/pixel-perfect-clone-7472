@@ -145,7 +145,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
       return;
     }
     toast.success("Atividade adicionada!");
-    setNewActivity({ activity_type: "nota", description: "", scheduled_at: "" });
+    setNewActivity({ activity_type: "ligacao", description: "", scheduled_at: "" });
     setShowAddActivity(false);
     loadActivities();
   };
