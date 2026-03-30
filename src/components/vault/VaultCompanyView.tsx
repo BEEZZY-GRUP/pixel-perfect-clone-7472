@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, CheckCircle, XCircle, Save, DollarSign, CreditCard, User } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -46,6 +47,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   const [bankAccountModal, setBankAccountModal] = useState<{ open: boolean; account?: any }>({ open: false });
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; title: string; desc: string; onConfirm: () => Promise<void> }>({ open: false, title: "", desc: "", onConfirm: async () => {} });
+  const [goalModal, setGoalModal] = useState<{ open: boolean; goal?: any }>({ open: false });
+  const [goalForm, setGoalForm] = useState({ goal_type: "", description: "", target_value: "", current_value: "" });
 
   // RH tab state
   const [selectedRHEmployee, setSelectedRHEmployee] = useState<any>(null);
@@ -342,16 +345,38 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
 
             {/* Goals */}
             <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
-              <h3 className="text-xs font-medium mb-3">Metas {new Date().getFullYear()}</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium">Metas {new Date().getFullYear()}</h3>
+                {hasPerm("fin") && (
+                  <button
+                    onClick={() => {
+                      setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" });
+                      setGoalModal({ open: true });
+                    }}
+                    className="p-1 rounded hover:bg-white/10 transition-colors"
+                    title="Adicionar meta"
+                  >
+                    <Plus size={14} className="text-[#FFD600]" />
+                  </button>
+                )}
+              </div>
               {(goals?.length ?? 0) > 0 ? (
                 <div className="space-y-3">
                   {goals?.map((g: any) => {
                     const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
                     return (
-                      <div key={g.id}>
+                      <div key={g.id} className="group">
                         <div className="flex justify-between text-[11px] mb-1">
                           <span className="truncate mr-2">{g.description || g.goal_type}</span>
-                          <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                          <div className="flex items-center gap-1">
+                            <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                            {hasPerm("fin") && (
+                              <>
+                                <button onClick={() => { setGoalForm({ goal_type: g.goal_type, description: g.description || "", target_value: String(g.target_value), current_value: String(g.current_value) }); setGoalModal({ open: true, goal: g }); }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
+                                <button onClick={() => handleDelete("vault_goals", g.id, "Meta", "vault_goals")} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/20 transition-all"><Trash2 size={10} className="text-red-400/60" /></button>
+                              </>
+                            )}
+                          </div>
                         </div>
                         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
                           <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(p, 100)}%`, background: p >= 100 ? "#22c55e" : company.color }} />
@@ -361,7 +386,17 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   })}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-[140px] text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</div>
+                <div className="flex flex-col items-center justify-center h-[140px] gap-2">
+                  <span className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</span>
+                  {hasPerm("fin") && (
+                    <button
+                      onClick={() => { setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" }); setGoalModal({ open: true }); }}
+                      className="text-[10px] px-3 py-1 rounded bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors"
+                    >
+                      + Criar meta
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -1003,6 +1038,88 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
         onConfirm={deleteModal.onConfirm}
         onClose={() => setDeleteModal(d => ({ ...d, open: false }))}
       />
+
+      {/* Goal Modal */}
+      <Dialog open={goalModal.open} onOpenChange={() => setGoalModal({ open: false })}>
+        <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#F2F0E8]">{goalModal.goal ? "Editar Meta" : "Nova Meta"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+              <select
+                value={goalForm.goal_type}
+                onChange={e => setGoalForm(f => ({ ...f, goal_type: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
+              >
+                <option value="" className="bg-[#111]">Selecione...</option>
+                {["Faturamento", "Clientes", "Margem", "Redução de Custos", "Outros"].map(t => (
+                  <option key={t} value={t} className="bg-[#111]">{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
+              <input
+                type="text"
+                placeholder="Ex: Atingir R$ 100k de faturamento"
+                value={goalForm.description}
+                onChange={e => setGoalForm(f => ({ ...f, description: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Alvo</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={goalForm.target_value}
+                  onChange={e => setGoalForm(f => ({ ...f, target_value: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Atual</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={goalForm.current_value}
+                  onChange={e => setGoalForm(f => ({ ...f, current_value: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-3">
+            <Button variant="ghost" onClick={() => setGoalModal({ open: false })} className="text-[#F2F0E8]/60">Cancelar</Button>
+            <Button
+              className="bg-[#FFD600] text-black hover:bg-[#E6C200]"
+              onClick={async () => {
+                if (!goalForm.goal_type) { toast.error("Selecione o tipo da meta"); return; }
+                const payload = {
+                  company_id: coId,
+                  goal_type: goalForm.goal_type,
+                  description: goalForm.description || null,
+                  target_value: Number(goalForm.target_value) || 0,
+                  current_value: Number(goalForm.current_value) || 0,
+                  year: new Date().getFullYear(),
+                };
+                const { error } = goalModal.goal
+                  ? await supabase.from("vault_goals").update(payload).eq("id", goalModal.goal.id)
+                  : await supabase.from("vault_goals").insert(payload);
+                if (error) { toast.error(error.message); return; }
+                toast.success(goalModal.goal ? "Meta atualizada" : "Meta criada");
+                qc.invalidateQueries({ queryKey: ["vault_goals", coId] });
+                setGoalModal({ open: false });
+              }}
+            >
+              Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
