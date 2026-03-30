@@ -18,6 +18,11 @@ const VaultGlobalPlanning = () => {
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
   const [form, setForm] = useState({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" });
 
+  // Budget modal
+  const [budgetModal, setBudgetModal] = useState<{ open: boolean; budget?: any; companyId?: string }>({ open: false });
+  const [budgetForm, setBudgetForm] = useState({ category: "", amount: "", year: "2026" });
+  const [deleteBudgetModal, setDeleteBudgetModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
+
   const { data: companies } = useQuery({
     queryKey: ["vault_companies"],
     queryFn: async () => { const { data } = await supabase.from("vault_companies").select("*").eq("active", true).order("name"); return data ?? []; },
@@ -46,10 +51,40 @@ const VaultGlobalPlanning = () => {
     qc.invalidateQueries({ queryKey: ["vault_goals_all"] });
     setGoalModal({ open: false });
   };
+
+  const handleSaveBudget = async () => {
+    if (!budgetForm.category || !budgetForm.amount) { toast.error("Preencha categoria e valor"); return; }
+    const companyId = budgetModal.companyId || companies?.[0]?.id;
+    if (!companyId) return;
+    const payload = { company_id: companyId, category: budgetForm.category, amount: Number(budgetForm.amount), year: Number(budgetForm.year) || 2026 };
+    const { error } = budgetModal.budget ? await supabase.from("vault_budgets").update(payload).eq("id", budgetModal.budget.id) : await supabase.from("vault_budgets").insert(payload);
+    if (error) { toast.error(error.message); return; }
+    toast.success(budgetModal.budget ? "Budget atualizado" : "Budget criado");
+    qc.invalidateQueries({ queryKey: ["vault_budgets_all"] });
+    setBudgetModal({ open: false });
+  };
+
   const openEdit = (g: any) => { setForm({ description: g.description ?? "", goal_type: g.goal_type, target_value: String(g.target_value), current_value: String(g.current_value), year: String(g.year) }); setGoalModal({ open: true, goal: g, companyId: g.company_id }); };
   const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
 
+  const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
+  const openEditBudget = (b: any) => { setBudgetForm({ category: b.category, amount: String(b.amount), year: String(b.year) }); setBudgetModal({ open: true, budget: b, companyId: b.company_id }); };
+
   const tabs = ["OKRs & Metas", "Projeções", "Budget Anual"];
+
+  const tabButton = () => {
+    if (activeTab === 0) return (
+      <Button size="sm" onClick={() => openNew()} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+        <Plus size={12} className="mr-1" /> Nova Meta
+      </Button>
+    );
+    if (activeTab === 2) return (
+      <Button size="sm" onClick={() => openNewBudget()} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+        <Plus size={12} className="mr-1" /> Novo Budget
+      </Button>
+    );
+    return null;
+  };
 
   return (
     <div>
@@ -58,9 +93,7 @@ const VaultGlobalPlanning = () => {
           <h1 className="font-heading text-xl font-semibold tracking-tight">Planejamento & Estratégia</h1>
           <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>OKRs, metas e projeções do grupo</p>
         </div>
-        <Button size="sm" onClick={() => openNew()} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
-          <Plus size={12} className="mr-1" /> Nova Meta
-        </Button>
+        {tabButton()}
       </div>
 
       <div className="flex border-b border-white/5 mb-5 gap-0">
@@ -74,7 +107,7 @@ const VaultGlobalPlanning = () => {
       {/* OKRs */}
       {activeTab === 0 && (
         <div>
-          <div className="text-xs mb-4" style={{ color: "rgba(242,240,232,0.4)" }}>Objetivos 2026 — {goals?.length ?? 0} KRs ativos</div>
+          <div className="text-xs mb-4" style={{ color: "rgba(242,240,232,0.4)" }}>Objetivos 2026 | {goals?.length ?? 0} KRs ativos</div>
           {companies?.map((c: any) => {
             const coGoals = goals?.filter((g: any) => g.company_id === c.id) ?? [];
             if (coGoals.length === 0) return null;
@@ -99,6 +132,7 @@ const VaultGlobalPlanning = () => {
                         </div>
                         <span className="text-[10px] min-w-[30px] text-right" style={{ color: "#FFD600" }}>{p}%</span>
                         <button onClick={() => openEdit(g)} className="p-1 rounded hover:bg-white/10"><Pencil size={11} style={{ color: "rgba(242,240,232,0.4)" }} /></button>
+                        <button onClick={() => setDeleteModal({ open: true, id: g.id })} className="p-1 rounded hover:bg-red-500/20"><Trash2 size={11} className="text-red-400" /></button>
                       </div>
                     );
                   })}
@@ -126,7 +160,7 @@ const VaultGlobalPlanning = () => {
             ))}
           </div>
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
-            <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR — Próximos 6 meses</span></div>
+            <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR | Próximos 6 meses</span></div>
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
@@ -164,12 +198,14 @@ const VaultGlobalPlanning = () => {
                     <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
                     <span className="text-xs font-medium">{c.name}</span>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => toast.info("Editando budget...")} className="h-6 text-[10px] px-2 border-white/10 text-white/60">Editar Budget</Button>
+                  <Button size="sm" variant="outline" onClick={() => openNewBudget(c.id)} className="h-6 text-[10px] px-2 border-white/10 text-white/60">
+                    <Plus size={10} className="mr-1" /> Adicionar
+                  </Button>
                 </div>
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5">
-                      {["Categoria", "Orçado", "Realizado", "Saldo", "Utilização"].map(h => (
+                      {["Categoria", "Orçado", "Realizado", "Saldo", "Utilização", ""].map(h => (
                         <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
                       ))}
                     </tr>
@@ -191,6 +227,12 @@ const VaultGlobalPlanning = () => {
                                 <div className="h-full rounded-full" style={{ width: `${Math.min(u, 100)}%`, background: u > 100 ? "#ef4444" : u > 85 ? "#f59e0b" : "#FFD600" }} />
                               </div>
                               <span className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>{u}%</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <div className="flex gap-1">
+                              <button onClick={() => openEditBudget(b)} className="p-1 rounded hover:bg-white/10"><Pencil size={11} style={{ color: "rgba(242,240,232,0.4)" }} /></button>
+                              <button onClick={() => setDeleteBudgetModal({ open: true, id: b.id })} className="p-1 rounded hover:bg-red-500/20"><Trash2 size={11} className="text-red-400" /></button>
                             </div>
                           </td>
                         </tr>
@@ -239,9 +281,52 @@ const VaultGlobalPlanning = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Budget Modal */}
+      <Dialog open={budgetModal.open} onOpenChange={() => setBudgetModal({ open: false })}>
+        <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
+          <DialogHeader><DialogTitle className="text-[#F2F0E8]">{budgetModal.budget ? "Editar Budget" : "Novo Budget"}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Empresa</label>
+              <select value={budgetModal.companyId} onChange={e => setBudgetModal(g => ({ ...g, companyId: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                {companies?.map((c: any) => <option key={c.id} value={c.id} className="bg-[#111]">{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Categoria</label>
+              <select value={budgetForm.category} onChange={e => setBudgetForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                <option value="" className="bg-[#111]">Selecione</option>
+                {["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"].map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Orçado</label>
+                <input type="number" value={budgetForm.amount} onChange={e => setBudgetForm(f => ({ ...f, amount: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
+                <select value={budgetForm.year} onChange={e => setBudgetForm(f => ({ ...f, year: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  {["2025", "2026", "2027"].map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-3">
+            <Button variant="ghost" onClick={() => setBudgetModal({ open: false })} className="text-[#F2F0E8]/60">Cancelar</Button>
+            <Button onClick={handleSaveBudget} className="bg-[#FFD600] text-black hover:bg-[#E6C200]">Salvar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <VaultDeleteConfirm open={deleteModal.open} title="Excluir Meta?" description="Esta ação não pode ser desfeita."
         onConfirm={async () => { const { error } = await supabase.from("vault_goals").delete().eq("id", deleteModal.id); if (error) throw error; toast.success("Meta excluída"); qc.invalidateQueries({ queryKey: ["vault_goals_all"] }); }}
         onClose={() => setDeleteModal(d => ({ ...d, open: false }))}
+      />
+
+      <VaultDeleteConfirm open={deleteBudgetModal.open} title="Excluir Budget?" description="Esta ação não pode ser desfeita."
+        onConfirm={async () => { const { error } = await supabase.from("vault_budgets").delete().eq("id", deleteBudgetModal.id); if (error) throw error; toast.success("Budget excluído"); qc.invalidateQueries({ queryKey: ["vault_budgets_all"] }); }}
+        onClose={() => setDeleteBudgetModal(d => ({ ...d, open: false }))}
       />
     </div>
   );

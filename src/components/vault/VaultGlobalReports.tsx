@@ -108,12 +108,15 @@ const VaultGlobalReports = () => {
 
   // Payroll per company
   const payrollByCompany = useMemo(() => {
+    const filteredEmps = filterCo.length > 0
+      ? (employees ?? []).filter((e: any) => filterCo.includes(e.company_id))
+      : employees ?? [];
     return companies?.map((c: any) => {
-      const emps = (employees ?? []).filter((e: any) => e.company_id === c.id);
+      const emps = filteredEmps.filter((e: any) => e.company_id === c.id);
       const total = emps.reduce((a: number, e: any) => a + Number(e.salary), 0);
       return { name: c.name, color: c.color, total, count: emps.length };
     }).filter(c => c.count > 0) ?? [];
-  }, [companies, employees]);
+  }, [companies, employees, filterCo]);
 
   const toggleCompanyFilter = (id: string) => {
     setFilterCo(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
@@ -154,7 +157,7 @@ const VaultGlobalReports = () => {
     <div>
       <div className="mb-5">
         <h1 className="font-heading text-xl font-semibold tracking-tight">Relatórios</h1>
-        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>DRE, fluxo de caixa, impostos, folha e budget — dados consolidados do grupo</p>
+        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>DRE, fluxo de caixa, impostos, folha e budget | dados consolidados do grupo</p>
       </div>
 
       {filterBar}
@@ -202,7 +205,7 @@ const VaultGlobalReports = () => {
 
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5">
-              <span className="text-xs font-medium">DRE — Demonstrativo do Resultado {filterCo.length > 0 ? "(Filtrado)" : "(Consolidado)"}</span>
+              <span className="text-xs font-medium">DRE | Demonstrativo do Resultado {filterCo.length > 0 ? "(Filtrado)" : "(Consolidado)"}</span>
             </div>
             {months.length === 0 ? (
               <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum dado mensal cadastrado</div>
@@ -390,9 +393,10 @@ const VaultGlobalReports = () => {
             </thead>
             <tbody>
               {(() => {
+                const displayCompanies = filterCo.length > 0 ? companies?.filter((c: any) => filterCo.includes(c.id)) : companies;
                 let totalTax = 0;
                 let totalRev = 0;
-                const rows = companies?.map((c: any) => {
+                const rows = displayCompanies?.map((c: any) => {
                   const md = lastMonth ? filteredMonthly.find((d: any) => d.company_id === c.id && d.month_date === lastMonth) : null;
                   const rev = Number(md?.revenue ?? 0);
                   const tax = Math.round(rev * (Number(c.aliquota) / 100));
@@ -475,7 +479,7 @@ const VaultGlobalReports = () => {
       {activeTab === 6 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5">
-            <span className="text-xs font-medium">Budget vs Realizado — {filterYear || "Todos"}</span>
+            <span className="text-xs font-medium">Budget vs Realizado | {filterYear || "Todos"}</span>
           </div>
           {(budgets?.length ?? 0) === 0 ? (
             <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum budget cadastrado</div>
@@ -483,32 +487,41 @@ const VaultGlobalReports = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/5">
-                  {["Categoria", "Orçado", "Realizado", "Saldo", "Utilização"].map(h => (
+                  {["Empresa", "Categoria", "Orçado", "Realizado", "Saldo", "Utilização"].map(h => (
                     <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {budgets?.map((b: any) => {
-                  const realized = filteredEntries.filter((e: any) => e.category === b.category && e.entry_type === "despesa").reduce((a: number, e: any) => a + Number(e.amount), 0);
-                  const pct = Number(b.amount) > 0 ? Math.round((realized / Number(b.amount)) * 100) : 0;
-                  return (
-                    <tr key={b.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                      <td className="px-4 py-2.5 text-xs">{b.category}</td>
-                      <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(b.amount))}</td>
-                      <td className="px-4 py-2.5 text-xs">{fmt(realized)}</td>
-                      <td className={`px-4 py-2.5 text-xs ${Number(b.amount) - realized >= 0 ? "text-green-400" : "text-red-400"}`}>{fmt(Number(b.amount) - realized)}</td>
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                            <div className="h-full rounded-full" style={{ width: `${Math.min(pct, 100)}%`, background: pct > 100 ? "#ef4444" : pct > 85 ? "#f59e0b" : "#FFD600" }} />
+                {(() => {
+                  const displayBudgets = filterCo.length > 0
+                    ? budgets?.filter((b: any) => filterCo.includes(b.company_id))
+                    : budgets;
+                  return displayBudgets?.map((b: any) => {
+                    const co = companies?.find((c: any) => c.id === b.company_id);
+                    const realized = filteredEntries.filter((e: any) => e.company_id === b.company_id && e.category === b.category && e.entry_type === "despesa").reduce((a: number, e: any) => a + Number(e.amount), 0);
+                    const p = Number(b.amount) > 0 ? Math.round((realized / Number(b.amount)) * 100) : 0;
+                    return (
+                      <tr key={b.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                        <td className="px-4 py-2.5">
+                          {co && <span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${co.color}15`, color: co.color }}>{co.name}</span>}
+                        </td>
+                        <td className="px-4 py-2.5 text-xs">{b.category}</td>
+                        <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(b.amount))}</td>
+                        <td className="px-4 py-2.5 text-xs">{fmt(realized)}</td>
+                        <td className={`px-4 py-2.5 text-xs ${Number(b.amount) - realized >= 0 ? "text-green-400" : "text-red-400"}`}>{fmt(Number(b.amount) - realized)}</td>
+                        <td className="px-4 py-2.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                              <div className="h-full rounded-full" style={{ width: `${Math.min(p, 100)}%`, background: p > 100 ? "#ef4444" : p > 85 ? "#f59e0b" : "#FFD600" }} />
+                            </div>
+                            <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{p}%</span>
                           </div>
-                          <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{pct}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
           )}

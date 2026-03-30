@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
-const fmtDate = (s: string | null) => { if (!s) return "—"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+const fmtDate = (s: string | null) => { if (!s) return "-"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
 
 const statusBadge = (status: string) => {
   const colors: Record<string, string> = {
@@ -37,7 +37,7 @@ const VaultGlobalEntries = () => {
   const totPago = despesas.filter((e: any) => e.status === "pago").reduce((a: number, e: any) => a + Number(e.amount), 0);
   const totFat = faturamentos.reduce((a: number, e: any) => a + Number(e.amount), 0);
 
-  const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "—";
+  const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "-";
   const getCoColor = (id: string) => companies?.find((c: any) => c.id === id)?.color ?? "#888";
   const getAliq = (id: string) => Number(companies?.find((c: any) => c.id === id)?.aliquota ?? 0);
 
@@ -47,7 +47,7 @@ const VaultGlobalEntries = () => {
     <div>
       <div className="mb-5">
         <h1 className="font-heading text-xl font-semibold tracking-tight">Lançamentos</h1>
-        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Centro de informações — despesas e faturamentos de todo o grupo</p>
+        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Centro de informações de despesas e faturamentos de todo o grupo</p>
       </div>
 
       {/* KPI Cards */}
@@ -77,7 +77,7 @@ const VaultGlobalEntries = () => {
       {activeTab === 0 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-medium">Contas a Pagar — Todas as Empresas</span>
+            <span className="text-xs font-medium">Contas a Pagar</span>
             <div className="flex items-center gap-2 flex-wrap">
               <select value={filterCo} onChange={e => setFilterCo(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Todas empresas</option>
@@ -113,7 +113,7 @@ const VaultGlobalEntries = () => {
                   <td className="px-4 py-2.5 text-xs font-medium">{fmt(Number(e.amount))}</td>
                   <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.due_date)}</td>
                   <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.payment_date)}</td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.payment_method || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.payment_method || "-"}</td>
                   <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
                 </tr>
               ))}
@@ -131,7 +131,7 @@ const VaultGlobalEntries = () => {
       {activeTab === 1 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-medium">Faturamentos — Todas as Empresas</span>
+            <span className="text-xs font-medium">Faturamentos</span>
             <div className="flex items-center gap-2">
               <select value={filterCo} onChange={e => setFilterCo(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Todas empresas</option>
@@ -166,8 +166,8 @@ const VaultGlobalEntries = () => {
                     <td className="px-4 py-2.5 text-xs text-red-400">{fmt(imp)}</td>
                     <td className="px-4 py-2.5 text-xs text-green-400">{fmt(Number(e.amount) - imp)}</td>
                     <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(e.entry_date)}</td>
-                    <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.payment_method || "—"}</td>
-                    <td className="px-4 py-2.5 text-xs">{e.quantity || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{e.payment_method || "-"}</td>
+                    <td className="px-4 py-2.5 text-xs">{e.quantity || "-"}</td>
                     <td className="px-4 py-2.5">{statusBadge(e.status)}</td>
                   </tr>
                 );
