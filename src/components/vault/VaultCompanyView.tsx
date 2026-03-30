@@ -726,7 +726,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                     const margin = r > 0 ? Math.round((res / r) * 100) : 0;
                     const [y, mo] = (m.month_date as string).split("-");
                     return (
-                      <tr key={m.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                      <tr key={m.month_date} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                         <td className="px-4 py-2.5 text-xs">{`${mo}/${y}`}</td>
                         <td className="px-4 py-2.5 text-xs font-medium">{fmtK(r)}</td>
                         <td className="px-4 py-2.5 text-xs text-red-400">{fmtK(e)}</td>
