@@ -2,9 +2,10 @@ import { VaultUser } from "@/hooks/useVaultAuth";
 import {
   LayoutDashboard, Bell, Settings, Plug, ChevronDown, ChevronRight,
   Building2, DollarSign, Users, BarChart3, Wrench, CreditCard,
+  FileText, Target, UserCircle,
 } from "lucide-react";
 
-type GlobalView = "dashboard" | "notifications" | "integrations" | "settings";
+export type GlobalView = "dashboard" | "lancamentos" | "relatorios" | "planejamento" | "rh" | "notifications" | "integrations" | "settings" | "usuarios" | "perfil";
 
 const COMPANY_TABS = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -79,9 +80,14 @@ const VaultSidebar = ({
           Principal
         </div>
         {navItem("dashboard", <LayoutDashboard size={13} />, "Dashboard", globalView === "dashboard", () => onGlobalView("dashboard"))}
+        {navItem("lancamentos", <FileText size={13} />, "Lançamentos", globalView === "lancamentos", () => onGlobalView("lancamentos"))}
+        {navItem("relatorios", <BarChart3 size={13} />, "Relatórios", globalView === "relatorios", () => onGlobalView("relatorios"))}
+        {navItem("planejamento", <Target size={13} />, "Planejamento", globalView === "planejamento", () => onGlobalView("planejamento"))}
+        {navItem("rh", <Users size={13} />, "Pessoas & RH", globalView === "rh", () => onGlobalView("rh"))}
         {navItem("notifications", <Bell size={13} />, "Notificações", globalView === "notifications", () => onGlobalView("notifications"), unreadCount)}
         {navItem("integrations", <Plug size={13} />, "Integrações", globalView === "integrations", () => onGlobalView("integrations"))}
         {navItem("settings", <Settings size={13} />, "Configurações", globalView === "settings", () => onGlobalView("settings"))}
+        {navItem("usuarios", <UserCircle size={13} />, "Usuários", globalView === "usuarios", () => onGlobalView("usuarios"))}
       </div>
 
       {/* Companies */}
@@ -113,7 +119,6 @@ const VaultSidebar = ({
                 {isSelected ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
               </button>
 
-              {/* Company sub-tabs */}
               {isSelected && (
                 <div className="ml-3 pl-2 border-l border-white/5 mb-1">
                   {COMPANY_TABS.map((tab, idx) => (
@@ -140,14 +145,17 @@ const VaultSidebar = ({
 
       {/* User footer */}
       <div className="mt-auto border-t border-white/5 p-2">
-        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md">
+        <button
+          onClick={() => onGlobalView("perfil")}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-white/[0.03] transition-colors"
+        >
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-black font-heading shrink-0"
             style={{ background: `linear-gradient(135deg, ${user.color}, ${user.color}aa)` }}
           >
             {user.avatar}
           </div>
-          <div>
+          <div className="text-left">
             <div className="text-xs font-medium">{user.name}</div>
             <span
               className="inline-block text-[8px] font-bold px-1.5 rounded mt-0.5"
@@ -156,7 +164,7 @@ const VaultSidebar = ({
               {roleLabels[user.role]}
             </span>
           </div>
-        </div>
+        </button>
       </div>
     </div>
   );
