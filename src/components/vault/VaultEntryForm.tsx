@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   open: boolean;
@@ -30,6 +31,12 @@ const PAYMENT_METHODS = [
   "Dinheiro", "Cheque", "Débito Automático",
 ];
 
+const initCurrency = (v: any) => {
+  const n = Number(v);
+  if (!v || n === 0) return "";
+  return maskCurrency(n.toFixed(2).replace(".", ","));
+};
+
 const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!entry;
@@ -37,7 +44,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
     description: entry?.description ?? "",
     entry_type: entry?.entry_type ?? defaultType ?? "despesa",
     category: entry?.category ?? "",
-    amount: entry?.amount?.toString() ?? "",
+    amount: initCurrency(entry?.amount),
     due_date: entry?.due_date ?? "",
     entry_date: entry?.entry_date ?? new Date().toISOString().split("T")[0],
     status: entry?.status ?? "pendente",
@@ -50,7 +57,8 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
 
   const handleSave = async () => {
     if (!form.description) { toast.error("Preencha a descrição"); return; }
-    if (!form.amount || Number(form.amount) <= 0) { toast.error("Informe um valor válido"); return; }
+    const numAmount = Number(unmaskCurrency(form.amount));
+    if (!numAmount || numAmount <= 0) { toast.error("Informe um valor válido"); return; }
     if (!form.category) { toast.error("Selecione uma categoria"); return; }
     setLoading(true);
     const payload = {
@@ -58,7 +66,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
       description: form.description,
       entry_type: form.entry_type,
       category: form.category || null,
-      amount: Number(form.amount),
+      amount: numAmount,
       due_date: form.due_date || null,
       entry_date: form.entry_date || null,
       status: form.status,
@@ -118,7 +126,17 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
             {selectField("Categoria", "category", categories.map(c => ({ value: c, label: c })), "Selecione...")}
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {inputField("Valor (R$)", "amount", "number", "0,00")}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="R$ 0,00"
+                value={form.amount}
+                onChange={e => setForm(f => ({ ...f, amount: maskCurrency(e.target.value) }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
+              />
+            </div>
             {inputField("Vencimento", "due_date", "date")}
           </div>
           <div className="grid grid-cols-2 gap-3">

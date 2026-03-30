@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   open: boolean;
@@ -19,13 +20,19 @@ const TRANSACTION_CATEGORIES = [
   "Investimento", "Dividendos", "Outros",
 ];
 
+const initCurrency = (v: any) => {
+  const n = Number(v);
+  if (!v || n === 0) return "";
+  return maskCurrency(n.toFixed(2).replace(".", ","));
+};
+
 const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transaction }: Props) => {
   const qc = useQueryClient();
   const isEdit = !!transaction;
   const [form, setForm] = useState({
     description: transaction?.description ?? "",
     transaction_type: transaction?.transaction_type ?? "despesa",
-    amount: transaction?.amount?.toString() ?? "",
+    amount: initCurrency(transaction?.amount),
     transaction_date: transaction?.transaction_date ?? new Date().toISOString().split("T")[0],
     bank_account_id: transaction?.bank_account_id ?? "",
     category: transaction?.category ?? "",
@@ -35,7 +42,8 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
 
   const handleSave = async () => {
     if (!form.description) { toast.error("Preencha a descrição"); return; }
-    if (!form.amount || Number(form.amount) <= 0) { toast.error("Informe um valor válido"); return; }
+    const numAmount = Number(unmaskCurrency(form.amount));
+    if (!numAmount || numAmount <= 0) { toast.error("Informe um valor válido"); return; }
     if (!form.bank_account_id) { toast.error("Selecione uma conta bancária"); return; }
     if (!form.category) { toast.error("Selecione uma categoria"); return; }
     setLoading(true);
@@ -43,7 +51,7 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
       company_id: companyId,
       description: form.description,
       transaction_type: form.transaction_type,
-      amount: Number(form.amount),
+      amount: numAmount,
       transaction_date: form.transaction_date,
       bank_account_id: form.bank_account_id || null,
       category: form.category || null,
@@ -73,18 +81,7 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
     </div>
   );
 
-  const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
-    <div>
-      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={(form as any)[key]}
-        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
-      />
-    </div>
-  );
+  const cls = "w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20";
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
@@ -93,17 +90,29 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Transação" : "Nova Transação"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {inputField("Descrição", "description", "text", "Ex: Pagamento fornecedor")}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
+            <input type="text" placeholder="Ex: Pagamento fornecedor" value={form.description}
+              onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className={cls} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             {selectField("Tipo", "transaction_type", [
               { value: "receita", label: "Receita" },
               { value: "despesa", label: "Despesa" },
               { value: "transferencia", label: "Transferência" },
             ])}
-            {inputField("Valor (R$)", "amount", "number", "0,00")}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor</label>
+              <input type="text" inputMode="decimal" placeholder="R$ 0,00" value={form.amount}
+                onChange={e => setForm(f => ({ ...f, amount: maskCurrency(e.target.value) }))} className={cls} />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {inputField("Data", "transaction_date", "date")}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Data</label>
+              <input type="date" value={form.transaction_date}
+                onChange={e => setForm(f => ({ ...f, transaction_date: e.target.value }))} className={cls} />
+            </div>
             {selectField("Conta", "bank_account_id", bankAccounts.map((a: any) => ({
               value: a.id,
               label: `${a.bank_name} - ${a.account_number || "S/N"}`,
@@ -111,12 +120,7 @@ const VaultTransactionForm = ({ open, onClose, companyId, bankAccounts, transact
           </div>
           {selectField("Categoria", "category", TRANSACTION_CATEGORIES.map(c => ({ value: c, label: c })), "Selecione...")}
           <label className="flex items-center gap-2 text-xs cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.reconciled}
-              onChange={e => setForm(f => ({ ...f, reconciled: e.target.checked }))}
-              className="accent-[#FFD600]"
-            />
+            <input type="checkbox" checked={form.reconciled} onChange={e => setForm(f => ({ ...f, reconciled: e.target.checked }))} className="accent-[#FFD600]" />
             Conciliado
           </label>
         </div>
