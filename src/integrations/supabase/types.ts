@@ -551,6 +551,563 @@ export type Database = {
         }
         Relationships: []
       }
+      vault_bank_accounts: {
+        Row: {
+          account_number: string | null
+          account_type: string | null
+          active: boolean
+          agency: string | null
+          balance: number
+          bank_name: string
+          company_id: string
+          created_at: string
+          credit_limit: number | null
+          id: string
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: string | null
+          active?: boolean
+          agency?: string | null
+          balance?: number
+          bank_name: string
+          company_id: string
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: string | null
+          active?: boolean
+          agency?: string | null
+          balance?: number
+          bank_name?: string
+          company_id?: string
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_bank_accounts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_bank_transactions: {
+        Row: {
+          amount: number
+          bank_account_id: string | null
+          category: string | null
+          company_id: string
+          created_at: string
+          description: string
+          id: string
+          reconciled: boolean
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          amount?: number
+          bank_account_id?: string | null
+          category?: string | null
+          company_id: string
+          created_at?: string
+          description: string
+          id?: string
+          reconciled?: boolean
+          transaction_date: string
+          transaction_type?: string
+        }
+        Update: {
+          amount?: number
+          bank_account_id?: string | null
+          category?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          reconciled?: boolean
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_bank_transactions_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "vault_bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vault_bank_transactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_budgets: {
+        Row: {
+          amount: number
+          category: string
+          company_id: string
+          created_at: string
+          id: string
+          year: number
+        }
+        Insert: {
+          amount?: number
+          category: string
+          company_id: string
+          created_at?: string
+          id?: string
+          year?: number
+        }
+        Update: {
+          amount?: number
+          category?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_budgets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_companies: {
+        Row: {
+          account_number: string | null
+          active: boolean
+          address: string | null
+          agency: string | null
+          aliquota: number
+          cnae: string | null
+          cnpj: string | null
+          color: string
+          created_at: string
+          dividend_date: string | null
+          dividend_fund: number | null
+          email: string | null
+          emergency_fund: number | null
+          emergency_fund_goal: number | null
+          founded_at: string | null
+          id: string
+          ie: string | null
+          im: string | null
+          investment_fund: number | null
+          is_holding: boolean
+          main_bank: string | null
+          name: string
+          phone: string | null
+          pix_key: string | null
+          regime: string | null
+          responsible: string | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          account_number?: string | null
+          active?: boolean
+          address?: string | null
+          agency?: string | null
+          aliquota?: number
+          cnae?: string | null
+          cnpj?: string | null
+          color?: string
+          created_at?: string
+          dividend_date?: string | null
+          dividend_fund?: number | null
+          email?: string | null
+          emergency_fund?: number | null
+          emergency_fund_goal?: number | null
+          founded_at?: string | null
+          id?: string
+          ie?: string | null
+          im?: string | null
+          investment_fund?: number | null
+          is_holding?: boolean
+          main_bank?: string | null
+          name: string
+          phone?: string | null
+          pix_key?: string | null
+          regime?: string | null
+          responsible?: string | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string | null
+          active?: boolean
+          address?: string | null
+          agency?: string | null
+          aliquota?: number
+          cnae?: string | null
+          cnpj?: string | null
+          color?: string
+          created_at?: string
+          dividend_date?: string | null
+          dividend_fund?: number | null
+          email?: string | null
+          emergency_fund?: number | null
+          emergency_fund_goal?: number | null
+          founded_at?: string | null
+          id?: string
+          ie?: string | null
+          im?: string | null
+          investment_fund?: number | null
+          is_holding?: boolean
+          main_bank?: string | null
+          name?: string
+          phone?: string | null
+          pix_key?: string | null
+          regime?: string | null
+          responsible?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vault_employees: {
+        Row: {
+          admission_date: string | null
+          company_id: string
+          cpf: string | null
+          created_at: string
+          department: string | null
+          email: string | null
+          employment_type: string | null
+          id: string
+          name: string
+          pis: string | null
+          position: string | null
+          salary: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admission_date?: string | null
+          company_id: string
+          cpf?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          employment_type?: string | null
+          id?: string
+          name: string
+          pis?: string | null
+          position?: string | null
+          salary?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admission_date?: string | null
+          company_id?: string
+          cpf?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          employment_type?: string | null
+          id?: string
+          name?: string
+          pis?: string | null
+          position?: string | null
+          salary?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_entries: {
+        Row: {
+          amount: number
+          category: string | null
+          company_id: string
+          created_at: string
+          description: string
+          due_date: string | null
+          entry_date: string | null
+          entry_type: string
+          id: string
+          notes: string | null
+          payment_date: string | null
+          payment_method: string | null
+          quantity: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          category?: string | null
+          company_id: string
+          created_at?: string
+          description: string
+          due_date?: string | null
+          entry_date?: string | null
+          entry_type?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          quantity?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          entry_date?: string | null
+          entry_type?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          quantity?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_entries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_goals: {
+        Row: {
+          company_id: string
+          created_at: string
+          current_value: number
+          description: string | null
+          goal_type: string
+          id: string
+          target_value: number
+          year: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          goal_type: string
+          id?: string
+          target_value?: number
+          year?: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          goal_type?: string
+          id?: string
+          target_value?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_goals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_integrations: {
+        Row: {
+          category: string | null
+          config: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          category?: string | null
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+        }
+        Update: {
+          category?: string | null
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      vault_monthly_data: {
+        Row: {
+          company_id: string
+          created_at: string
+          expenses: number | null
+          id: string
+          month_date: string
+          revenue: number | null
+          sales_count: number | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          expenses?: number | null
+          id?: string
+          month_date: string
+          revenue?: number | null
+          sales_count?: number | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          expenses?: number | null
+          id?: string
+          month_date?: string
+          revenue?: number | null
+          sales_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_monthly_data_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_notifications: {
+        Row: {
+          color: string | null
+          company_id: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          message: string
+          notification_date: string | null
+          notification_type: string
+          read: boolean
+          sub_message: string | null
+        }
+        Insert: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          message: string
+          notification_date?: string | null
+          notification_type?: string
+          read?: boolean
+          sub_message?: string | null
+        }
+        Update: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          message?: string
+          notification_date?: string | null
+          notification_type?: string
+          read?: boolean
+          sub_message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_notifications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vault_vacations: {
+        Row: {
+          company_id: string
+          created_at: string
+          days: number
+          employee_id: string
+          id: string
+          leave_type: string
+          return_date: string
+          start_date: string
+          status: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          days?: number
+          employee_id: string
+          id?: string
+          leave_type?: string
+          return_date: string
+          start_date: string
+          status?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          days?: number
+          employee_id?: string
+          id?: string
+          leave_type?: string
+          return_date?: string
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_vacations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vault_vacations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "vault_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_comments: {
         Row: {
           content: string
