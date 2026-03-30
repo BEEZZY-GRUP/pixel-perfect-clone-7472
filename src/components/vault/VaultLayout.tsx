@@ -29,7 +29,7 @@ interface Props {
 const VIEW_LABELS: Record<string, string> = {
   dashboard: "Dashboard", lancamentos: "Lançamentos", relatorios: "Relatórios",
   planejamento: "Planejamento", rh: "Pessoas & RH", notifications: "Notificações",
-  integrations: "Integrações", settings: "Configurações", usuarios: "Usuários", perfil: "Meu Perfil",
+  settings: "Configurações", usuarios: "Usuários", perfil: "Meu Perfil",
 };
 
 const SETTINGS_FIELDS = [

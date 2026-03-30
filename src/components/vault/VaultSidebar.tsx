@@ -88,7 +88,6 @@ const VaultSidebar = ({
         {navItem("planejamento", <Target size={13} />, "Planejamento", globalView === "planejamento", () => onGlobalView("planejamento"))}
         {navItem("rh", <Users size={13} />, "Pessoas & RH", globalView === "rh", () => onGlobalView("rh"))}
         {navItem("notifications", <Bell size={13} />, "Notificações", globalView === "notifications", () => onGlobalView("notifications"), unreadCount)}
-        {navItem("integrations", <Plug size={13} />, "Integrações", globalView === "integrations", () => onGlobalView("integrations"))}
         {navItem("settings", <Settings size={13} />, "Configurações", globalView === "settings", () => onGlobalView("settings"))}
         {navItem("usuarios", <UserCircle size={13} />, "Usuários", globalView === "usuarios", () => onGlobalView("usuarios"))}
       </div>
