@@ -44,12 +44,18 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [companyTab, setCompanyTab] = useState(0);
 
-  // Settings state
+  // Settings state - loaded from DB
   const [editingSettings, setEditingSettings] = useState(false);
-  const [settingsForm, setSettingsForm] = useState<Record<string, string>>(() => {
-    const saved = sessionStorage.getItem("vault_group_settings");
-    return saved ? JSON.parse(saved) : {};
+  const { data: dbSettings } = useQuery({
+    queryKey: ["vault_settings"],
+    queryFn: async () => {
+      const { data } = await supabase.from("vault_settings").select("*");
+      const map: Record<string, string> = {};
+      data?.forEach((s: any) => { map[s.key] = s.value; });
+      return map;
+    },
   });
+  const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
 
   // Company CRUD
   const [companyModal, setCompanyModal] = useState<{ open: boolean; company?: any }>({ open: false });
