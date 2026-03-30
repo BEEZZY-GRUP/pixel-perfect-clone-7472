@@ -40,6 +40,97 @@ const VaultGlobalPlanning = () => {
     queryKey: ["vault_entries_plan"],
     queryFn: async () => { const { data } = await supabase.from("vault_entries").select("*").eq("entry_type", "despesa"); return data ?? []; },
   });
+  const { data: allEntries } = useQuery({
+    queryKey: ["vault_entries_all_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_entries").select("*"); return data ?? []; },
+  });
+  const { data: employees } = useQuery({
+    queryKey: ["vault_employees_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_employees").select("*").eq("status", "ativo"); return data ?? []; },
+  });
+  const { data: bankAccounts } = useQuery({
+    queryKey: ["vault_bank_accounts_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_bank_accounts").select("*").eq("active", true); return data ?? []; },
+  });
+
+  // Compute projection data from real entries
+  const projectionData = useMemo(() => {
+    const all = allEntries ?? [];
+    const comps = companies ?? [];
+    const emps = employees ?? [];
+    const banks = bankAccounts ?? [];
+
+    // Group entries by company and month
+    const byCompanyMonth: Record<string, Record<string, { rev: number; exp: number }>> = {};
+    all.forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7);
+      if (!byCompanyMonth[e.company_id]) byCompanyMonth[e.company_id] = {};
+      if (!byCompanyMonth[e.company_id][monthKey]) byCompanyMonth[e.company_id][monthKey] = { rev: 0, exp: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        byCompanyMonth[e.company_id][monthKey].rev += Number(e.amount);
+      } else {
+        byCompanyMonth[e.company_id][monthKey].exp += Number(e.amount);
+      }
+    });
+
+    // Current month
+    const now = new Date();
+    const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    // Per company: latest MRR, avg growth, burn rate
+    const companyProjections = comps.map((c: any) => {
+      const months = Object.keys(byCompanyMonth[c.id] ?? {}).sort();
+      const lastMonth = months[months.length - 1] ?? currentMonthKey;
+      const lastData = byCompanyMonth[c.id]?.[lastMonth] ?? { rev: 0, exp: 0 };
+      const currentMRR = lastData.rev;
+      const currentBurn = lastData.exp;
+
+      // Calculate growth rate from last 3 months
+      const recentMonths = months.slice(-3);
+      let growthRate = 1.03; // default 3%
+      if (recentMonths.length >= 2) {
+        const revs = recentMonths.map(m => byCompanyMonth[c.id][m]?.rev ?? 0).filter(v => v > 0);
+        if (revs.length >= 2) {
+          const avgGrowth = revs.slice(1).reduce((sum, v, i) => sum + (v / revs[i] - 1), 0) / (revs.length - 1);
+          growthRate = 1 + Math.max(-0.1, Math.min(avgGrowth, 0.2)); // clamp between -10% and +20%
+        }
+      }
+
+      // Payroll
+      const payroll = emps.filter((e: any) => e.company_id === c.id).reduce((a: number, e: any) => a + Number(e.salary), 0);
+
+      // Bank balance
+      const balance = banks.filter((b: any) => b.company_id === c.id).reduce((a: number, b: any) => a + Number(b.balance), 0);
+
+      return { id: c.id, name: c.name, color: c.color, currentMRR, currentBurn, growthRate, payroll, balance };
+    });
+
+    // Totals
+    const totalMRR = companyProjections.reduce((a, c) => a + c.currentMRR, 0);
+    const totalBurn = companyProjections.reduce((a, c) => a + c.currentBurn, 0);
+    const totalPayroll = companyProjections.reduce((a, c) => a + c.payroll, 0);
+    const totalBalance = companyProjections.reduce((a, c) => a + c.balance, 0);
+    const netBurn = totalBurn + totalPayroll - totalMRR;
+    const runway = netBurn > 0 ? Math.floor(totalBalance / netBurn) : 99;
+
+    // Projected MRR 6 months out
+    const avgGrowth = companyProjections.length > 0
+      ? companyProjections.reduce((a, c) => a + c.growthRate, 0) / companyProjections.length
+      : 1.03;
+    const projectedMRR6 = Math.round(totalMRR * Math.pow(avgGrowth, 6));
+    const mrrGrowthPct = totalMRR > 0 ? ((projectedMRR6 / totalMRR - 1) * 100).toFixed(1) : "0";
+
+    // Future months
+    const futureMonths: { label: string; key: string }[] = [];
+    for (let i = 1; i <= 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      futureMonths.push({ label: `${monthNames[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`, key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` });
+    }
+
+    return { companyProjections, totalMRR, projectedMRR6, mrrGrowthPct, runway, futureMonths, totalBurn, totalPayroll };
+  }, [allEntries, companies, employees, bankAccounts]);
 
   const handleSaveGoal = async () => {
     if (!form.description || !form.target_value) { toast.error("Preencha descrição e meta"); return; }
