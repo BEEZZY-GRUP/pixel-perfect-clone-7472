@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2 } from "lucide-react";
+import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2, ArrowRight, Bot } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, CHALLENGE_OPTIONS, SOURCE_OPTIONS, type Lead } from "./types";
 import { supabase } from "@/integrations/supabase/client";
