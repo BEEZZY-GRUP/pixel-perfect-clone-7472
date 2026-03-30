@@ -1255,6 +1255,54 @@ export type Database = {
           },
         ]
       }
+      vault_salary_history: {
+        Row: {
+          change_date: string
+          company_id: string
+          created_at: string
+          employee_id: string
+          id: string
+          new_salary: number
+          previous_salary: number
+          reason: string | null
+        }
+        Insert: {
+          change_date?: string
+          company_id: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          new_salary?: number
+          previous_salary?: number
+          reason?: string | null
+        }
+        Update: {
+          change_date?: string
+          company_id?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          new_salary?: number
+          previous_salary?: number
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vault_salary_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "vault_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vault_salary_history_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "vault_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vault_settings: {
         Row: {
           id: string
