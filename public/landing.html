@@ -1511,6 +1511,14 @@ ScrollTrigger.create({trigger:'#testimonials',start:'top 80%',once:true,
   }
 });
 
+/* Case Study */
+ScrollTrigger.create({trigger:'#case-study',start:'top 80%',once:true,
+  onEnter(){
+    gsap.to('.case-eyebrow,.case-title,.case-subtitle',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.case-phase',{opacity:1,x:0,stagger:.15,duration:.9,ease:'power3.out',delay:.3});
+  }
+});
+
 /* CTA */
 ['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 82%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
 ScrollTrigger.create({trigger:'#cta',start:'top 80%',once:true,onEnter(){gsap.to('#ctaTitle',{opacity:1,y:0,duration:1.1,ease:'power3.out'})}});
