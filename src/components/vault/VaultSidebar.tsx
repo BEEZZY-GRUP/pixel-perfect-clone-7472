@@ -16,6 +16,7 @@ const COMPANY_TABS = [
   { icon: FileText, label: "Faturamentos" },
   { icon: BarChart3, label: "Relatórios" },
   { icon: Users, label: "Pessoas & RH" },
+  { icon: UserCircle, label: "RH" },
   { icon: Wrench, label: "Configurações" },
 ];
 
