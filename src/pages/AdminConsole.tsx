@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PageBackground from "@/components/PageBackground";
-import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw } from "lucide-react";
+import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw, Users } from "lucide-react";
 import { LeadsProvider, useLeads } from "@/components/admin/LeadsContext";
 import KanbanBoard from "@/components/admin/KanbanBoard";
 import LeadsList from "@/components/admin/LeadsList";
@@ -10,6 +10,7 @@ import SalesDashboard from "@/components/admin/SalesDashboard";
 import DiagnosticsList from "@/components/admin/DiagnosticsList";
 import TrashPanel from "@/components/admin/TrashPanel";
 import AddLeadModal from "@/components/admin/AddLeadModal";
+import ConsoleUsersTab from "@/components/admin/ConsoleUsersTab";
 
 const TABS = [
   { key: "Dashboard", label: "DASHBOARD", icon: BarChart3 },
@@ -17,6 +18,7 @@ const TABS = [
   { key: "Leads", label: "LEADS", icon: List },
   { key: "Diagnosticos", label: "DIAGNÓSTICOS", icon: FileText },
   { key: "Lixeira", label: "LIXEIRA", icon: Trash2 },
+  { key: "Usuarios", label: "USUÁRIOS", icon: Users, adminOnly: true },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -26,6 +28,9 @@ function ConsoleContent() {
   const { refresh, loading } = useLeads();
   const [tab, setTab] = useState<TabKey>("Dashboard");
   const [addOpen, setAddOpen] = useState(false);
+
+  const consoleRole = sessionStorage.getItem("bzy_role") || "comercial";
+  const isAdmin = consoleRole === "admin";
 
   useEffect(() => {
     if (sessionStorage.getItem("bzy_auth") !== "1") {
@@ -58,7 +63,7 @@ function ConsoleContent() {
 
           {/* Tabs */}
           <nav className="flex h-full overflow-x-auto scrollbar-none mx-2">
-            {TABS.map((t) => {
+            {TABS.filter(t => !("adminOnly" in t && t.adminOnly) || isAdmin).map((t) => {
               const Icon = t.icon;
               const isActive = tab === t.key;
               return (
@@ -124,9 +129,10 @@ function ConsoleContent() {
           >
             {tab === "Dashboard" && <SalesDashboard />}
             {tab === "Funil" && <KanbanBoard />}
-            {tab === "Leads" && <LeadsList />}
+            {tab === "Leads" && <LeadsList consoleRole={consoleRole} />}
             {tab === "Diagnosticos" && <DiagnosticsList />}
-            {tab === "Lixeira" && <TrashPanel />}
+            {tab === "Lixeira" && <TrashPanel consoleRole={consoleRole} />}
+            {tab === "Usuarios" && isAdmin && <ConsoleUsersTab />}
           </motion.div>
         </AnimatePresence>
       </main>

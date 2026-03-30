@@ -172,6 +172,39 @@ export type Database = {
         }
         Relationships: []
       }
+      console_users: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          password_hash: string
+          role: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          password_hash: string
+          role?: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          password_hash?: string
+          role?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       diagnostics: {
         Row: {
           additional_notes: string | null

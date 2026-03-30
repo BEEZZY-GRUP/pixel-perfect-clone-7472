@@ -6,7 +6,7 @@ import { STATUS_OPTIONS, PRIORITY_OPTIONS, SOURCE_OPTIONS, type Lead } from "./t
 import LeadDetailModal from "./LeadDetailModal";
 import AddLeadModal from "./AddLeadModal";
 
-export default function LeadsList() {
+export default function LeadsList({ consoleRole = "admin" }: { consoleRole?: string }) {
   const { leads, deleteLead } = useLeads();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -234,9 +234,11 @@ export default function LeadsList() {
                     <button onClick={() => setSelectedLead(lead)} className="p-1.5 text-muted-foreground/40 hover:text-gold transition-colors rounded">
                       <Eye size={13} />
                     </button>
-                    <button onClick={() => deleteLead(lead.id)} className="p-1.5 text-muted-foreground/40 hover:text-red-400 transition-colors rounded">
-                      <Trash2 size={13} />
-                    </button>
+                    {consoleRole === "admin" && (
+                      <button onClick={() => deleteLead(lead.id)} className="p-1.5 text-muted-foreground/40 hover:text-red-400 transition-colors rounded">
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </td>
               </motion.tr>

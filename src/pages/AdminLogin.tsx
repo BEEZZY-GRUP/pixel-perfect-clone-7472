@@ -2,25 +2,37 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, ArrowRight } from "lucide-react";
 import PageBackground from "@/components/PageBackground";
-
-const ADMIN_USER = "beezzygroup";
-const ADMIN_PASS = "Zetslife@2026";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminLogin() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    setLoading(true);
+    setError(false);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("console-auth", {
+        body: { action: "login", username: user, password: pass },
+      });
+      if (fnError || data?.error || !data?.user) {
+        setError(true);
+        setLoading(false);
+        return;
+      }
       sessionStorage.setItem("bzy_auth", "1");
+      sessionStorage.setItem("bzy_role", data.user.role);
+      sessionStorage.setItem("bzy_user_name", data.user.name);
       navigate("/adminconsole");
-    } else {
+    } catch {
       setError(true);
     }
+    setLoading(false);
   };
 
   return (
@@ -92,10 +104,11 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full group border border-gold bg-gold/10 hover:bg-gold text-gold hover:text-background font-heading text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3 rounded-lg font-bold"
+              disabled={loading}
+              className="w-full group border border-gold bg-gold/10 hover:bg-gold text-gold hover:text-background font-heading text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3 rounded-lg font-bold disabled:opacity-50"
             >
-              ACESSAR
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              {loading ? "AUTENTICANDO..." : "ACESSAR"}
+              {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
 
