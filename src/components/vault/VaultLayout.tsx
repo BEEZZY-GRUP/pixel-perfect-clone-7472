@@ -11,7 +11,7 @@ import VaultGlobalPlanning from "./VaultGlobalPlanning";
 import VaultGlobalHR from "./VaultGlobalHR";
 import VaultUsersPage from "./VaultUsersPage";
 import VaultProfilePage from "./VaultProfilePage";
-import VaultIntegrationsPage from "./VaultIntegrationsPage";
+
 import { ChevronRight, Bell, LogOut, Save, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
