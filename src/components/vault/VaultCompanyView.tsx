@@ -46,6 +46,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   const [bankAccountModal, setBankAccountModal] = useState<{ open: boolean; account?: any }>({ open: false });
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; title: string; desc: string; onConfirm: () => Promise<void> }>({ open: false, title: "", desc: "", onConfirm: async () => {} });
+  const [goalModal, setGoalModal] = useState<{ open: boolean; goal?: any }>({ open: false });
+  const [goalForm, setGoalForm] = useState({ goal_type: "", description: "", target_value: "", current_value: "" });
 
   // RH tab state
   const [selectedRHEmployee, setSelectedRHEmployee] = useState<any>(null);
