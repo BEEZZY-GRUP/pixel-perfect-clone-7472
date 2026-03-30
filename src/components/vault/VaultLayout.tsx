@@ -34,9 +34,13 @@ const VIEW_LABELS: Record<string, string> = {
 
 const SETTINGS_FIELDS = [
   { key: "group_name", label: "Nome do Grupo", default: "Beezzy Group" },
-  { key: "currency", label: "Moeda Padrão", default: "BRL — Real Brasileiro" },
-  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro — Dezembro" },
-  { key: "timezone", label: "Fuso Horário", default: "America/Sao_Paulo (UTC-3)" },
+  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro — Dezembro", type: "select", options: ["Janeiro — Dezembro", "Abril — Março", "Julho — Junho"] },
+  { key: "tax_regime_default", label: "Regime Tributário Padrão", default: "Simples Nacional", type: "select", options: ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"] },
+  { key: "holding_name", label: "Empresa Holding", default: "" },
+  { key: "responsible", label: "Responsável Geral", default: "" },
+  { key: "contact_email", label: "E-mail de Contato", default: "" },
+  { key: "contact_phone", label: "Telefone de Contato", default: "" },
+  { key: "address", label: "Endereço Sede", default: "" },
 ];
 
 const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props) => {
@@ -159,16 +163,34 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               <h1 className="font-heading text-lg font-semibold mb-4">Notificações</h1>
               <div className="space-y-2">
                 {notifications?.length === 0 && <div className="text-center py-12 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação</div>}
-                {notifications?.map((n: any) => (
-                  <div key={n.id} className="p-3 rounded-lg border border-white/5 flex items-start gap-3" style={{ background: "#0e0e0a" }}>
-                    <span className="text-lg">{n.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
-                      {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
-                    </div>
-                    {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
-                  </div>
-                ))}
+                {notifications?.map((n: any) => {
+                  const getTargetView = (type: string): GlobalView | null => {
+                    if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
+                    if (type === "relatorio") return "relatorios";
+                    if (type === "rh" || type === "admissao" || type === "ferias") return "rh";
+                    if (type === "planejamento" || type === "meta") return "planejamento";
+                    if (type === "config") return "settings";
+                    return null;
+                  };
+                  const targetView = getTargetView(n.notification_type);
+                  return (
+                    <button key={n.id} onClick={async () => {
+                      if (!n.read) {
+                        await supabase.from("vault_notifications").update({ read: true }).eq("id", n.id);
+                        qc.invalidateQueries({ queryKey: ["vault_notifications"] });
+                      }
+                      if (targetView) handleGlobalView(targetView);
+                    }}
+                      className="w-full text-left p-3 rounded-lg border border-white/5 flex items-start gap-3 hover:border-white/10 transition-colors cursor-pointer" style={{ background: "#0e0e0a" }}>
+                      <span className="text-lg">{n.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-medium ${n.read ? 'opacity-50' : ''}`}>{n.message}</div>
+                        {n.sub_message && <div className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>{n.sub_message}</div>}
+                      </div>
+                      {!n.read && <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -201,8 +223,15 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                   <div key={f.key} className="rounded-xl p-3 border border-white/5" style={{ background: "#0e0e0a" }}>
                     <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.3)" }}>{f.label}</div>
                     {editingSettings ? (
-                      <input value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
-                        className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                      f.type === "select" ? (
+                        <select value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
+                          {f.options?.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
+                        </select>
+                      ) : (
+                        <input value={getSettingValue(f.key)} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                      )
                     ) : (
                       <div className="text-sm">{getSettingValue(f.key)}</div>
                     )}

@@ -146,7 +146,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
     { key: "email", label: "E-mail", type: "text" },
     { key: "phone", label: "Telefone", type: "text" },
     { key: "address", label: "Endereço", type: "text" },
-    { key: "main_bank", label: "Banco Principal", type: "select", options: ["Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa Econômica", "Nubank", "Inter", "C6 Bank", "BTG Pactual", "Outro"] },
+    { key: "main_bank", label: "Banco Principal", type: "dynamic_select" },
     { key: "agency", label: "Agência", type: "text" },
     { key: "account_number", label: "Conta", type: "text" },
     { key: "pix_key", label: "Chave Pix", type: "text" },
@@ -649,6 +649,12 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
                       className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
                       <option value="" className="bg-[#111]">Selecione...</option>
                       {f.options?.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
+                    </select>
+                  ) : f.type === "dynamic_select" ? (
+                    <select value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
+                      <option value="" className="bg-[#111]">Selecione...</option>
+                      {bankAccounts?.filter((a: any) => a.active).map((a: any) => <option key={a.id} value={a.bank_name} className="bg-[#111]">{a.bank_name} ({a.account_type})</option>)}
                     </select>
                   ) : f.type === "color" ? (
                     <div className="flex items-center gap-2">
