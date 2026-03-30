@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, CheckCircle, XCircle, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import VaultEntryForm from "./VaultEntryForm";
 import VaultEmployeeForm from "./VaultEmployeeForm";
 import VaultBankAccountForm from "./VaultBankAccountForm";
@@ -43,52 +44,38 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
   const [transactionModal, setTransactionModal] = useState<{ open: boolean; transaction?: any }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; title: string; desc: string; onConfirm: () => Promise<void> }>({ open: false, title: "", desc: "", onConfirm: async () => {} });
 
+  // Editable settings state
+  const [editSettings, setEditSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
+
   const { data: monthlyData } = useQuery({
     queryKey: ["vault_monthly", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_monthly_data").select("*").eq("company_id", coId).order("month_date");
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_monthly_data").select("*").eq("company_id", coId).order("month_date"); return data ?? []; },
   });
 
   const { data: entries } = useQuery({
     queryKey: ["vault_entries", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_entries").select("*").eq("company_id", coId).order("created_at", { ascending: false });
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_entries").select("*").eq("company_id", coId).order("created_at", { ascending: false }); return data ?? []; },
   });
 
   const { data: employees } = useQuery({
     queryKey: ["vault_employees", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_employees").select("*").eq("company_id", coId).order("name");
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_employees").select("*").eq("company_id", coId).order("name"); return data ?? []; },
   });
 
   const { data: goals } = useQuery({
     queryKey: ["vault_goals", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_goals").select("*").eq("company_id", coId);
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_goals").select("*").eq("company_id", coId); return data ?? []; },
   });
 
   const { data: bankAccounts } = useQuery({
     queryKey: ["vault_bank_accounts", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_bank_accounts").select("*").eq("company_id", coId).order("bank_name");
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_bank_accounts").select("*").eq("company_id", coId).order("bank_name"); return data ?? []; },
   });
 
   const { data: bankTransactions } = useQuery({
     queryKey: ["vault_bank_transactions", coId],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_bank_transactions").select("*").eq("company_id", coId).order("transaction_date", { ascending: false });
-      return data ?? [];
-    },
+    queryFn: async () => { const { data } = await supabase.from("vault_bank_transactions").select("*").eq("company_id", coId).order("transaction_date", { ascending: false }); return data ?? []; },
   });
 
   const current = monthlyData?.find((m: any) => m.month_date === "2026-03-01");
@@ -104,9 +91,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
 
   const handleDelete = (table: string, id: string, label: string, queryKey: string) => {
     setDeleteModal({
-      open: true,
-      title: `Excluir ${label}?`,
-      desc: `Esta ação não pode ser desfeita.`,
+      open: true, title: `Excluir ${label}?`, desc: "Esta ação não pode ser desfeita.",
       onConfirm: async () => {
         const { error } = await supabase.from(table as any).delete().eq("id", id);
         if (error) throw error;
@@ -131,14 +116,59 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
 
   const actionBtns = (onEdit: () => void, onDelete: () => void) => (
     <div className="flex gap-1">
-      <button onClick={onEdit} className="p-1 rounded hover:bg-white/10 transition-colors" title="Editar">
-        <Pencil size={12} style={{ color: "rgba(242,240,232,0.4)" }} />
-      </button>
-      <button onClick={onDelete} className="p-1 rounded hover:bg-red-500/20 transition-colors" title="Excluir">
-        <Trash2 size={12} className="text-red-400" />
-      </button>
+      <button onClick={onEdit} className="p-1 rounded hover:bg-white/10 transition-colors" title="Editar"><Pencil size={12} style={{ color: "rgba(242,240,232,0.4)" }} /></button>
+      <button onClick={onDelete} className="p-1 rounded hover:bg-red-500/20 transition-colors" title="Excluir"><Trash2 size={12} className="text-red-400" /></button>
     </div>
   );
+
+  // Settings fields config
+  const settingsFields = [
+    { key: "name", label: "Nome", type: "text" },
+    { key: "cnpj", label: "CNPJ", type: "text" },
+    { key: "regime", label: "Regime Tributário", type: "select", options: ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"] },
+    { key: "aliquota", label: "Alíquota (%)", type: "number" },
+    { key: "cnae", label: "CNAE", type: "text" },
+    { key: "ie", label: "Inscrição Estadual", type: "text" },
+    { key: "im", label: "Inscrição Municipal", type: "text" },
+    { key: "responsible", label: "Responsável", type: "text" },
+    { key: "email", label: "E-mail", type: "text" },
+    { key: "phone", label: "Telefone", type: "text" },
+    { key: "address", label: "Endereço", type: "text" },
+    { key: "main_bank", label: "Banco Principal", type: "text" },
+    { key: "agency", label: "Agência", type: "text" },
+    { key: "account_number", label: "Conta", type: "text" },
+    { key: "pix_key", label: "Chave Pix", type: "text" },
+    { key: "color", label: "Cor", type: "color" },
+    { key: "founded_at", label: "Data Fundação", type: "date" },
+  ];
+
+  const startEditSettings = () => {
+    const f: Record<string, string> = {};
+    settingsFields.forEach(sf => { f[sf.key] = String(company[sf.key] ?? ""); });
+    setSettingsForm(f);
+    setEditSettings(true);
+  };
+
+  const handleSaveSettings = async () => {
+    const payload: any = {};
+    settingsFields.forEach(sf => {
+      const v = settingsForm[sf.key];
+      if (sf.type === "number") payload[sf.key] = Number(v) || 0;
+      else payload[sf.key] = v || null;
+    });
+    payload.name = settingsForm.name || company.name;
+    const { error } = await supabase.from("vault_companies").update(payload).eq("id", coId);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Dados da empresa atualizados");
+    qc.invalidateQueries({ queryKey: ["vault_companies"] });
+    setEditSettings(false);
+  };
+
+  // Chart data for company reports
+  const chartData = monthlyData?.map((m: any) => {
+    const [y, mo] = (m.month_date as string).split("-");
+    return { name: `${mo}/${y}`, Faturamento: Number(m.revenue), Despesas: Number(m.expenses), Resultado: Number(m.revenue) - Number(m.expenses) };
+  }) ?? [];
 
   return (
     <div>
@@ -195,22 +225,17 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
           )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Colaboradores</div>
-              <div className="font-heading text-lg font-semibold">{activeEmps}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Folha Mensal</div>
-              <div className="font-heading text-lg font-semibold">{fmtK(payroll)}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Saldo Bancário</div>
-              <div className="font-heading text-lg font-semibold text-green-400">{fmtK(totalBalance)}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Contas Ativas</div>
-              <div className="font-heading text-lg font-semibold">{activeAccounts}</div>
-            </div>
+            {[
+              { label: "Colaboradores", value: String(activeEmps) },
+              { label: "Folha Mensal", value: fmtK(payroll) },
+              { label: "Saldo Bancário", value: fmtK(totalBalance), cls: "text-green-400" },
+              { label: "Contas Ativas", value: String(activeAccounts) },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -256,27 +281,20 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
       {/* Tab 2: Contas Bancárias & Transações */}
       {tab === 2 && (
         <div className="space-y-5">
-          {/* Bank Account Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Saldo Total</div>
-              <div className="font-heading text-lg font-semibold bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent">{fmtK(totalBalance)}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Contas Ativas</div>
-              <div className="font-heading text-lg font-semibold">{activeAccounts}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>Transações</div>
-              <div className="font-heading text-lg font-semibold">{bankTransactions?.length ?? 0}</div>
-            </div>
-            <div className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
-              <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>A Conciliar</div>
-              <div className={`font-heading text-lg font-semibold ${unconciledCount > 0 ? "text-amber-400" : "text-green-400"}`}>{unconciledCount}</div>
-            </div>
+            {[
+              { label: "Saldo Total", value: fmtK(totalBalance), cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
+              { label: "Contas Ativas", value: String(activeAccounts) },
+              { label: "Transações", value: String(bankTransactions?.length ?? 0) },
+              { label: "A Conciliar", value: String(unconciledCount), cls: unconciledCount > 0 ? "text-amber-400" : "text-green-400" },
+            ].map((k, i) => (
+              <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
+                <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
+                <div className={`font-heading text-lg font-semibold ${k.cls ?? ""}`}>{k.value}</div>
+              </div>
+            ))}
           </div>
 
-          {/* Bank Accounts Table */}
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
               <span className="text-xs font-medium">Contas Bancárias</span>
@@ -313,7 +331,6 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
             </table>
           </div>
 
-          {/* Transactions Table */}
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
               <span className="text-xs font-medium">Transações Bancárias</span>
@@ -341,16 +358,12 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
                       <td className={`px-4 py-2.5 text-xs font-medium ${t.transaction_type === "receita" ? "text-green-400" : "text-red-400"}`}>{fmt(Number(t.amount))}</td>
                       <td className="px-4 py-2.5">
                         {hasPerm("fin") ? (
-                          <button
-                            onClick={() => handleReconcile(t.id, !t.reconciled)}
+                          <button onClick={() => handleReconcile(t.id, !t.reconciled)}
                             className={`p-1 rounded transition-colors ${t.reconciled ? "text-green-400 hover:text-green-300" : "text-white/20 hover:text-amber-400"}`}
-                            title={t.reconciled ? "Desconciliar" : "Marcar como conciliado"}
-                          >
+                            title={t.reconciled ? "Desconciliar" : "Conciliar"}>
                             {t.reconciled ? <CheckCircle size={14} /> : <XCircle size={14} />}
                           </button>
-                        ) : (
-                          t.reconciled ? <CheckCircle size={14} className="text-green-400" /> : <XCircle size={14} className="text-white/20" />
-                        )}
+                        ) : (t.reconciled ? <CheckCircle size={14} className="text-green-400" /> : <XCircle size={14} className="text-white/20" />)}
                       </td>
                       <td className="px-4 py-2.5">
                         {hasPerm("fin") && actionBtns(
@@ -408,30 +421,110 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm }: Props) => {
 
       {/* Tab 4: Relatórios */}
       {tab === 4 && (
-        <div className="text-sm" style={{ color: "rgba(242,240,232,0.4)" }}>
-          <h2 className="font-heading text-sm font-semibold mb-3 text-[#F2F0E8]">Relatórios — {company.name}</h2>
-          <p>Módulo de relatórios será expandido em breve.</p>
+        <div className="space-y-5">
+          <h2 className="font-heading text-sm font-semibold text-[#F2F0E8]">Relatórios — {company.name}</h2>
+
+          {chartData.length > 0 && (
+            <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
+              <h3 className="text-xs font-medium mb-3">Faturamento vs Despesas</h3>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} />
+                  <YAxis tick={{ fill: "rgba(242,240,232,0.4)", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#F2F0E8", fontSize: 11 }} formatter={(v: number) => fmt(v)} />
+                  <Bar dataKey="Faturamento" fill={company.color} radius={[4,4,0,0]} />
+                  <Bar dataKey="Despesas" fill="#ef4444" radius={[4,4,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+            <div className="px-4 py-3 border-b border-white/5">
+              <span className="text-xs font-medium">DRE — {company.name}</span>
+            </div>
+            {(monthlyData?.length ?? 0) === 0 ? (
+              <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum dado mensal</div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    {["Período", "Faturamento", "Despesas", "Imposto", "Resultado", "Margem"].map(h => (
+                      <th key={h} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyData?.map((m: any) => {
+                    const r = Number(m.revenue); const e = Number(m.expenses);
+                    const t = Math.round(r * (Number(company.aliquota) / 100));
+                    const res = r - e - t;
+                    const margin = r > 0 ? Math.round((res / r) * 100) : 0;
+                    const [y, mo] = (m.month_date as string).split("-");
+                    return (
+                      <tr key={m.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                        <td className="px-4 py-2.5 text-xs">{`${mo}/${y}`}</td>
+                        <td className="px-4 py-2.5 text-xs font-medium">{fmtK(r)}</td>
+                        <td className="px-4 py-2.5 text-xs text-red-400">{fmtK(e)}</td>
+                        <td className="px-4 py-2.5 text-xs text-red-400">{fmtK(t)}</td>
+                        <td className={`px-4 py-2.5 text-xs font-semibold ${res >= 0 ? "text-green-400" : "text-red-400"}`}>{fmtK(res)}</td>
+                        <td className={`px-4 py-2.5 text-xs ${margin >= 0 ? "text-green-400" : "text-red-400"}`}>{margin}%</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Tab 5: Configurações */}
+      {/* Tab 5: Configurações (Editable) */}
       {tab === 5 && (
         <div>
-          <h2 className="font-heading text-sm font-semibold mb-4">Configurações — {company.name}</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-heading text-sm font-semibold">Configurações — {company.name}</h2>
+            {!editSettings ? (
+              <Button size="sm" onClick={startEditSettings} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+                <Pencil size={12} className="mr-1" /> Editar
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={() => setEditSettings(false)} className="h-7 text-[11px] px-2.5 text-white/60">Cancelar</Button>
+                <Button size="sm" onClick={handleSaveSettings} className="bg-[#FFD600] text-black hover:bg-[#E6C200] h-7 text-[11px] px-2.5">
+                  <Save size={12} className="mr-1" /> Salvar
+                </Button>
+              </div>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "CNPJ", value: company.cnpj },
-              { label: "Regime", value: company.regime },
-              { label: "Alíquota", value: `${company.aliquota}%` },
-              { label: "Responsável", value: company.responsible },
-              { label: "Email", value: company.email },
-              { label: "Telefone", value: company.phone },
-              { label: "Banco Principal", value: company.main_bank },
-              { label: "Fundação", value: fmtDate(company.founded_at) },
-            ].map((f, i) => (
-              <div key={i} className="rounded-xl p-3 border border-white/5" style={{ background: "#0e0e0a" }}>
+            {settingsFields.map((f) => (
+              <div key={f.key} className="rounded-xl p-3 border border-white/5" style={{ background: "#0e0e0a" }}>
                 <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.3)" }}>{f.label}</div>
-                <div className="text-sm">{f.value || "—"}</div>
+                {editSettings ? (
+                  f.type === "select" ? (
+                    <select value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none">
+                      {f.options?.map(o => <option key={o} value={o} className="bg-[#111]">{o}</option>)}
+                    </select>
+                  ) : f.type === "color" ? (
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={settingsForm[f.key] ?? "#888"} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))} className="w-8 h-8 rounded border-0 bg-transparent cursor-pointer" />
+                      <span className="text-sm">{settingsForm[f.key]}</span>
+                    </div>
+                  ) : (
+                    <input type={f.type} value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                  )
+                ) : (
+                  <div className="text-sm">{f.type === "color" ? (
+                    <div className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full" style={{ background: company[f.key] ?? "#888" }} />
+                      <span>{company[f.key] ?? "—"}</span>
+                    </div>
+                  ) : (f.key === "founded_at" ? fmtDate(company[f.key]) : (company[f.key] ?? "—"))}</div>
+                )}
               </div>
             ))}
           </div>
