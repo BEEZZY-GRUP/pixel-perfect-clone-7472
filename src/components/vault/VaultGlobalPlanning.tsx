@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -40,6 +40,97 @@ const VaultGlobalPlanning = () => {
     queryKey: ["vault_entries_plan"],
     queryFn: async () => { const { data } = await supabase.from("vault_entries").select("*").eq("entry_type", "despesa"); return data ?? []; },
   });
+  const { data: allEntries } = useQuery({
+    queryKey: ["vault_entries_all_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_entries").select("*"); return data ?? []; },
+  });
+  const { data: employees } = useQuery({
+    queryKey: ["vault_employees_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_employees").select("*").eq("status", "ativo"); return data ?? []; },
+  });
+  const { data: bankAccounts } = useQuery({
+    queryKey: ["vault_bank_accounts_plan"],
+    queryFn: async () => { const { data } = await supabase.from("vault_bank_accounts").select("*").eq("active", true); return data ?? []; },
+  });
+
+  // Compute projection data from real entries
+  const projectionData = useMemo(() => {
+    const all = allEntries ?? [];
+    const comps = companies ?? [];
+    const emps = employees ?? [];
+    const banks = bankAccounts ?? [];
+
+    // Group entries by company and month
+    const byCompanyMonth: Record<string, Record<string, { rev: number; exp: number }>> = {};
+    all.forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7);
+      if (!byCompanyMonth[e.company_id]) byCompanyMonth[e.company_id] = {};
+      if (!byCompanyMonth[e.company_id][monthKey]) byCompanyMonth[e.company_id][monthKey] = { rev: 0, exp: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        byCompanyMonth[e.company_id][monthKey].rev += Number(e.amount);
+      } else {
+        byCompanyMonth[e.company_id][monthKey].exp += Number(e.amount);
+      }
+    });
+
+    // Current month
+    const now = new Date();
+    const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    // Per company: latest MRR, avg growth, burn rate
+    const companyProjections = comps.map((c: any) => {
+      const months = Object.keys(byCompanyMonth[c.id] ?? {}).sort();
+      const lastMonth = months[months.length - 1] ?? currentMonthKey;
+      const lastData = byCompanyMonth[c.id]?.[lastMonth] ?? { rev: 0, exp: 0 };
+      const currentMRR = lastData.rev;
+      const currentBurn = lastData.exp;
+
+      // Calculate growth rate from last 3 months
+      const recentMonths = months.slice(-3);
+      let growthRate = 1.03; // default 3%
+      if (recentMonths.length >= 2) {
+        const revs = recentMonths.map(m => byCompanyMonth[c.id][m]?.rev ?? 0).filter(v => v > 0);
+        if (revs.length >= 2) {
+          const avgGrowth = revs.slice(1).reduce((sum, v, i) => sum + (v / revs[i] - 1), 0) / (revs.length - 1);
+          growthRate = 1 + Math.max(-0.1, Math.min(avgGrowth, 0.2)); // clamp between -10% and +20%
+        }
+      }
+
+      // Payroll
+      const payroll = emps.filter((e: any) => e.company_id === c.id).reduce((a: number, e: any) => a + Number(e.salary), 0);
+
+      // Bank balance
+      const balance = banks.filter((b: any) => b.company_id === c.id).reduce((a: number, b: any) => a + Number(b.balance), 0);
+
+      return { id: c.id, name: c.name, color: c.color, currentMRR, currentBurn, growthRate, payroll, balance };
+    });
+
+    // Totals
+    const totalMRR = companyProjections.reduce((a, c) => a + c.currentMRR, 0);
+    const totalBurn = companyProjections.reduce((a, c) => a + c.currentBurn, 0);
+    const totalPayroll = companyProjections.reduce((a, c) => a + c.payroll, 0);
+    const totalBalance = companyProjections.reduce((a, c) => a + c.balance, 0);
+    const netBurn = totalBurn + totalPayroll - totalMRR;
+    const runway = netBurn > 0 ? Math.floor(totalBalance / netBurn) : 99;
+
+    // Projected MRR 6 months out
+    const avgGrowth = companyProjections.length > 0
+      ? companyProjections.reduce((a, c) => a + c.growthRate, 0) / companyProjections.length
+      : 1.03;
+    const projectedMRR6 = Math.round(totalMRR * Math.pow(avgGrowth, 6));
+    const mrrGrowthPct = totalMRR > 0 ? ((projectedMRR6 / totalMRR - 1) * 100).toFixed(1) : "0";
+
+    // Future months
+    const futureMonths: { label: string; key: string }[] = [];
+    for (let i = 1; i <= 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      futureMonths.push({ label: `${monthNames[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`, key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` });
+    }
+
+    return { companyProjections, totalMRR, projectedMRR6, mrrGrowthPct, runway, futureMonths, totalBurn, totalPayroll };
+  }, [allEntries, companies, employees, bankAccounts]);
 
   const handleSaveGoal = async () => {
     if (!form.description || !form.target_value) { toast.error("Preencha descrição e meta"); return; }
@@ -168,9 +259,9 @@ const VaultGlobalPlanning = () => {
         <div>
           <div className="grid grid-cols-3 gap-2.5 mb-5">
             {[
-              { label: "MRR Projetado Jun/26", value: "R$ 620k", sub: "▲ +27,3% vs atual", cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
-              { label: "ARR Projetado 2026", value: "R$ 6,8M", sub: "Crescimento anual" },
-              { label: "Runway", value: "18 meses", sub: "Com base no burn rate", cls: "text-green-400" },
+              { label: "MRR Atual", value: projectionData.totalMRR > 0 ? fmtK(projectionData.totalMRR) : "Sem dados", sub: "Receita recorrente mensal", cls: "bg-gradient-to-r from-[#FFD600] to-[#E6C200] bg-clip-text text-transparent" },
+              { label: `MRR Projetado ${projectionData.futureMonths[5]?.label ?? ""}`, value: projectionData.projectedMRR6 > 0 ? fmtK(projectionData.projectedMRR6) : "—", sub: projectionData.totalMRR > 0 ? `▲ +${projectionData.mrrGrowthPct}% vs atual` : "Cadastre receitas para projetar" },
+              { label: "Runway", value: projectionData.runway >= 99 ? "∞" : `${projectionData.runway} meses`, sub: projectionData.totalBurn > 0 ? `Burn: ${fmtK(projectionData.totalBurn + projectionData.totalPayroll)}/mês` : "Sem despesas registradas", cls: projectionData.runway > 12 ? "text-green-400" : projectionData.runway > 6 ? "text-yellow-400" : "text-red-400" },
             ].map((k, i) => (
               <div key={i} className="rounded-xl p-3.5 border border-white/5" style={{ background: "#0e0e0a" }}>
                 <div className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.4)" }}>{k.label}</div>
@@ -179,29 +270,49 @@ const VaultGlobalPlanning = () => {
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
-            <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR | Próximos 6 meses</span></div>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Empresa</th>
-                  {["Abr", "Mai", "Jun", "Jul", "Ago", "Set"].map(m => <th key={m} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{m}/26</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { name: "Beezzy", base: 248000, rate: 1.05, color: "#a78bfa" },
-                  { name: "Palpita.io", base: 146000, rate: 1.06, color: "#f472b6" },
-                  { name: "Starmind", base: 93000, rate: 1.04, color: "#F5C518" },
-                ].map(co => (
-                  <tr key={co.name} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                    <td className="px-4 py-2.5"><span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${co.color}15`, color: co.color }}>{co.name}</span></td>
-                    {[1,2,3,4,5,6].map(i => <td key={i} className="px-4 py-2.5 text-xs">{fmtK(Math.round(co.base * Math.pow(co.rate, i)))}</td>)}
+
+          {projectionData.companyProjections.filter(c => c.currentMRR > 0).length === 0 ? (
+            <div className="rounded-xl border border-white/5 p-8 text-center" style={{ background: "#0e0e0a" }}>
+              <div className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Cadastre lançamentos de faturamento nas empresas para gerar projeções</div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+              <div className="px-4 py-3 border-b border-white/5"><span className="text-xs font-medium">Projeção MRR | Próximos 6 meses</span></div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Empresa</th>
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>MRR Atual</th>
+                    <th className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>Cresc.</th>
+                    {projectionData.futureMonths.map(m => (
+                      <th key={m.key} className="text-left px-4 py-2 text-[9px] uppercase tracking-widest font-medium" style={{ color: "rgba(242,240,232,0.25)" }}>{m.label}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {projectionData.companyProjections.filter(c => c.currentMRR > 0).map(co => (
+                    <tr key={co.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                      <td className="px-4 py-2.5"><span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${co.color}15`, color: co.color }}>{co.name}</span></td>
+                      <td className="px-4 py-2.5 text-xs font-medium">{fmtK(co.currentMRR)}</td>
+                      <td className="px-4 py-2.5 text-xs" style={{ color: co.growthRate >= 1 ? "#22c55e" : "#ef4444" }}>{((co.growthRate - 1) * 100).toFixed(1)}%</td>
+                      {[1,2,3,4,5,6].map(i => (
+                        <td key={i} className="px-4 py-2.5 text-xs">{fmtK(Math.round(co.currentMRR * Math.pow(co.growthRate, i)))}</td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-white/10 font-semibold">
+                    <td className="px-4 py-2.5 text-xs">TOTAL</td>
+                    <td className="px-4 py-2.5 text-xs">{fmtK(projectionData.totalMRR)}</td>
+                    <td className="px-4 py-2.5 text-xs" />
+                    {[1,2,3,4,5,6].map(i => {
+                      const total = projectionData.companyProjections.filter(c => c.currentMRR > 0).reduce((a, co) => a + Math.round(co.currentMRR * Math.pow(co.growthRate, i)), 0);
+                      return <td key={i} className="px-4 py-2.5 text-xs">{fmtK(total)}</td>;
+                    })}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
