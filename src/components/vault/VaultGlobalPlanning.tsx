@@ -20,7 +20,7 @@ const VaultGlobalPlanning = () => {
 
   // Budget modal
   const [budgetModal, setBudgetModal] = useState<{ open: boolean; budget?: any; companyId?: string }>({ open: false });
-  const [budgetForm, setBudgetForm] = useState({ category: "", amount: "", year: "2026" });
+  const [budgetForm, setBudgetForm] = useState({ category: "", customCategory: "", amount: "", year: "2026" });
   const [deleteBudgetModal, setDeleteBudgetModal] = useState<{ open: boolean; id: string }>({ open: false, id: "" });
 
   const { data: companies } = useQuery({
@@ -53,10 +53,11 @@ const VaultGlobalPlanning = () => {
   };
 
   const handleSaveBudget = async () => {
-    if (!budgetForm.category || !budgetForm.amount) { toast.error("Preencha categoria e valor"); return; }
+    const finalCategory = budgetForm.category === "Outros" ? (budgetForm.customCategory.trim() || "Outros") : budgetForm.category;
+    if (!finalCategory || !budgetForm.amount) { toast.error("Preencha categoria e valor"); return; }
     const companyId = budgetModal.companyId || companies?.[0]?.id;
     if (!companyId) return;
-    const payload = { company_id: companyId, category: budgetForm.category, amount: Number(budgetForm.amount), year: Number(budgetForm.year) || 2026 };
+    const payload = { company_id: companyId, category: finalCategory, amount: Number(budgetForm.amount), year: Number(budgetForm.year) || 2026 };
     const { error } = budgetModal.budget ? await supabase.from("vault_budgets").update(payload).eq("id", budgetModal.budget.id) : await supabase.from("vault_budgets").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(budgetModal.budget ? "Budget atualizado" : "Budget criado");
@@ -67,8 +68,13 @@ const VaultGlobalPlanning = () => {
   const openEdit = (g: any) => { setForm({ description: g.description ?? "", goal_type: g.goal_type, target_value: String(g.target_value), current_value: String(g.current_value), year: String(g.year) }); setGoalModal({ open: true, goal: g, companyId: g.company_id }); };
   const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
 
-  const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
-  const openEditBudget = (b: any) => { setBudgetForm({ category: b.category, amount: String(b.amount), year: String(b.year) }); setBudgetModal({ open: true, budget: b, companyId: b.company_id }); };
+  const BUDGET_CATS = ["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"];
+  const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", customCategory: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
+  const openEditBudget = (b: any) => {
+    const isPreset = BUDGET_CATS.includes(b.category);
+    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: String(b.amount), year: String(b.year) });
+    setBudgetModal({ open: true, budget: b, companyId: b.company_id });
+  };
 
   const tabs = ["OKRs & Metas", "Projeções", "Budget Anual"];
 
@@ -296,11 +302,19 @@ const VaultGlobalPlanning = () => {
             </div>
             <div>
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Categoria</label>
-              <select value={budgetForm.category} onChange={e => setBudgetForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+              <select value={budgetForm.category} onChange={e => setBudgetForm(f => ({ ...f, category: e.target.value, customCategory: e.target.value !== "Outros" ? "" : f.customCategory }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Selecione</option>
-                {["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"].map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                {BUDGET_CATS.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
               </select>
             </div>
+            {budgetForm.category === "Outros" && (
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Nome da Categoria</label>
+                <input type="text" placeholder="Ex: Treinamentos, Eventos..." value={budgetForm.customCategory}
+                  onChange={e => setBudgetForm(f => ({ ...f, customCategory: e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Valor Orçado</label>
