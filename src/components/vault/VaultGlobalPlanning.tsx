@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
+import { maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
 const fmtK = (v: number) => v >= 1000 ? "R$ " + (v / 1000).toFixed(v % 1000 === 0 ? 0 : 1).replace(".", ",") + "k" : fmt(v);
