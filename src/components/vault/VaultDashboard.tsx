@@ -15,14 +15,6 @@ const pct = (a: number, b: number) => b ? Math.min(Math.round((a / b) * 100), 99
 const COLORS = ["#FFD600", "#3B82F6", "#A855F7", "#22c55e", "#ef4444", "#f59e0b", "#06b6d4"];
 
 const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
-  const { data: monthlyData } = useQuery({
-    queryKey: ["vault_monthly_all"],
-    queryFn: async () => {
-      const { data } = await supabase.from("vault_monthly_data").select("*").order("month_date");
-      return data ?? [];
-    },
-  });
-
   const { data: employees } = useQuery({
     queryKey: ["vault_employees_count"],
     queryFn: async () => {
@@ -55,12 +47,29 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
     },
   });
 
+  // Compute monthly aggregates from entries
+  const monthlyByCompanyMonth = useMemo(() => {
+    const map: Record<string, { company_id: string; month_date: string; revenue: number; expenses: number }> = {};
+    (entries ?? []).forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7) + "-01";
+      const key = `${e.company_id}_${monthKey}`;
+      if (!map[key]) map[key] = { company_id: e.company_id, month_date: monthKey, revenue: 0, expenses: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        map[key].revenue += Number(e.amount);
+      } else {
+        map[key].expenses += Number(e.amount);
+      }
+    });
+    return Object.values(map);
+  }, [entries]);
+
   // Current month
   const now = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-  const currentMonth = monthlyData?.filter((m: any) => m.month_date === currentMonthStr) ?? [];
-  const totalRevenue = currentMonth.reduce((a: number, m: any) => a + Number(m.revenue), 0);
-  const totalExpenses = currentMonth.reduce((a: number, m: any) => a + Number(m.expenses), 0);
+  const currentMonth = monthlyByCompanyMonth.filter(m => m.month_date === currentMonthStr);
+  const totalRevenue = currentMonth.reduce((a, m) => a + m.revenue, 0);
+  const totalExpenses = currentMonth.reduce((a, m) => a + m.expenses, 0);
   const totalResult = totalRevenue - totalExpenses;
   const activeEmployees = employees?.filter((e: any) => e.status === "ativo") ?? [];
   const totalEmployees = activeEmployees.length;
@@ -74,8 +83,8 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
   }, []);
-  const prevMonth = monthlyData?.filter((m: any) => m.month_date === prevMonthStr) ?? [];
-  const prevRevenue = prevMonth.reduce((a: number, m: any) => a + Number(m.revenue), 0);
+  const prevMonth = monthlyByCompanyMonth.filter(m => m.month_date === prevMonthStr);
+  const prevRevenue = prevMonth.reduce((a, m) => a + m.revenue, 0);
   const revGrowth = prevRevenue > 0 ? Math.round(((totalRevenue - prevRevenue) / prevRevenue) * 100) : 0;
 
   // Revenue trend (last 6 months)
@@ -86,19 +95,19 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
       months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`);
     }
     return months.map(m => {
-      const rows = monthlyData?.filter((d: any) => d.month_date === m) ?? [];
-      const rev = rows.reduce((a: number, r: any) => a + Number(r.revenue), 0);
-      const exp = rows.reduce((a: number, r: any) => a + Number(r.expenses), 0);
+      const rows = monthlyByCompanyMonth.filter(d => d.month_date === m);
+      const rev = rows.reduce((a, r) => a + r.revenue, 0);
+      const exp = rows.reduce((a, r) => a + r.expenses, 0);
       const [y, mo] = m.split("-");
       return { name: `${mo}/${y.slice(2)}`, Faturamento: rev, Despesas: exp, Resultado: rev - exp };
     });
-  }, [monthlyData]);
+  }, [monthlyByCompanyMonth]);
 
   // Revenue breakdown by company (pie)
   const revByCompany = useMemo(() => {
     return companies.map((c: any) => {
-      const md = currentMonth.find((m: any) => m.company_id === c.id);
-      return { name: c.name, value: Number(md?.revenue ?? 0), color: c.color };
+      const rev = currentMonth.filter(m => m.company_id === c.id).reduce((a, m) => a + m.revenue, 0);
+      return { name: c.name, value: rev, color: c.color };
     }).filter(d => d.value > 0);
   }, [companies, currentMonth]);
 
