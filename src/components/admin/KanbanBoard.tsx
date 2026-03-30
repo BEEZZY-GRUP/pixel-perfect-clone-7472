@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Building2, Phone, GripVertical, Eye, Trash2, Mail, Calendar, Tag, Users } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, type Lead } from "./types";
+import { supabase } from "@/integrations/supabase/client";
 import LeadDetailModal from "./LeadDetailModal";
 
 export default function KanbanBoard() {
@@ -28,7 +29,22 @@ export default function KanbanBoard() {
     e.preventDefault();
     setDragOverCol(null);
     if (draggedId) {
+      const lead = leads.find((l) => l.id === draggedId);
+      const previousStatus = lead?.status;
       await updateLead(draggedId, { status: colKey });
+      
+      // Auto-log activity for status change
+      if (lead && previousStatus && previousStatus !== colKey) {
+        const fromLabel = STATUS_OPTIONS.find(s => s.key === previousStatus)?.label || previousStatus;
+        const toLabel = STATUS_OPTIONS.find(s => s.key === colKey)?.label || colKey;
+        await supabase.from("lead_activities").insert({
+          lead_id: draggedId,
+          activity_type: "movimentacao",
+          description: `Status alterado de ${fromLabel} para ${toLabel}`,
+          is_automatic: true,
+        } as any);
+      }
+      
       setDraggedId(null);
     }
   };

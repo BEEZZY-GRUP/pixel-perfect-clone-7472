@@ -72,18 +72,86 @@ const INVESTMENT_OPTIONS = ["Muito baixa", "Baixa", "Moderada", "Alta", "Muito a
 const STAKEHOLDERS = ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6+ pessoas"];
 const DECISION_PROCESSES = ["Decisão individual", "Sócios decidem juntos", "Conselho/comitê", "Processo complexo"];
 
-// ───── Beezzy Solutions Mapping ─────
-const PAIN_SOLUTIONS: Record<string, { solution: string; description: string }> = {
-  "Falta de processos definidos": { solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais, comerciais e administrativos com acompanhamento contínuo." },
-  "Dificuldade em gerar leads": { solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound marketing, funis de conversão, automação de marketing e campanhas de performance." },
-  "Time de vendas desorganizado": { solution: "Reestruturação Comercial", description: "Implementação de CRM, scripts de vendas, pipeline estruturado, treinamento de equipe e metas claras com KPIs." },
-  "Falta de presença digital": { solution: "Posicionamento Digital", description: "Branding digital, gestão de redes sociais, website profissional, SEO e estratégia de conteúdo." },
-  "Não consegue escalar": { solution: "Aceleração & Escala", description: "Diagnóstico de gargalos, automação de operações, estruturação de processos escaláveis e planejamento de crescimento." },
-  "Gestão financeira precária": { solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." },
-  "Falta de liderança": { solution: "Desenvolvimento de Liderança", description: "Mentoria executiva, treinamento de gestores, cultura organizacional e governance." },
-  "Comunicação interna ruim": { solution: "Comunicação Organizacional", description: "Ferramentas de comunicação interna, rituais de alinhamento, cultura de feedback e transparência." },
-  "Retenção de talentos": { solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." },
-  "Transformação digital": { solution: "Transformação Digital", description: "Migração de ferramentas, automação de processos, integração de sistemas e capacitação tecnológica da equipe." },
+// ───── Beezzy Solutions Mapping (Complete) ─────
+interface BeezzySolution {
+  solution: string;
+  module: string;
+  description: string;
+  deliverables: string[];
+  methodology_pillar: string;
+}
+
+const PAIN_SOLUTIONS: Record<string, BeezzySolution> = {
+  "Falta de processos definidos": {
+    solution: "Gestão de Processos",
+    module: "Execução de Verdade",
+    description: "Mapeamento completo de processos operacionais, comerciais e administrativos. Documentação de fluxos com responsáveis, prazos e indicadores de performance.",
+    deliverables: ["Mapa de processos AS-IS e TO-BE", "Manual operacional documentado", "Fluxogramas por departamento", "Checklist de execução por função", "KPIs de eficiência por processo"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 03 — Execução",
+  },
+  "Dificuldade em gerar leads": {
+    solution: "MarTech & Aquisição de Clientes",
+    module: "Marketing + Tecnologia",
+    description: "Construção de funis de aquisição com inbound e outbound marketing, automação de nurturing, campanhas de performance e estratégias de conversão baseadas em dados.",
+    deliverables: ["Funil de aquisição completo", "Automação de e-mail marketing", "Landing pages de conversão", "Campanhas pagas (Meta Ads, Google Ads)", "Dashboard de performance de marketing", "Estratégia de conteúdo para atração"],
+    methodology_pillar: "Pilar 03 — Execução + Pilar 04 — Resultados",
+  },
+  "Time de vendas desorganizado": {
+    solution: "Reestruturação Comercial Completa",
+    module: "Gestão por Resultados",
+    description: "Implementação de CRM com pipeline estruturado, criação de scripts de vendas, definição de metas individuais e coletivas, treinamento da equipe e rituais de acompanhamento semanal.",
+    deliverables: ["CRM configurado e customizado", "Pipeline de vendas em 6 etapas", "Scripts de abordagem e follow-up", "Metas SMART por vendedor", "Dashboard comercial em tempo real", "Ritual semanal de revisão de pipeline"],
+    methodology_pillar: "Pilar 02 — Plano Operacional + Pilar 04 — Resultados",
+  },
+  "Falta de presença digital": {
+    solution: "Posicionamento Digital Estratégico",
+    module: "Marketing + Tecnologia",
+    description: "Construção de autoridade digital com branding, website profissional, SEO, gestão de redes sociais e estratégia de conteúdo para posicionar a marca como referência no segmento.",
+    deliverables: ["Website institucional otimizado", "Perfis otimizados em redes sociais", "Estratégia de SEO e palavras-chave", "Calendário editorial mensal", "Identidade visual digital", "Gestão de Google Meu Negócio"],
+    methodology_pillar: "Pilar 03 — Execução",
+  },
+  "Não consegue escalar": {
+    solution: "Aceleração & Escalabilidade",
+    module: "Parceiro Estratégico",
+    description: "Diagnóstico de gargalos de crescimento, automação de operações repetitivas, estruturação de processos escaláveis e planejamento de expansão com projeções financeiras.",
+    deliverables: ["Mapa de gargalos operacionais", "Plano de automação de processos", "Modelo de negócio escalável", "Projeção financeira de crescimento", "Playbook de expansão", "Definição de capacidade operacional"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 05 — Legado",
+  },
+  "Gestão financeira precária": {
+    solution: "Gestão Financeira & Controle",
+    module: "Gestão por Resultados",
+    description: "Implantação de DRE gerencial, fluxo de caixa projetado, planejamento orçamentário anual, dashboards financeiros em tempo real e controle rigoroso de custos e margens.",
+    deliverables: ["DRE gerencial mensal", "Fluxo de caixa projetado", "Orçamento anual por centro de custo", "Dashboard financeiro em tempo real", "Política de aprovação de gastos", "Análise de margem por produto/serviço"],
+    methodology_pillar: "Pilar 04 — Resultados",
+  },
+  "Falta de liderança": {
+    solution: "Desenvolvimento de Liderança & Governance",
+    module: "Legado Duradouro",
+    description: "Programa de mentoria executiva, treinamento de gestores em liderança situacional, definição de cultura organizacional e implementação de governance com conselhos e rituais de decisão.",
+    deliverables: ["Programa de mentoria executiva", "Treinamento de liderança situacional", "Código de cultura organizacional", "Estrutura de governance", "Rituais de liderança (1:1, all-hands)", "Plano de sucessão"],
+    methodology_pillar: "Pilar 05 — Legado",
+  },
+  "Comunicação interna ruim": {
+    solution: "Comunicação Organizacional Integrada",
+    module: "Execução de Verdade",
+    description: "Implantação de ferramentas de comunicação interna, rituais de alinhamento entre times, cultura de feedback contínuo e transparência radical na gestão.",
+    deliverables: ["Stack de comunicação interna", "Rituais de alinhamento (daily, weekly, monthly)", "Política de feedback 360°", "Canal de comunicação transparente", "Template de reuniões produtivas", "Onboarding de comunicação para novos"],
+    methodology_pillar: "Pilar 03 — Execução",
+  },
+  "Retenção de talentos": {
+    solution: "Gestão de Pessoas & Employer Branding",
+    module: "Legado Duradouro",
+    description: "Criação de plano de carreira, política salarial competitiva, pesquisa de clima organizacional, programa de onboarding e construção de employer branding para atrair talentos.",
+    deliverables: ["Plano de cargos e salários", "Pesquisa de clima organizacional", "Programa de onboarding estruturado", "PDI (Plano de Desenvolvimento Individual)", "Employer branding nas redes", "Política de benefícios e reconhecimento"],
+    methodology_pillar: "Pilar 05 — Legado",
+  },
+  "Transformação digital": {
+    solution: "Transformação Digital & Automação",
+    module: "Marketing + Tecnologia",
+    description: "Migração de ferramentas analógicas para digitais, automação de processos manuais, integração de sistemas e capacitação tecnológica de toda a equipe.",
+    deliverables: ["Auditoria de maturidade digital", "Roadmap de transformação digital", "Migração de ferramentas e dados", "Automação de processos-chave", "Treinamento de equipe em novas ferramentas", "Integrações entre sistemas (APIs)"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 03 — Execução",
+  },
 };
 
 function calculateScore(form: Record<string, any>): { score: number; classification: string; summary: string } {
@@ -903,34 +971,45 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
   const comparison = previousDiagnostic ? generateComparativeSummary(diagnostic, previousDiagnostic) : null;
 
   const challenges = diagnostic.main_challenges || [];
-  const commercialSolutions = challenges
-    .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || { solution: "Consultoria Personalizada", description: "Análise e desenvolvimento de solução sob medida para este desafio específico." }) }));
+  const defaultSolution: BeezzySolution = { solution: "Consultoria Personalizada", module: "Parceiro Estratégico", description: "Análise e desenvolvimento de solução sob medida para este desafio específico.", deliverables: ["Diagnóstico personalizado", "Plano de ação customizado", "Acompanhamento semanal"], methodology_pillar: "Pilar 01 — Diagnóstico" };
+  
+  const commercialSolutions: Array<{ pain: string } & BeezzySolution> = challenges
+    .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || defaultSolution) }));
 
-  // Additional solutions based on other fields
+  // Additional solutions based on biggest_pain free text
   if (diagnostic.biggest_pain) {
     const painLower = diagnostic.biggest_pain.toLowerCase();
-    if (painLower.includes("vend") || painLower.includes("comercial") || painLower.includes("cliente")) {
-      if (!commercialSolutions.find(s => s.solution === "Reestruturação Comercial")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Reestruturação Comercial", description: "Pipeline estruturado, CRM, metas e treinamento de equipe comercial para maximizar conversões." });
-      }
-    }
-    if (painLower.includes("financ") || painLower.includes("caixa") || painLower.includes("lucr") || painLower.includes("prejuízo")) {
-      if (!commercialSolutions.find(s => s.solution === "Gestão Financeira")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." });
-      }
-    }
-    if (painLower.includes("equipe") || painLower.includes("time") || painLower.includes("pessoas") || painLower.includes("funcionário")) {
-      if (!commercialSolutions.find(s => s.solution === "Gestão de Pessoas")) {
-        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." });
+    const painMappings: Array<{ keywords: string[]; challengeKey: string; fallbackSolution: string }> = [
+      { keywords: ["vend", "comercial", "cliente", "receita", "faturamento baixo"], challengeKey: "Time de vendas desorganizado", fallbackSolution: "Reestruturação Comercial Completa" },
+      { keywords: ["financ", "caixa", "lucr", "prejuízo", "custo", "margem"], challengeKey: "Gestão financeira precária", fallbackSolution: "Gestão Financeira & Controle" },
+      { keywords: ["equipe", "time", "pessoas", "funcionário", "colaborador", "rh"], challengeKey: "Retenção de talentos", fallbackSolution: "Gestão de Pessoas & Employer Branding" },
+      { keywords: ["líder", "gestor", "gestão", "gerente", "direção"], challengeKey: "Falta de liderança", fallbackSolution: "Desenvolvimento de Liderança & Governance" },
+      { keywords: ["digital", "tecnolog", "sistema", "software", "automaç"], challengeKey: "Transformação digital", fallbackSolution: "Transformação Digital & Automação" },
+      { keywords: ["marketing", "marca", "divulg", "rede social", "instagram"], challengeKey: "Falta de presença digital", fallbackSolution: "Posicionamento Digital Estratégico" },
+      { keywords: ["cresc", "escal", "expand"], challengeKey: "Não consegue escalar", fallbackSolution: "Aceleração & Escalabilidade" },
+      { keywords: ["process", "organiz", "bagunça", "caos"], challengeKey: "Falta de processos definidos", fallbackSolution: "Gestão de Processos" },
+      { keywords: ["comunic", "alinha", "feedback"], challengeKey: "Comunicação interna ruim", fallbackSolution: "Comunicação Organizacional Integrada" },
+    ];
+    for (const mapping of painMappings) {
+      if (mapping.keywords.some(k => painLower.includes(k)) && !commercialSolutions.find(s => s.solution === (PAIN_SOLUTIONS[mapping.challengeKey]?.solution || mapping.fallbackSolution))) {
+        const sol = PAIN_SOLUTIONS[mapping.challengeKey] || defaultSolution;
+        commercialSolutions.push({ pain: `Dor principal: "${diagnostic.biggest_pain}"`, ...sol });
       }
     }
   }
 
+  // Auto-detect from diagnostic flags
   if (!diagnostic.has_defined_processes && !commercialSolutions.find(s => s.pain === "Falta de processos definidos")) {
-    commercialSolutions.push({ pain: "Sem processos definidos", solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais com acompanhamento contínuo." });
+    commercialSolutions.push({ pain: "Empresa sem processos definidos", ...PAIN_SOLUTIONS["Falta de processos definidos"] });
   }
-  if (!diagnostic.has_marketing_strategy && !commercialSolutions.find(s => s.solution === "MarTech & Aquisição")) {
-    commercialSolutions.push({ pain: "Sem estratégia de marketing", solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound, funis de conversão, automação e campanhas de performance." });
+  if (!diagnostic.has_marketing_strategy && !commercialSolutions.find(s => s.solution.includes("MarTech"))) {
+    commercialSolutions.push({ pain: "Sem estratégia de marketing ativa", ...PAIN_SOLUTIONS["Dificuldade em gerar leads"] });
+  }
+  if (!diagnostic.has_sales_team && !commercialSolutions.find(s => s.solution.includes("Comercial"))) {
+    commercialSolutions.push({ pain: "Sem time comercial estruturado", ...PAIN_SOLUTIONS["Time de vendas desorganizado"] });
+  }
+  if (diagnostic.digital_presence_level && ["Inexistente", "Básico"].includes(diagnostic.digital_presence_level) && !commercialSolutions.find(s => s.solution.includes("Digital"))) {
+    commercialSolutions.push({ pain: `Presença digital ${diagnostic.digital_presence_level.toLowerCase()}`, ...PAIN_SOLUTIONS["Falta de presença digital"] });
   }
 
   const sections = [
@@ -1205,16 +1284,16 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
           </motion.div>
 
           {commercialSolutions.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {commercialSolutions.map((sol, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  className="rounded-lg border border-border/40 bg-card/10 p-5"
+                  className="rounded-lg border border-border/40 bg-card/10 overflow-hidden"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="p-5 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
                       <AlertTriangle size={16} className="text-red-400" />
                     </div>
@@ -1223,14 +1302,36 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                       <p className="font-heading text-sm text-foreground/80 font-semibold">{sol.pain}</p>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border/20 flex items-start gap-4">
+                  <div className="px-5 pb-5 pt-4 border-t border-border/20 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold-border/30 flex items-center justify-center shrink-0">
                       <Lightbulb size={16} className="text-gold" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold mb-1">SOLUÇÃO BEEZZY</p>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold">SOLUÇÃO BEEZZY</p>
+                        {sol.module && <span className="font-heading text-[8px] px-2 py-0.5 rounded bg-gold/10 text-gold/60 border border-gold-border/20">{sol.module}</span>}
+                      </div>
                       <p className="font-heading text-sm text-gold font-bold">{sol.solution}</p>
                       <p className="font-heading text-[11px] text-foreground/50 mt-1.5 leading-relaxed">{sol.description}</p>
+                      {sol.deliverables && sol.deliverables.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-border/15">
+                          <p className="font-heading text-[8px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-2">ENTREGÁVEIS</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {sol.deliverables.map((d: string, di: number) => (
+                              <div key={di} className="flex items-center gap-1.5">
+                                <div className="w-1 h-1 rounded-full bg-gold/40 shrink-0" />
+                                <span className="font-heading text-[10px] text-foreground/60">{d}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {sol.methodology_pillar && (
+                        <div className="mt-2.5 flex items-center gap-1.5">
+                          <Target size={9} className="text-muted-foreground/30" />
+                          <span className="font-heading text-[9px] text-muted-foreground/40 italic">{sol.methodology_pillar}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>

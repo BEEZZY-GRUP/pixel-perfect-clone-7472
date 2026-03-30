@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2 } from "lucide-react";
+import { X, Save, Mail, Phone, Building2, FileText, Calendar, Clock, Tag, AlertCircle, MessageSquare, Plus, PhoneCall, Video, Send, CheckCircle, Trash2, ArrowRight, Bot } from "lucide-react";
 import { useLeads } from "./LeadsContext";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, CHALLENGE_OPTIONS, SOURCE_OPTIONS, type Lead } from "./types";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ interface Activity {
   activity_type: string;
   description: string;
   scheduled_at: string | null;
+  is_automatic: boolean;
 }
 
 const ACTIVITY_TYPES = [
@@ -21,6 +22,7 @@ const ACTIVITY_TYPES = [
   { key: "reuniao", label: "Reunião", icon: Video, color: "text-purple-400" },
   { key: "email", label: "E-mail", icon: Send, color: "text-green-400" },
   { key: "tarefa", label: "Tarefa", icon: CheckCircle, color: "text-gold" },
+  { key: "movimentacao", label: "Movimentação", icon: ArrowRight, color: "text-orange-400" },
 ];
 
 interface Props {
@@ -420,6 +422,11 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className={`font-heading text-[10px] font-semibold ${color}`}>{label}</span>
+                                {(activity as any).is_automatic && (
+                                  <span className="inline-flex items-center gap-0.5 font-heading text-[8px] text-muted-foreground/40 bg-card/30 px-1.5 py-0.5 rounded border border-border/20">
+                                    <Bot size={8} /> AUTO
+                                  </span>
+                                )}
                                 <span className="font-heading text-[9px] text-muted-foreground/40">{timeAgo(activity.created_at)}</span>
                               </div>
                               <button
