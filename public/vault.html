@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beezzy Group Vault</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" onerror="console.warn('Chart.js failed to load')"></script>
 <style>
 :root{
   --bg:#060604;--bg2:#0c0c08;--card:#0e0e0a;--card2:#141410;
@@ -590,17 +590,20 @@ function getSLabels() { return MS.slice(ST.fs, ST.fe+1); }
 function destroyCharts(){ CHARTS.forEach(c=>{try{c.destroy();}catch(e){}}); CHARTS=[]; }
 const CD = { grid:'rgba(255,255,255,0.04)', tick:{color:'rgba(255,255,255,0.28)',font:{size:10,family:'DM Sans'}} };
 function mkChart(id,type,data,opts={}){
+  if(typeof Chart === 'undefined') return null;
   const ctx=document.getElementById(id); if(!ctx) return null;
-  const ch=new Chart(ctx,{type,data,options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:opts.leg||false,labels:{color:'rgba(255,255,255,.45)',font:{size:10,family:'DM Sans'},boxWidth:10,padding:10}}},
-    scales:opts.noScale?{}:{
-      x:{grid:{color:CD.grid},ticks:CD.tick},
-      y:{grid:{color:CD.grid},ticks:{...CD.tick,callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}
-    },
-    ...(opts.extra||{})
-  }});
-  CHARTS.push(ch); return ch;
+  try {
+    const ch=new Chart(ctx,{type,data,options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:opts.leg||false,labels:{color:'rgba(255,255,255,.45)',font:{size:10,family:'DM Sans'},boxWidth:10,padding:10}}},
+      scales:opts.noScale?{}:{
+        x:{grid:{color:CD.grid},ticks:CD.tick},
+        y:{grid:{color:CD.grid},ticks:{...CD.tick,callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}
+      },
+      ...(opts.extra||{})
+    }});
+    CHARTS.push(ch); return ch;
+  } catch(e) { console.warn('Chart error:', e); return null; }
 }
 
 // ═══════════════════════════════════════════════════════
