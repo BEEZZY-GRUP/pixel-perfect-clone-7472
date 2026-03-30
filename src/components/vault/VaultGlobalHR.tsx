@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Gift, Cake } from "lucide-react";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
 const fmtDate = (s: string | null) => { if (!s) return "-"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
@@ -48,7 +49,7 @@ const VaultGlobalHR = () => {
   const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "-";
   const getCoColor = (id: string) => companies?.find((c: any) => c.id === id)?.color ?? "#888";
 
-  const tabs = ["Colaboradores", "Folha de Pagamento", "Férias & Afastamentos"];
+  const tabs = ["Colaboradores", "Folha de Pagamento", "Férias & Afastamentos", "Aniversários"];
 
   return (
     <div>
@@ -232,6 +233,108 @@ const VaultGlobalHR = () => {
               })()}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Tab 3: Aniversários */}
+      {activeTab === 3 && (
+        <BirthdayTab employees={filtered} companies={companies} getCoName={getCoName} getCoColor={getCoColor} />
+      )}
+    </div>
+  );
+};
+
+/* ───── Birthday Sub-Component ───── */
+
+const getDaysUntilBirthday = (birthDateStr: string) => {
+  const today = new Date();
+  const [y, m, d] = birthDateStr.split("-").map(Number);
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  let next = new Date(today.getFullYear(), m - 1, d);
+  if (next < todayDate) next = new Date(today.getFullYear() + 1, m - 1, d);
+  return Math.ceil((next.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+};
+
+const BirthdayTab = ({ employees, companies, getCoName, getCoColor }: {
+  employees: any[];
+  companies: any[] | undefined;
+  getCoName: (id: string) => string;
+  getCoColor: (id: string) => string;
+}) => {
+  const withBirthday = employees
+    .filter((e: any) => e.birth_date && e.status !== "inativo")
+    .map((e: any) => ({ ...e, _daysUntil: getDaysUntilBirthday(e.birth_date) }))
+    .sort((a: any, b: any) => a._daysUntil - b._daysUntil);
+
+  useEffect(() => {
+    const todayBirthdays = withBirthday.filter((e: any) => e._daysUntil === 0);
+    todayBirthdays.forEach(async (e: any) => {
+      const msg = `🎂 Hoje é aniversário de ${e.name}!`;
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const { data: existing } = await supabase
+        .from("vault_notifications")
+        .select("id")
+        .eq("message", msg)
+        .gte("created_at", todayStr);
+      if (!existing || existing.length === 0) {
+        await supabase.from("vault_notifications").insert({
+          message: msg,
+          sub_message: `${e.position ?? ""} — ${getCoName(e.company_id)}`,
+          notification_type: "birthday",
+          icon: "🎂",
+          color: "#FFD600",
+          company_id: e.company_id,
+        });
+      }
+    });
+  }, [withBirthday.length]);
+
+  const fmtBday = (s: string) => {
+    const [, m, d] = s.split("-");
+    const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    return `${d} ${months[Number(m) - 1]}`;
+  };
+
+  return (
+    <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
+      <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+        <Cake className="w-4 h-4 text-[#FFD600]" />
+        <span className="text-xs font-medium">Aniversários</span>
+        <span className="text-[10px] ml-auto" style={{ color: "rgba(242,240,232,0.4)" }}>{withBirthday.length} colaboradores com data cadastrada</span>
+      </div>
+      {withBirthday.length === 0 ? (
+        <div className="text-center py-12 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>
+          <Gift className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          Nenhum colaborador com data de nascimento cadastrada
+        </div>
+      ) : (
+        <div className="divide-y divide-white/5">
+          {withBirthday.map((e: any) => {
+            const isToday = e._daysUntil === 0;
+            const isSoon = e._daysUntil <= 7 && e._daysUntil > 0;
+            return (
+              <div key={e.id} className={`flex items-center gap-3 px-4 py-3 ${isToday ? "bg-[#FFD600]/5" : "hover:bg-white/[0.02]"}`}>
+                <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg ${isToday ? "bg-[#FFD600]/20" : isSoon ? "bg-amber-500/10" : "bg-white/5"}`}>
+                  {isToday ? "🎂" : "🎁"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium truncate">{e.name}</span>
+                    {isToday && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FFD600]/20 text-[#FFD600]">HOJE!</span>}
+                    {isSoon && <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400">Em {e._daysUntil} dia{e._daysUntil > 1 ? "s" : ""}</span>}
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px]" style={{ color: "rgba(242,240,232,0.4)" }}>{e.position}</span>
+                    <span className="inline-flex text-[9px] font-medium px-1.5 py-0.5 rounded" style={{ background: `${getCoColor(e.company_id)}15`, color: getCoColor(e.company_id) }}>{getCoName(e.company_id)}</span>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-xs font-semibold" style={{ color: isToday ? "#FFD600" : isSoon ? "#f59e0b" : "rgba(242,240,232,0.6)" }}>{fmtBday(e.birth_date)}</div>
+                  {!isToday && <div className="text-[10px]" style={{ color: "rgba(242,240,232,0.3)" }}>em {e._daysUntil} dias</div>}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
