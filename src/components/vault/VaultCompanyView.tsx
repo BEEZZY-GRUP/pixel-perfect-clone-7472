@@ -12,7 +12,7 @@ import VaultBankAccountForm from "./VaultBankAccountForm";
 import VaultTransactionForm from "./VaultTransactionForm";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
 import { EmployeeProfile } from "./VaultGlobalHR";
-import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber, unmaskCurrency } from "@/lib/masks";
+import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber, maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   company: any;
