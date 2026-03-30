@@ -16,8 +16,11 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
   const { data: users } = useQuery({
     queryKey: ["vault_users"],
     queryFn: async () => {
-      const { data } = await supabase.from("vault_users").select("*").order("created_at");
-      return data ?? [];
+      const { data, error } = await supabase.functions.invoke("vault-auth", {
+        body: { action: "list" },
+      });
+      if (error) throw error;
+      return data?.users ?? [];
     },
   });
 
@@ -34,33 +37,47 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
   };
 
   const openEdit = (u: any) => {
-    setForm({ name: u.name, username: u.username, email: u.email, password: u.password, role: u.role, active: u.active });
+    setForm({ name: u.name, username: u.username, email: u.email, password: "", role: u.role, active: u.active });
     setShowPassword(false);
     setModal({ open: true, userId: u.id });
   };
 
   const handleSave = async () => {
     if (!form.name || !form.username || !form.email) { toast.error("Preencha todos os campos"); return; }
-    if (!form.password || form.password.length < 4) { toast.error("Senha deve ter no mínimo 4 caracteres"); return; }
+    if (!modal.userId && (!form.password || form.password.length < 4)) { toast.error("Senha deve ter no mínimo 4 caracteres"); return; }
+    if (modal.userId && form.password && form.password.length < 4) { toast.error("Senha deve ter no mínimo 4 caracteres"); return; }
     setSaving(true);
 
     if (modal.userId) {
-      const { error } = await supabase.from("vault_users").update({
-        name: form.name, username: form.username, email: form.email,
-        password: form.password, role: form.role, active: form.active,
-      }).eq("id", modal.userId);
+      const updateBody: Record<string, unknown> = {
+        action: "update",
+        id: modal.userId,
+        name: form.name,
+        username: form.username,
+        email: form.email,
+        role: form.role,
+        active: form.active,
+      };
+      if (form.password) updateBody.password = form.password;
+
+      const { error } = await supabase.functions.invoke("vault-auth", { body: updateBody });
       setSaving(false);
       if (error) { toast.error(error.message); return; }
       toast.success("Usuário atualizado");
     } else {
-      const existing = users?.find((u: any) => u.username === form.username);
-      if (existing) { setSaving(false); toast.error("Usuário já existe"); return; }
-      const { error } = await supabase.from("vault_users").insert({
-        name: form.name, username: form.username, email: form.email,
-        password: form.password, role: form.role, active: form.active,
+      const { data, error } = await supabase.functions.invoke("vault-auth", {
+        body: {
+          action: "create",
+          name: form.name,
+          username: form.username,
+          email: form.email,
+          password: form.password,
+          role: form.role,
+          active: form.active,
+        },
       });
       setSaving(false);
-      if (error) { toast.error(error.message); return; }
+      if (error || data?.error) { toast.error(data?.error || error?.message || "Erro"); return; }
       toast.success("Usuário criado");
     }
     qc.invalidateQueries({ queryKey: ["vault_users"] });
@@ -68,7 +85,9 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("vault_users").delete().eq("id", id);
+    const { error } = await supabase.functions.invoke("vault-auth", {
+      body: { action: "delete", id },
+    });
     if (error) { toast.error(error.message); return; }
     toast.success("Usuário excluído");
     qc.invalidateQueries({ queryKey: ["vault_users"] });
@@ -175,13 +194,15 @@ const VaultUsersPage = ({ user }: { user: VaultUser }) => {
               </div>
             ))}
             <div>
-              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Senha</label>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                {modal.userId ? "Nova Senha (deixe vazio para manter)" : "Senha"}
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={form.password}
                   onChange={e => setForm(fo => ({ ...fo, password: e.target.value }))}
-                  placeholder="Mínimo 4 caracteres"
+                  placeholder={modal.userId ? "Manter senha atual" : "Mínimo 4 caracteres"}
                   className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none pr-10"
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
