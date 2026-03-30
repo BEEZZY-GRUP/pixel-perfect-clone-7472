@@ -68,8 +68,13 @@ const VaultGlobalPlanning = () => {
   const openEdit = (g: any) => { setForm({ description: g.description ?? "", goal_type: g.goal_type, target_value: String(g.target_value), current_value: String(g.current_value), year: String(g.year) }); setGoalModal({ open: true, goal: g, companyId: g.company_id }); };
   const openNew = (cid?: string) => { setForm({ description: "", goal_type: "", target_value: "", current_value: "", year: "2026" }); setGoalModal({ open: true, companyId: cid || companies?.[0]?.id }); };
 
-  const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
-  const openEditBudget = (b: any) => { setBudgetForm({ category: b.category, amount: String(b.amount), year: String(b.year) }); setBudgetModal({ open: true, budget: b, companyId: b.company_id }); };
+  const BUDGET_CATS = ["Marketing", "Folha", "Infraestrutura", "Serviços", "Fornecedores", "Aluguel", "Software", "Impostos", "Investimentos", "Outros"];
+  const openNewBudget = (cid?: string) => { setBudgetForm({ category: "", customCategory: "", amount: "", year: "2026" }); setBudgetModal({ open: true, companyId: cid || companies?.[0]?.id }); };
+  const openEditBudget = (b: any) => {
+    const isPreset = BUDGET_CATS.includes(b.category);
+    setBudgetForm({ category: isPreset ? b.category : "Outros", customCategory: isPreset ? "" : b.category, amount: String(b.amount), year: String(b.year) });
+    setBudgetModal({ open: true, budget: b, companyId: b.company_id });
+  };
 
   const tabs = ["OKRs & Metas", "Projeções", "Budget Anual"];
 
