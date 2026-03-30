@@ -73,25 +73,28 @@ export default function TrashPanel({ consoleRole = "admin" }: { consoleRole?: st
                         <RotateCcw size={10} /> RESTAURAR
                       </button>
                       {confirmId === lead.id ? (
-                        {consoleRole === "admin" && (
-                          <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1">
+                          {consoleRole === "admin" && (
                             <button
                               onClick={() => { permanentDelete(lead.id); setConfirmId(null); }}
                               className="font-mono text-[9px] text-red-400 hover:text-red-300 px-2 py-1 border border-red-500/30 hover:border-red-500/50 transition-colors"
                             >
-                            CONFIRMAR
-                          </button>
+                              CONFIRMAR
+                            </button>
+                          )}
                           <button onClick={() => setConfirmId(null)} className="font-mono text-[9px] text-muted-foreground px-2 py-1">
                             CANCELAR
                           </button>
                         </div>
                       ) : (
-                        <button
-                          onClick={() => setConfirmId(lead.id)}
-                          className="flex items-center gap-1 font-mono text-[9px] tracking-[0.1em] text-red-400/60 hover:text-red-400 transition-colors px-2 py-1 border border-red-500/10 hover:border-red-500/30"
-                        >
-                          <AlertTriangle size={10} /> EXCLUIR
-                        </button>
+                        consoleRole === "admin" && (
+                          <button
+                            onClick={() => setConfirmId(lead.id)}
+                            className="flex items-center gap-1 font-mono text-[9px] tracking-[0.1em] text-red-400/60 hover:text-red-400 transition-colors px-2 py-1 border border-red-500/10 hover:border-red-500/30"
+                          >
+                            <AlertTriangle size={10} /> EXCLUIR
+                          </button>
+                        )
                       )}
                     </div>
                   </td>
