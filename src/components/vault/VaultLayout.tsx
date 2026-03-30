@@ -34,13 +34,8 @@ const VIEW_LABELS: Record<string, string> = {
 
 const SETTINGS_FIELDS = [
   { key: "group_name", label: "Nome do Grupo", default: "Beezzy Group" },
-  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro — Dezembro", type: "select", options: ["Janeiro — Dezembro", "Abril — Março", "Julho — Junho"] },
+  { key: "fiscal_year", label: "Exercício Fiscal", default: "Janeiro - Dezembro", type: "select", options: ["Janeiro - Dezembro", "Abril - Março", "Julho - Junho"] },
   { key: "tax_regime_default", label: "Regime Tributário Padrão", default: "Simples Nacional", type: "select", options: ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"] },
-  { key: "holding_name", label: "Empresa Holding", default: "" },
-  { key: "responsible", label: "Responsável Geral", default: "" },
-  { key: "contact_email", label: "E-mail de Contato", default: "" },
-  { key: "contact_phone", label: "Telefone de Contato", default: "" },
-  { key: "address", label: "Endereço Sede", default: "" },
 ];
 
 const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props) => {
@@ -152,7 +147,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: "thin" }}>
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-gold">
           {globalView === "dashboard" && <VaultDashboard companies={companies ?? []} onSelectCompany={handleSelectCompany} />}
           {globalView === "lancamentos" && <VaultGlobalEntries />}
           {globalView === "relatorios" && <VaultGlobalReports />}
@@ -268,7 +263,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
                           </div>
                         </td>
                         <td className="px-4 py-2.5 text-xs font-mono" style={{ color: "rgba(242,240,232,0.4)" }}>{co.slug}</td>
-                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.cnpj || "—"}</td>
+                        <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.cnpj || "-"}</td>
                         <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{co.regime}</td>
                         <td className="px-4 py-2.5 text-xs">{co.aliquota}%</td>
                         <td className="px-4 py-2.5">

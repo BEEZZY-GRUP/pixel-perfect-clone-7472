@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
-const fmtDate = (s: string | null) => { if (!s) return "—"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+const fmtDate = (s: string | null) => { if (!s) return "-"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
 
 const statusBadge = (status: string) => {
   const colors: Record<string, string> = {
@@ -45,7 +45,7 @@ const VaultGlobalHR = () => {
 
   const departments = [...new Set(employees?.map((e: any) => e.department).filter(Boolean) ?? [])];
 
-  const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "—";
+  const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "-";
   const getCoColor = (id: string) => companies?.find((c: any) => c.id === id)?.color ?? "#888";
 
   const tabs = ["Colaboradores", "Folha de Pagamento", "Férias & Afastamentos"];
@@ -54,7 +54,7 @@ const VaultGlobalHR = () => {
     <div>
       <div className="mb-5">
         <h1 className="font-heading text-xl font-semibold tracking-tight">Pessoas & RH</h1>
-        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Centro de informações — colaboradores de todo o grupo</p>
+        <p className="text-[11px]" style={{ color: "rgba(242,240,232,0.4)" }}>Centro de informações de colaboradores de todo o grupo</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5 mb-5">
@@ -84,7 +84,7 @@ const VaultGlobalHR = () => {
       {activeTab === 0 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-medium">Colaboradores — Todas as Empresas</span>
+            <span className="text-xs font-medium">Colaboradores</span>
             <div className="flex items-center gap-2 flex-wrap">
               <select value={filterCo} onChange={e => setFilterCo(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Todas empresas</option>
@@ -138,7 +138,7 @@ const VaultGlobalHR = () => {
       {activeTab === 1 && (
         <div>
           <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-            <div className="text-[13px] font-medium">Folha de Pagamento — Março/2026</div>
+            <div className="text-[13px] font-medium">Folha de Pagamento</div>
             <div className="flex gap-2">
               <select value={filterCo} onChange={e => setFilterCo(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
                 <option value="" className="bg-[#111]">Todas empresas</option>
@@ -197,7 +197,7 @@ const VaultGlobalHR = () => {
       {activeTab === 2 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-medium">Férias & Afastamentos — Todas as Empresas</span>
+            <span className="text-xs font-medium">Férias & Afastamentos</span>
             <select value={filterCo} onChange={e => setFilterCo(e.target.value)} className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-[11px] text-[#F2F0E8] outline-none">
               <option value="" className="bg-[#111]">Todas empresas</option>
               {companies?.map((c: any) => <option key={c.id} value={c.id} className="bg-[#111]">{c.name}</option>)}
@@ -219,7 +219,7 @@ const VaultGlobalHR = () => {
                   const emp = employees?.find((e: any) => e.id === v.employee_id);
                   return (
                     <tr key={v.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                      <td className="px-4 py-2.5 text-xs font-medium">{emp?.name ?? "—"}</td>
+                      <td className="px-4 py-2.5 text-xs font-medium">{emp?.name ?? "-"}</td>
                       <td className="px-4 py-2.5"><span className="inline-flex text-[10px] font-medium px-2 py-0.5 rounded" style={{ background: `${getCoColor(v.company_id)}15`, color: getCoColor(v.company_id) }}>{getCoName(v.company_id)}</span></td>
                       <td className="px-4 py-2.5 text-xs">{v.leave_type}</td>
                       <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(v.start_date)}</td>

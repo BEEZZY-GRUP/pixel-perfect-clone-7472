@@ -66,7 +66,7 @@ const VaultSidebar = ({
   );
 
   return (
-    <div className="w-[240px] flex flex-col border-r border-white/5 shrink-0 overflow-y-auto" style={{ background: "#070707" }}>
+    <div className="w-[240px] flex flex-col border-r border-white/5 shrink-0 overflow-y-auto scrollbar-gold" style={{ background: "#070707" }}>
       {/* Logo */}
       <div className="px-4 py-5 border-b border-white/5">
         <div className="font-heading font-bold text-sm tracking-tight">
