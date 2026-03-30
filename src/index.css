@@ -75,7 +75,6 @@
     @apply bg-background text-foreground;
     font-family: var(--font-heading);
     overflow-x: hidden;
-    cursor: none;
     -webkit-font-smoothing: antialiased;
   }
 }
