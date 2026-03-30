@@ -98,7 +98,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
     queryFn: async () => { const { data } = await supabase.from("vault_salary_history").select("*").eq("company_id", coId).order("change_date", { ascending: false }); return data ?? []; },
   });
 
-  const current = monthlyData?.find((m: any) => m.month_date === "2026-03-01");
+  const current = monthlyData?.length ? monthlyData[monthlyData.length - 1] : null;
   const rev = Number(current?.revenue ?? 0);
   const exp = Number(current?.expenses ?? 0);
   const tax = Math.round(rev * (Number(company.aliquota) / 100));
