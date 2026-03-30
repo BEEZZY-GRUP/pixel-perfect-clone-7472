@@ -188,7 +188,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   const renderEntriesTable = (data: any[], title: string, emptyMsg: string, showPayBtn = false) => (
     <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
       <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-        <span className="text-xs font-medium">{title} - {company.name}</span>
+        <span className="text-xs font-medium">{title} | {company.name}</span>
         <span className="text-[10px] px-2 py-0.5 rounded bg-white/5" style={{ color: "rgba(242,240,232,0.5)" }}>{data.length} registro(s)</span>
       </div>
       <table className="w-full">
@@ -525,7 +525,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
         <div>
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="font-heading text-sm font-semibold">Lançar Despesa - {company.name}</h2>
+              <h2 className="font-heading text-sm font-semibold">Lançar Despesa | {company.name}</h2>
               <p className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>Registre uma nova despesa para esta empresa</p>
             </div>
           </div>
@@ -559,7 +559,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
         <div>
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="font-heading text-sm font-semibold">Lançar Faturamento - {company.name}</h2>
+              <h2 className="font-heading text-sm font-semibold">Lançar Faturamento | {company.name}</h2>
               <p className="text-[11px] mt-0.5" style={{ color: "rgba(242,240,232,0.4)" }}>Registre uma nova receita para esta empresa</p>
             </div>
           </div>
@@ -592,7 +592,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {tab === 4 && (
         <div>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-heading text-sm font-semibold">Contas a Pagar - {company.name}</h2>
+            <h2 className="font-heading text-sm font-semibold">Contas a Pagar | {company.name}</h2>
             {hasPerm("fin") && addBtn("Nova Despesa", () => setEntryModal({ open: true, defaultType: "despesa" }))}
           </div>
 
@@ -618,7 +618,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {tab === 5 && (
         <div>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-heading text-sm font-semibold">Faturamentos - {company.name}</h2>
+            <h2 className="font-heading text-sm font-semibold">Faturamentos | {company.name}</h2>
             {hasPerm("fin") && addBtn("Novo Faturamento", () => setEntryModal({ open: true, defaultType: "faturamento" }))}
           </div>
 
@@ -643,7 +643,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {/* Tab 6: Relatórios */}
       {tab === 6 && (
         <div className="space-y-5">
-          <h2 className="font-heading text-sm font-semibold text-[#F2F0E8]">Relatórios - {company.name}</h2>
+          <h2 className="font-heading text-sm font-semibold text-[#F2F0E8]">Relatórios | {company.name}</h2>
 
           {chartData.length > 0 && (
             <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
@@ -662,7 +662,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
 
           <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
             <div className="px-4 py-3 border-b border-white/5">
-              <span className="text-xs font-medium">DRE - {company.name}</span>
+              <span className="text-xs font-medium">DRE | {company.name}</span>
             </div>
             {(monthlyData?.length ?? 0) === 0 ? (
               <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum dado mensal</div>
@@ -704,7 +704,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
       {tab === 7 && (
         <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: "#0e0e0a" }}>
           <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-            <span className="text-xs font-medium">Equipe - {company.name}</span>
+            <span className="text-xs font-medium">Equipe | {company.name}</span>
             {hasPerm("ops") && addBtn("Novo Colaborador", () => setEmployeeModal({ open: true }))}
           </div>
           <table className="w-full">
