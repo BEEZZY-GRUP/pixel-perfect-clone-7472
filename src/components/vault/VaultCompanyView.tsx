@@ -707,7 +707,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
             <div className="px-4 py-3 border-b border-white/5">
               <span className="text-xs font-medium">DRE | {company.name}</span>
             </div>
-            {(monthlyData?.length ?? 0) === 0 ? (
+            {computedMonthly.length === 0 ? (
               <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum dado mensal</div>
             ) : (
               <table className="w-full">
@@ -719,8 +719,8 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   </tr>
                 </thead>
                 <tbody>
-                  {monthlyData?.map((m: any) => {
-                    const r = Number(m.revenue); const e = Number(m.expenses);
+                  {computedMonthly.map((m, idx) => {
+                    const r = m.revenue; const e = m.expenses;
                     const t = Math.round(r * (Number(company.aliquota) / 100));
                     const res = r - e - t;
                     const margin = r > 0 ? Math.round((res / r) * 100) : 0;
