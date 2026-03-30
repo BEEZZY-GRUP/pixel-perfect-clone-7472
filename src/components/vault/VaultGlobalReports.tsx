@@ -124,6 +124,15 @@ const VaultGlobalReports = () => {
 
   const tabs = ["DRE", "Fluxo de Caixa", "Por Empresa", "Categorias", "Impostos", "Folha", "Budget vs Realizado"];
 
+  // Tabs that support company comparison
+  const comparableTabs = [0, 1, 2]; // DRE, Fluxo de Caixa, Por Empresa
+
+  const handleTabChange = (idx: number) => {
+    setActiveTab(idx);
+    setFilterCo([]);
+    setCompareMode(false);
+  };
+
   // Filter bar
   const filterBar = (
     <div className="flex flex-wrap items-center gap-2 mb-5 p-3 rounded-xl border border-white/5" style={{ background: "#0e0e0a" }}>
