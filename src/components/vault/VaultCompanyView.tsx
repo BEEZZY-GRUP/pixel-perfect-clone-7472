@@ -99,9 +99,33 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
     queryFn: async () => { const { data } = await supabase.from("vault_salary_history").select("*").eq("company_id", coId).order("change_date", { ascending: false }); return data ?? []; },
   });
 
-  const current = monthlyData?.length ? monthlyData[monthlyData.length - 1] : null;
-  const rev = Number(current?.revenue ?? 0);
-  const exp = Number(current?.expenses ?? 0);
+  // Compute monthly aggregates from entries
+  const computedMonthly = useMemo(() => {
+    const all = entries ?? [];
+    const map: Record<string, { month_date: string; revenue: number; expenses: number }> = {};
+    all.forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7);
+      if (!map[monthKey]) map[monthKey] = { month_date: monthKey, revenue: 0, expenses: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        map[monthKey].revenue += Number(e.amount);
+      } else {
+        map[monthKey].expenses += Number(e.amount);
+      }
+    });
+    // Merge with vault_monthly_data if it has data
+    (monthlyData ?? []).forEach((m: any) => {
+      const monthKey = (m.month_date as string).substring(0, 7);
+      if (!map[monthKey]) {
+        map[monthKey] = { month_date: monthKey, revenue: Number(m.revenue), expenses: Number(m.expenses) };
+      }
+    });
+    return Object.values(map).sort((a, b) => a.month_date.localeCompare(b.month_date));
+  }, [entries, monthlyData]);
+
+  const current = computedMonthly.length ? computedMonthly[computedMonthly.length - 1] : null;
+  const rev = current?.revenue ?? 0;
+  const exp = current?.expenses ?? 0;
   const tax = Math.round(rev * (Number(company.aliquota) / 100));
   const result = rev - exp - tax;
   const activeEmps = employees?.filter((e: any) => e.status === "ativo").length ?? 0;
