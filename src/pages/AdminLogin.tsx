@@ -104,10 +104,11 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full group border border-gold bg-gold/10 hover:bg-gold text-gold hover:text-background font-heading text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3 rounded-lg font-bold"
+              disabled={loading}
+              className="w-full group border border-gold bg-gold/10 hover:bg-gold text-gold hover:text-background font-heading text-xs tracking-[0.2em] py-4 transition-all duration-300 flex items-center justify-center gap-3 rounded-lg font-bold disabled:opacity-50"
             >
-              ACESSAR
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              {loading ? "AUTENTICANDO..." : "ACESSAR"}
+              {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
 
