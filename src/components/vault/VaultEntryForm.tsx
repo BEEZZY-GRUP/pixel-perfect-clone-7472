@@ -141,8 +141,9 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
             </div>
             {inputField("Vencimento", "due_date", "date")}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {inputField("Data Lançamento", "entry_date", "date")}
+            {inputField("Data Pagamento", "payment_date", "date")}
             {selectField("Forma de Pagamento", "payment_method", PAYMENT_METHODS.map(m => ({ value: m, label: m })), "Selecione...")}
           </div>
           {selectField("Status", "status", [
