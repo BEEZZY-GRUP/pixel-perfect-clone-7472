@@ -344,16 +344,38 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
 
             {/* Goals */}
             <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
-              <h3 className="text-xs font-medium mb-3">Metas {new Date().getFullYear()}</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium">Metas {new Date().getFullYear()}</h3>
+                {hasPerm("fin") && (
+                  <button
+                    onClick={() => {
+                      setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" });
+                      setGoalModal({ open: true });
+                    }}
+                    className="p-1 rounded hover:bg-white/10 transition-colors"
+                    title="Adicionar meta"
+                  >
+                    <Plus size={14} className="text-[#FFD600]" />
+                  </button>
+                )}
+              </div>
               {(goals?.length ?? 0) > 0 ? (
                 <div className="space-y-3">
                   {goals?.map((g: any) => {
                     const p = Number(g.target_value) > 0 ? Math.round((Number(g.current_value) / Number(g.target_value)) * 100) : 0;
                     return (
-                      <div key={g.id}>
+                      <div key={g.id} className="group">
                         <div className="flex justify-between text-[11px] mb-1">
                           <span className="truncate mr-2">{g.description || g.goal_type}</span>
-                          <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                          <div className="flex items-center gap-1">
+                            <span className="flex-shrink-0" style={{ color: p >= 100 ? "#22c55e" : "#FFD600" }}>{p}%</span>
+                            {hasPerm("fin") && (
+                              <>
+                                <button onClick={() => { setGoalForm({ goal_type: g.goal_type, description: g.description || "", target_value: String(g.target_value), current_value: String(g.current_value) }); setGoalModal({ open: true, goal: g }); }} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/10 transition-all"><Pencil size={10} className="text-white/40" /></button>
+                                <button onClick={() => handleDelete("vault_goals", g.id, "Meta", "vault_goals")} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-500/20 transition-all"><Trash2 size={10} className="text-red-400/60" /></button>
+                              </>
+                            )}
+                          </div>
                         </div>
                         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
                           <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(p, 100)}%`, background: p >= 100 ? "#22c55e" : company.color }} />
@@ -363,7 +385,17 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   })}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-[140px] text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</div>
+                <div className="flex flex-col items-center justify-center h-[140px] gap-2">
+                  <span className="text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma meta cadastrada</span>
+                  {hasPerm("fin") && (
+                    <button
+                      onClick={() => { setGoalForm({ goal_type: "", description: "", target_value: "", current_value: "" }); setGoalModal({ open: true }); }}
+                      className="text-[10px] px-3 py-1 rounded bg-[#FFD600]/10 text-[#FFD600] hover:bg-[#FFD600]/20 transition-colors"
+                    >
+                      + Criar meta
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
