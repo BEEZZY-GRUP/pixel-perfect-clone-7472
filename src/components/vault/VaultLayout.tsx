@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { VaultUser } from "@/hooks/useVaultAuth";
-import VaultSidebar from "./VaultSidebar";
+import VaultSidebar, { GlobalView } from "./VaultSidebar";
 import VaultDashboard from "./VaultDashboard";
 import VaultCompanyView from "./VaultCompanyView";
-import {
-  LayoutDashboard, Bell, Settings, Plug, LogOut, ChevronRight,
-} from "lucide-react";
-
-type GlobalView = "dashboard" | "notifications" | "integrations" | "settings";
+import VaultGlobalEntries from "./VaultGlobalEntries";
+import VaultGlobalReports from "./VaultGlobalReports";
+import VaultGlobalPlanning from "./VaultGlobalPlanning";
+import VaultGlobalHR from "./VaultGlobalHR";
+import VaultUsersPage from "./VaultUsersPage";
+import VaultProfilePage from "./VaultProfilePage";
+import VaultIntegrationsPage from "./VaultIntegrationsPage";
+import { ChevronRight, Bell, LogOut } from "lucide-react";
 
 interface Props {
   user: VaultUser;
@@ -18,6 +21,12 @@ interface Props {
   roleColors: Record<string, string>;
   hasPerm: (p: string) => boolean;
 }
+
+const VIEW_LABELS: Record<string, string> = {
+  dashboard: "Dashboard", lancamentos: "Lançamentos", relatorios: "Relatórios",
+  planejamento: "Planejamento", rh: "Pessoas & RH", notifications: "Notificações",
+  integrations: "Integrações", settings: "Configurações", usuarios: "Usuários", perfil: "Meu Perfil",
+};
 
 const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props) => {
   const [globalView, setGlobalView] = useState<GlobalView | null>("dashboard");
@@ -56,14 +65,10 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
   const company = companies?.find((c: any) => c.slug === selectedCompany);
   const breadcrumb = selectedCompany
     ? `${company?.name ?? selectedCompany}`
-    : globalView === "dashboard" ? "Dashboard"
-    : globalView === "notifications" ? "Notificações"
-    : globalView === "integrations" ? "Integrações"
-    : "Configurações";
+    : VIEW_LABELS[globalView ?? "dashboard"] ?? "Dashboard";
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#060604", color: "#F2F0E8" }}>
-      {/* Sidebar */}
       <VaultSidebar
         user={user}
         companies={companies ?? []}
@@ -80,7 +85,6 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
         onCompanyTab={setCompanyTab}
       />
 
-      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
         <div className="h-12 flex items-center justify-between px-5 border-b border-white/5 shrink-0" style={{ background: "#070707" }}>
@@ -96,9 +100,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               style={{ color: "rgba(242,240,232,0.4)" }}
             >
               <Bell size={12} /> Notificações
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />
-              )}
+              {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500" />}
             </button>
             <button
               onClick={onLogout}
@@ -113,10 +115,15 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: "thin" }}>
           {globalView === "dashboard" && <VaultDashboard companies={companies ?? []} onSelectCompany={handleSelectCompany} />}
+          {globalView === "lancamentos" && <VaultGlobalEntries />}
+          {globalView === "relatorios" && <VaultGlobalReports />}
+          {globalView === "planejamento" && <VaultGlobalPlanning />}
+          {globalView === "rh" && <VaultGlobalHR />}
           {globalView === "notifications" && (
             <div>
               <h1 className="font-heading text-lg font-semibold mb-4">Notificações</h1>
               <div className="space-y-2">
+                {notifications?.length === 0 && <div className="text-center py-12 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhuma notificação</div>}
                 {notifications?.map((n: any) => (
                   <div key={n.id} className="p-3 rounded-lg border border-white/5 flex items-start gap-3" style={{ background: "#0e0e0a" }}>
                     <span className="text-lg">{n.icon}</span>
@@ -130,18 +137,27 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               </div>
             </div>
           )}
+          {globalView === "integrations" && <VaultIntegrationsPage />}
           {globalView === "settings" && (
             <div>
               <h1 className="font-heading text-lg font-semibold mb-4">Configurações do Grupo</h1>
-              <p className="text-sm" style={{ color: "rgba(242,240,232,0.4)" }}>Configurações globais serão implementadas em breve.</p>
+              <div className="max-w-lg space-y-3">
+                {[
+                  { label: "Nome do Grupo", value: "Beezzy Group" },
+                  { label: "Moeda Padrão", value: "BRL — Real Brasileiro" },
+                  { label: "Exercício Fiscal", value: "Janeiro — Dezembro" },
+                  { label: "Fuso Horário", value: "America/Sao_Paulo (UTC-3)" },
+                ].map((f, i) => (
+                  <div key={i} className="rounded-xl p-3 border border-white/5" style={{ background: "#0e0e0a" }}>
+                    <div className="text-[9px] uppercase tracking-widest mb-1" style={{ color: "rgba(242,240,232,0.3)" }}>{f.label}</div>
+                    <div className="text-sm">{f.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-          {globalView === "integrations" && (
-            <div>
-              <h1 className="font-heading text-lg font-semibold mb-4">Integrações</h1>
-              <p className="text-sm" style={{ color: "rgba(242,240,232,0.4)" }}>Módulo de integrações será implementado em breve.</p>
-            </div>
-          )}
+          {globalView === "usuarios" && <VaultUsersPage user={user} />}
+          {globalView === "perfil" && <VaultProfilePage user={user} />}
           {selectedCompany && company && (
             <VaultCompanyView company={company} tab={companyTab} onTabChange={setCompanyTab} hasPerm={hasPerm} />
           )}
