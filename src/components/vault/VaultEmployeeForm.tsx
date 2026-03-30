@@ -132,6 +132,12 @@ const VaultEmployeeForm = ({ open, onClose, companyId, employee }: Props) => {
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Admissão</label>
               <input type="date" value={form.admission_date} onChange={e => setForm(f => ({ ...f, admission_date: e.target.value }))} className={cls} />
             </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Data de Nascimento</label>
+              <input type="date" value={form.birth_date} onChange={e => setForm(f => ({ ...f, birth_date: e.target.value }))} className={cls} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             {selectField("Status", "status", [
               { value: "ativo", label: "Ativo" },
               { value: "inativo", label: "Inativo" },
