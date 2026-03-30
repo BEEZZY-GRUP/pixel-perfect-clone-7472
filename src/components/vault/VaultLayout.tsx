@@ -168,14 +168,14 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
           {globalView === "lancamentos" && <VaultGlobalEntries />}
           {globalView === "relatorios" && <VaultGlobalReports />}
           {globalView === "planejamento" && <VaultGlobalPlanning />}
-          {globalView === "rh" && <VaultGlobalHR />}
+          
           {globalView === "notifications" && (() => {
             const unread = notifications?.filter((n: any) => !n.read) ?? [];
             const read = notifications?.filter((n: any) => n.read) ?? [];
             const getTargetView = (type: string): GlobalView | null => {
               if (type === "vencimento" || type === "pagamento" || type === "lancamento") return "lancamentos";
               if (type === "relatorio") return "relatorios";
-              if (type === "rh" || type === "admissao" || type === "ferias" || type === "birthday") return "rh";
+              if (type === "rh" || type === "admissao" || type === "ferias" || type === "birthday") return "dashboard";
               if (type === "planejamento" || type === "meta") return "planejamento";
               if (type === "config") return "settings";
               return null;
