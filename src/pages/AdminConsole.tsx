@@ -63,7 +63,7 @@ function ConsoleContent() {
 
           {/* Tabs */}
           <nav className="flex h-full overflow-x-auto scrollbar-none mx-2">
-            {TABS.map((t) => {
+            {TABS.filter(t => !("adminOnly" in t && t.adminOnly) || isAdmin).map((t) => {
               const Icon = t.icon;
               const isActive = tab === t.key;
               return (
