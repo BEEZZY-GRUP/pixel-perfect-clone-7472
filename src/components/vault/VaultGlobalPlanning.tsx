@@ -190,7 +190,6 @@ const VaultGlobalPlanning = () => {
         <div>
           {companies?.map((c: any) => {
             const coBudgets = budgets?.filter((b: any) => b.company_id === c.id) ?? [];
-            if (coBudgets.length === 0) return null;
             return (
               <div key={c.id} className="rounded-xl border border-white/5 mb-4 overflow-hidden" style={{ background: "#0e0e0a" }}>
                 <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
@@ -211,6 +210,9 @@ const VaultGlobalPlanning = () => {
                     </tr>
                   </thead>
                   <tbody>
+                    {coBudgets.length === 0 && (
+                      <tr><td colSpan={6} className="text-center py-6 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum budget cadastrado para esta empresa</td></tr>
+                    )}
                     {coBudgets.map((b: any) => {
                       const realized = entries?.filter((e: any) => e.company_id === c.id && e.category === b.category).reduce((a: number, e: any) => a + Number(e.amount), 0) ?? 0;
                       const u = pct(realized, Number(b.amount));
