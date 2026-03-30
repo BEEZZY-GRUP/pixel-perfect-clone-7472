@@ -60,6 +60,7 @@ const VaultEmployeeForm = ({ open, onClose, companyId, employee }: Props) => {
       employment_type: form.employment_type,
       salary: Number(unmaskCurrency(form.salary)) || 0,
       admission_date: form.admission_date || null,
+      birth_date: form.birth_date || null,
       status: form.status,
       email: form.email || null,
       cpf: form.cpf || null,
