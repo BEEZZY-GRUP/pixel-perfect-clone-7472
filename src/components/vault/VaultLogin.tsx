@@ -1,18 +1,21 @@
 import { useState } from "react";
-import { Lock, ArrowRight } from "lucide-react";
+import { Lock, ArrowRight, Loader2 } from "lucide-react";
 
 interface Props {
-  onLogin: (username: string, password: string) => boolean;
+  onLogin: (username: string, password: string) => Promise<boolean>;
 }
 
 const VaultLogin = ({ onLogin }: Props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = onLogin(username.trim(), password);
+    setLoading(true);
+    const ok = await onLogin(username.trim(), password);
+    setLoading(false);
     if (!ok) {
       setError(true);
       setTimeout(() => setError(false), 3000);
@@ -57,10 +60,11 @@ const VaultLogin = ({ onLogin }: Props) => {
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-md font-heading font-semibold text-sm text-black flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            disabled={loading}
+            className="w-full py-2.5 rounded-md font-heading font-semibold text-sm text-black flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-70"
             style={{ background: "linear-gradient(90deg, #FFD600, #E6C200)" }}
           >
-            Entrar no Sistema <ArrowRight size={14} />
+            {loading ? <><Loader2 size={14} className="animate-spin" /> Entrando...</> : <>Entrar no Sistema <ArrowRight size={14} /></>}
           </button>
         </form>
 
