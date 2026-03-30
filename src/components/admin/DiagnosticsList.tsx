@@ -72,18 +72,86 @@ const INVESTMENT_OPTIONS = ["Muito baixa", "Baixa", "Moderada", "Alta", "Muito a
 const STAKEHOLDERS = ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6+ pessoas"];
 const DECISION_PROCESSES = ["Decisão individual", "Sócios decidem juntos", "Conselho/comitê", "Processo complexo"];
 
-// ───── Beezzy Solutions Mapping ─────
-const PAIN_SOLUTIONS: Record<string, { solution: string; description: string }> = {
-  "Falta de processos definidos": { solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais, comerciais e administrativos com acompanhamento contínuo." },
-  "Dificuldade em gerar leads": { solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound marketing, funis de conversão, automação de marketing e campanhas de performance." },
-  "Time de vendas desorganizado": { solution: "Reestruturação Comercial", description: "Implementação de CRM, scripts de vendas, pipeline estruturado, treinamento de equipe e metas claras com KPIs." },
-  "Falta de presença digital": { solution: "Posicionamento Digital", description: "Branding digital, gestão de redes sociais, website profissional, SEO e estratégia de conteúdo." },
-  "Não consegue escalar": { solution: "Aceleração & Escala", description: "Diagnóstico de gargalos, automação de operações, estruturação de processos escaláveis e planejamento de crescimento." },
-  "Gestão financeira precária": { solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." },
-  "Falta de liderança": { solution: "Desenvolvimento de Liderança", description: "Mentoria executiva, treinamento de gestores, cultura organizacional e governance." },
-  "Comunicação interna ruim": { solution: "Comunicação Organizacional", description: "Ferramentas de comunicação interna, rituais de alinhamento, cultura de feedback e transparência." },
-  "Retenção de talentos": { solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." },
-  "Transformação digital": { solution: "Transformação Digital", description: "Migração de ferramentas, automação de processos, integração de sistemas e capacitação tecnológica da equipe." },
+// ───── Beezzy Solutions Mapping (Complete) ─────
+interface BeezzySolution {
+  solution: string;
+  module: string;
+  description: string;
+  deliverables: string[];
+  methodology_pillar: string;
+}
+
+const PAIN_SOLUTIONS: Record<string, BeezzySolution> = {
+  "Falta de processos definidos": {
+    solution: "Gestão de Processos",
+    module: "Execução de Verdade",
+    description: "Mapeamento completo de processos operacionais, comerciais e administrativos. Documentação de fluxos com responsáveis, prazos e indicadores de performance.",
+    deliverables: ["Mapa de processos AS-IS e TO-BE", "Manual operacional documentado", "Fluxogramas por departamento", "Checklist de execução por função", "KPIs de eficiência por processo"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 03 — Execução",
+  },
+  "Dificuldade em gerar leads": {
+    solution: "MarTech & Aquisição de Clientes",
+    module: "Marketing + Tecnologia",
+    description: "Construção de funis de aquisição com inbound e outbound marketing, automação de nurturing, campanhas de performance e estratégias de conversão baseadas em dados.",
+    deliverables: ["Funil de aquisição completo", "Automação de e-mail marketing", "Landing pages de conversão", "Campanhas pagas (Meta Ads, Google Ads)", "Dashboard de performance de marketing", "Estratégia de conteúdo para atração"],
+    methodology_pillar: "Pilar 03 — Execução + Pilar 04 — Resultados",
+  },
+  "Time de vendas desorganizado": {
+    solution: "Reestruturação Comercial Completa",
+    module: "Gestão por Resultados",
+    description: "Implementação de CRM com pipeline estruturado, criação de scripts de vendas, definição de metas individuais e coletivas, treinamento da equipe e rituais de acompanhamento semanal.",
+    deliverables: ["CRM configurado e customizado", "Pipeline de vendas em 6 etapas", "Scripts de abordagem e follow-up", "Metas SMART por vendedor", "Dashboard comercial em tempo real", "Ritual semanal de revisão de pipeline"],
+    methodology_pillar: "Pilar 02 — Plano Operacional + Pilar 04 — Resultados",
+  },
+  "Falta de presença digital": {
+    solution: "Posicionamento Digital Estratégico",
+    module: "Marketing + Tecnologia",
+    description: "Construção de autoridade digital com branding, website profissional, SEO, gestão de redes sociais e estratégia de conteúdo para posicionar a marca como referência no segmento.",
+    deliverables: ["Website institucional otimizado", "Perfis otimizados em redes sociais", "Estratégia de SEO e palavras-chave", "Calendário editorial mensal", "Identidade visual digital", "Gestão de Google Meu Negócio"],
+    methodology_pillar: "Pilar 03 — Execução",
+  },
+  "Não consegue escalar": {
+    solution: "Aceleração & Escalabilidade",
+    module: "Parceiro Estratégico",
+    description: "Diagnóstico de gargalos de crescimento, automação de operações repetitivas, estruturação de processos escaláveis e planejamento de expansão com projeções financeiras.",
+    deliverables: ["Mapa de gargalos operacionais", "Plano de automação de processos", "Modelo de negócio escalável", "Projeção financeira de crescimento", "Playbook de expansão", "Definição de capacidade operacional"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 05 — Legado",
+  },
+  "Gestão financeira precária": {
+    solution: "Gestão Financeira & Controle",
+    module: "Gestão por Resultados",
+    description: "Implantação de DRE gerencial, fluxo de caixa projetado, planejamento orçamentário anual, dashboards financeiros em tempo real e controle rigoroso de custos e margens.",
+    deliverables: ["DRE gerencial mensal", "Fluxo de caixa projetado", "Orçamento anual por centro de custo", "Dashboard financeiro em tempo real", "Política de aprovação de gastos", "Análise de margem por produto/serviço"],
+    methodology_pillar: "Pilar 04 — Resultados",
+  },
+  "Falta de liderança": {
+    solution: "Desenvolvimento de Liderança & Governance",
+    module: "Legado Duradouro",
+    description: "Programa de mentoria executiva, treinamento de gestores em liderança situacional, definição de cultura organizacional e implementação de governance com conselhos e rituais de decisão.",
+    deliverables: ["Programa de mentoria executiva", "Treinamento de liderança situacional", "Código de cultura organizacional", "Estrutura de governance", "Rituais de liderança (1:1, all-hands)", "Plano de sucessão"],
+    methodology_pillar: "Pilar 05 — Legado",
+  },
+  "Comunicação interna ruim": {
+    solution: "Comunicação Organizacional Integrada",
+    module: "Execução de Verdade",
+    description: "Implantação de ferramentas de comunicação interna, rituais de alinhamento entre times, cultura de feedback contínuo e transparência radical na gestão.",
+    deliverables: ["Stack de comunicação interna", "Rituais de alinhamento (daily, weekly, monthly)", "Política de feedback 360°", "Canal de comunicação transparente", "Template de reuniões produtivas", "Onboarding de comunicação para novos"],
+    methodology_pillar: "Pilar 03 — Execução",
+  },
+  "Retenção de talentos": {
+    solution: "Gestão de Pessoas & Employer Branding",
+    module: "Legado Duradouro",
+    description: "Criação de plano de carreira, política salarial competitiva, pesquisa de clima organizacional, programa de onboarding e construção de employer branding para atrair talentos.",
+    deliverables: ["Plano de cargos e salários", "Pesquisa de clima organizacional", "Programa de onboarding estruturado", "PDI (Plano de Desenvolvimento Individual)", "Employer branding nas redes", "Política de benefícios e reconhecimento"],
+    methodology_pillar: "Pilar 05 — Legado",
+  },
+  "Transformação digital": {
+    solution: "Transformação Digital & Automação",
+    module: "Marketing + Tecnologia",
+    description: "Migração de ferramentas analógicas para digitais, automação de processos manuais, integração de sistemas e capacitação tecnológica de toda a equipe.",
+    deliverables: ["Auditoria de maturidade digital", "Roadmap de transformação digital", "Migração de ferramentas e dados", "Automação de processos-chave", "Treinamento de equipe em novas ferramentas", "Integrações entre sistemas (APIs)"],
+    methodology_pillar: "Pilar 01 — Diagnóstico + Pilar 03 — Execução",
+  },
 };
 
 function calculateScore(form: Record<string, any>): { score: number; classification: string; summary: string } {
