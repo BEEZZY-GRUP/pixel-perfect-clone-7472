@@ -114,7 +114,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
-      <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-md">
+      <DialogContent className="bg-[#111] border-white/10 text-[#F2F0E8] max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Lançamento" : "Novo Lançamento"}</DialogTitle>
         </DialogHeader>
@@ -139,12 +139,12 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
                 className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
               />
             </div>
-            {inputField("Vencimento", "due_date", "date")}
+            {selectField("Forma de Pagamento", "payment_method", PAYMENT_METHODS.map(m => ({ value: m, label: m })), "Selecione...")}
           </div>
           <div className="grid grid-cols-3 gap-3">
             {inputField("Data Lançamento", "entry_date", "date")}
+            {inputField("Vencimento", "due_date", "date")}
             {inputField("Data Pagamento", "payment_date", "date")}
-            {selectField("Forma de Pagamento", "payment_method", PAYMENT_METHODS.map(m => ({ value: m, label: m })), "Selecione...")}
           </div>
           <div>
             <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Status</label>

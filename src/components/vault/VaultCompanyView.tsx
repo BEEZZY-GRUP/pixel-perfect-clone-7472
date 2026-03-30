@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, CheckCircle, XCircle, Save, DollarSign, CreditCard, User } from "lucide-react";
@@ -99,9 +99,33 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
     queryFn: async () => { const { data } = await supabase.from("vault_salary_history").select("*").eq("company_id", coId).order("change_date", { ascending: false }); return data ?? []; },
   });
 
-  const current = monthlyData?.length ? monthlyData[monthlyData.length - 1] : null;
-  const rev = Number(current?.revenue ?? 0);
-  const exp = Number(current?.expenses ?? 0);
+  // Compute monthly aggregates from entries
+  const computedMonthly = useMemo(() => {
+    const all = entries ?? [];
+    const map: Record<string, { month_date: string; revenue: number; expenses: number }> = {};
+    all.forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7);
+      if (!map[monthKey]) map[monthKey] = { month_date: monthKey, revenue: 0, expenses: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        map[monthKey].revenue += Number(e.amount);
+      } else {
+        map[monthKey].expenses += Number(e.amount);
+      }
+    });
+    // Merge with vault_monthly_data if it has data
+    (monthlyData ?? []).forEach((m: any) => {
+      const monthKey = (m.month_date as string).substring(0, 7);
+      if (!map[monthKey]) {
+        map[monthKey] = { month_date: monthKey, revenue: Number(m.revenue), expenses: Number(m.expenses) };
+      }
+    });
+    return Object.values(map).sort((a, b) => a.month_date.localeCompare(b.month_date));
+  }, [entries, monthlyData]);
+
+  const current = computedMonthly.length ? computedMonthly[computedMonthly.length - 1] : null;
+  const rev = current?.revenue ?? 0;
+  const exp = current?.expenses ?? 0;
   const tax = Math.round(rev * (Number(company.aliquota) / 100));
   const result = rev - exp - tax;
   const activeEmps = employees?.filter((e: any) => e.status === "ativo").length ?? 0;
@@ -198,10 +222,10 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
   };
 
   // Chart data for company reports
-  const chartData = monthlyData?.map((m: any) => {
-    const [y, mo] = (m.month_date as string).split("-");
-    return { name: `${mo}/${y}`, Faturamento: Number(m.revenue), Despesas: Number(m.expenses), Resultado: Number(m.revenue) - Number(m.expenses) };
-  }) ?? [];
+  const chartData = computedMonthly.map(m => {
+    const [y, mo] = m.month_date.split("-");
+    return { name: `${mo}/${y}`, Faturamento: m.revenue, Despesas: m.expenses, Resultado: m.revenue - m.expenses };
+  });
 
   // Entries table renderer
   const renderEntriesTable = (data: any[], title: string, emptyMsg: string, showPayBtn = false) => (
@@ -683,7 +707,7 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
             <div className="px-4 py-3 border-b border-white/5">
               <span className="text-xs font-medium">DRE | {company.name}</span>
             </div>
-            {(monthlyData?.length ?? 0) === 0 ? (
+            {computedMonthly.length === 0 ? (
               <div className="text-center py-8 text-xs" style={{ color: "rgba(242,240,232,0.3)" }}>Nenhum dado mensal</div>
             ) : (
               <table className="w-full">
@@ -695,14 +719,14 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                   </tr>
                 </thead>
                 <tbody>
-                  {monthlyData?.map((m: any) => {
-                    const r = Number(m.revenue); const e = Number(m.expenses);
+                  {computedMonthly.map((m, idx) => {
+                    const r = m.revenue; const e = m.expenses;
                     const t = Math.round(r * (Number(company.aliquota) / 100));
                     const res = r - e - t;
                     const margin = r > 0 ? Math.round((res / r) * 100) : 0;
                     const [y, mo] = (m.month_date as string).split("-");
                     return (
-                      <tr key={m.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+                      <tr key={m.month_date} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                         <td className="px-4 py-2.5 text-xs">{`${mo}/${y}`}</td>
                         <td className="px-4 py-2.5 text-xs font-medium">{fmtK(r)}</td>
                         <td className="px-4 py-2.5 text-xs text-red-400">{fmtK(e)}</td>
