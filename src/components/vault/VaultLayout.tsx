@@ -11,7 +11,7 @@ import VaultGlobalPlanning from "./VaultGlobalPlanning";
 import VaultGlobalHR from "./VaultGlobalHR";
 import VaultUsersPage from "./VaultUsersPage";
 import VaultProfilePage from "./VaultProfilePage";
-import VaultIntegrationsPage from "./VaultIntegrationsPage";
+
 import { ChevronRight, Bell, LogOut, Save, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -29,7 +29,7 @@ interface Props {
 const VIEW_LABELS: Record<string, string> = {
   dashboard: "Dashboard", lancamentos: "Lançamentos", relatorios: "Relatórios",
   planejamento: "Planejamento", rh: "Pessoas & RH", notifications: "Notificações",
-  integrations: "Integrações", settings: "Configurações", usuarios: "Usuários", perfil: "Meu Perfil",
+  settings: "Configurações", usuarios: "Usuários", perfil: "Meu Perfil",
 };
 
 const SETTINGS_FIELDS = [
@@ -172,7 +172,7 @@ const VaultLayout = ({ user, onLogout, roleLabels, roleColors, hasPerm }: Props)
               </div>
             </div>
           )}
-          {globalView === "integrations" && <VaultIntegrationsPage />}
+          
 
           {/* Settings - Editable */}
           {globalView === "settings" && (
