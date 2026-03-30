@@ -1633,7 +1633,34 @@ ScrollTrigger.create({trigger:'#case-study',start:'top 80%',once:true,
   }
 });
 
-/* CTA */
+/* FAQ */
+ScrollTrigger.create({trigger:'#faq',start:'top 80%',once:true,
+  onEnter(){
+    gsap.to('.faq-eyebrow,.faq-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.faq-item',{opacity:1,y:0,stagger:.06,duration:.7,ease:'power3.out',delay:.2});
+  }
+});
+
+/* FAQ Toggle */
+window.toggleFaq=function(btn){
+  const item=btn.parentElement;
+  const answer=item.querySelector('.faq-answer');
+  const inner=item.querySelector('.faq-answer-inner');
+  const wasActive=item.classList.contains('active');
+  
+  /* Close all */
+  document.querySelectorAll('.faq-item.active').forEach(function(el){
+    el.classList.remove('active');
+    el.querySelector('.faq-answer').style.maxHeight='0';
+  });
+  
+  if(!wasActive){
+    item.classList.add('active');
+    answer.style.maxHeight=inner.scrollHeight+'px';
+  }
+};
+
+
 ['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 82%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
 ScrollTrigger.create({trigger:'#cta',start:'top 80%',once:true,onEnter(){gsap.to('#ctaTitle',{opacity:1,y:0,duration:1.1,ease:'power3.out'})}});
 
