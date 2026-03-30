@@ -604,6 +604,51 @@ body.page-ready{overflow-y:clip}
 .test-card-role{font-size:.75rem;color:rgba(232,233,235,.4);margin-top:.15rem}
 @media(max-width:899px){.test-grid{grid-template-columns:1fr}}
 
+/* ═══ FAQ ═══ */
+#faq{
+  background:#060604;
+  padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+  position:relative;overflow:hidden;
+}
+.faq-header{max-width:1200px;margin:0 auto 3.5rem}
+.faq-eyebrow{
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:.6rem;
+  letter-spacing:.35em;text-transform:uppercase;color:#FFD600;margin-bottom:1rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.faq-eyebrow::before{content:'';width:24px;height:1px;background:#FFD600}
+.faq-title{font-family:'Montserrat',sans-serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:900;letter-spacing:-.03em}
+.faq-title em{color:#FFD600;font-style:normal}
+.faq-grid{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:.5rem}
+.faq-item{
+  border:1px solid rgba(232,233,235,.08);border-radius:var(--radius);
+  overflow:hidden;transition:border-color .3s;
+}
+.faq-item.active{border-color:rgba(255,214,0,.2)}
+.faq-question{
+  display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+  padding:1.3rem 1.8rem;cursor:pointer;user-select:none;
+  background:transparent;border:none;width:100%;text-align:left;
+  font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:700;
+  color:#E8E9EB;letter-spacing:-.01em;transition:color .3s;
+}
+.faq-question:hover{color:#FFD600}
+.faq-item.active .faq-question{color:#FFD600}
+.faq-chevron{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(232,233,235,.12);transition:all .3s;
+}
+.faq-item.active .faq-chevron{border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.08);transform:rotate(180deg)}
+.faq-chevron svg{width:14px;height:14px}
+.faq-answer{
+  max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.22,1,.36,1);
+}
+.faq-answer-inner{
+  padding:0 1.8rem 1.5rem;
+  font-size:.9rem;line-height:1.85;color:rgba(232,233,235,.55);
+}
+
 /* ═══ CASE STUDY ═══ */
 #case-study{
   background:#060604;
@@ -639,16 +684,17 @@ body.page-ready{overflow-y:clip}
 .case-phase-dot{
   width:56px;height:56px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.3rem;position:relative;z-index:1;
+  font-size:1.3rem;position:relative;z-index:2;
   transition:all .4s;
 }
+.case-phase-dot svg{width:22px;height:22px;transition:all .3s}
 .case-phase-dot.problem{background:#1a0808;border:2px solid rgba(239,68,68,.4)}
 .case-phase-dot.action{background:#111110;border:2px solid rgba(255,214,0,.3)}
 .case-phase-dot.result{background:#081a08;border:2px solid rgba(34,197,94,.4)}
 
-.case-phase:hover .case-phase-dot.problem{background:rgba(239,68,68,.15);border-color:#EF4444;transform:scale(1.1)}
-.case-phase:hover .case-phase-dot.action{background:rgba(255,214,0,.15);border-color:#FFD600;transform:scale(1.1)}
-.case-phase:hover .case-phase-dot.result{background:rgba(34,197,94,.15);border-color:#22C55E;transform:scale(1.1)}
+.case-phase:hover .case-phase-dot.problem{background:rgba(239,68,68,.2);border-color:#EF4444;transform:scale(1.12);box-shadow:0 0 30px rgba(239,68,68,.25)}
+.case-phase:hover .case-phase-dot.action{background:rgba(255,214,0,.2);border-color:#FFD600;transform:scale(1.12);box-shadow:0 0 30px rgba(255,214,0,.25)}
+.case-phase:hover .case-phase-dot.result{background:rgba(34,197,94,.2);border-color:#22C55E;transform:scale(1.12);box-shadow:0 0 30px rgba(34,197,94,.25)}
 
 .case-phase-body{
   background:#060604;border:none;border-radius:var(--radius-lg);
@@ -1215,7 +1261,7 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
   <div class="case-flow">
     <!-- PROBLEM -->
     <div class="case-phase">
-      <div class="case-phase-dot problem">🚨</div>
+      <div class="case-phase-dot problem"><svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
       <div class="case-phase-body problem-body">
         <div class="case-phase-label lbl-problem">O Cenário</div>
         <h3 class="case-phase-title">A empresa estava morrendo em silêncio</h3>
@@ -1232,7 +1278,7 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 
     <!-- ACTION -->
     <div class="case-phase">
-      <div class="case-phase-dot action">⚡</div>
+      <div class="case-phase-dot action"><svg viewBox="0 0 24 24" fill="none" stroke="#FFD600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <div class="case-phase-body action-body">
         <div class="case-phase-label lbl-action">O que a Beezzy fez</div>
         <h3 class="case-phase-title">Reestruturação total da operação</h3>
@@ -1252,7 +1298,7 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
 
     <!-- RESULT -->
     <div class="case-phase">
-      <div class="case-phase-dot result">🏆</div>
+      <div class="case-phase-dot result"><svg viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
       <div class="case-phase-body result-body">
         <div class="case-phase-label lbl-result">O Resultado</div>
         <h3 class="case-phase-title">Do vermelho ao lucro em tempo recorde</h3>
@@ -1293,6 +1339,72 @@ window.closeClientPortal=function(){document.getElementById('portal-overlay').cl
         <div class="test-card-avatar">RV</div>
         <div><div class="test-card-name">Ricardo Vieira</div><div class="test-card-role">Diretor de expansão | Palpita.io</div></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section id="faq">
+  <div class="faq-header">
+    <p class="faq-eyebrow">Dúvidas frequentes</p>
+    <h2 class="faq-title">Perguntas <em>frequentes</em></h2>
+  </div>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        O que exatamente a Beezzy faz?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">A Beezzy é uma empresa de gestão estratégica e MarTech que atua como parceira operacional dos negócios. Entramos na operação, diagnosticamos problemas, executamos soluções e mensuramos resultados — do planejamento à ação concreta. Não somos consultoria de relatório: somos parceiros de execução.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        A Beezzy é uma consultoria?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">Não no sentido tradicional. A Beezzy vai muito além de entregar relatórios e recomendações. Atuamos como parceiros operacionais — entramos no dia a dia, participamos de decisões, executamos ações e ficamos lado a lado até o resultado aparecer. É consultoria com execução real.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Qual o perfil de empresa ideal para trabalhar com a Beezzy?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">Trabalhamos principalmente com empresas que faturam entre R$1M e R$20M por ano e que sentem que estão estagnadas, desorganizadas ou sem conseguir escalar. Se você sente que a empresa depende demais de você, que os processos não funcionam ou que o time não entrega, a Beezzy é pra você.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Quanto tempo leva para ver resultados?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">Depende do cenário, mas em média nossos clientes começam a ver resultados tangíveis entre 30 e 90 dias. Já tivemos caso de empresa que saiu de 6 meses no vermelho para voltar a lucrar em 90 dias. O diagnóstico inicial leva entre 2 e 4 semanas.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        O que é o modelo PaaS (Partner as a Service)?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">PaaS é o nosso modelo de parceria estratégica. Atuamos como sócios operacionais sem que você precise abrir capital. Participamos de decisões, implementamos processos, acompanhamos KPIs e ficamos no dia a dia da operação até que a empresa funcione de forma autossustentável.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        A Beezzy atende empresas fora do Brasil?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">Sim. Já atendemos empresas em mais de 6 países. Nosso modelo de trabalho é híbrido — combinamos reuniões presenciais quando necessário com acompanhamento remoto constante. A distância nunca foi impedimento para entregar resultado.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Qual o investimento para trabalhar com a Beezzy?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">O investimento varia conforme o escopo e a complexidade do projeto. Trabalhamos com modelos personalizados para cada empresa. O primeiro passo é uma conversa sem compromisso para entendermos seu cenário e apresentarmos a melhor proposta. Entre em contato e vamos conversar.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        O que é o The Hive?
+        <span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-answer"><div class="faq-answer-inner">The Hive é o ecossistema exclusivo de clientes Beezzy. Uma comunidade onde empresários e gestores trocam experiências, acessam conteúdos exclusivos, participam de eventos e têm suporte contínuo da nossa equipe. É networking com propósito e resultado.</div></div>
     </div>
   </div>
 </section>
@@ -1449,6 +1561,8 @@ gsap.set('.cli-eyebrow,.cli-title',{opacity:0,y:20});
 gsap.set('.cli-item',{opacity:0,y:20});
 gsap.set('.test-eyebrow,.test-title',{opacity:0,y:25});
 gsap.set('.test-card',{opacity:0,y:40});
+gsap.set('.faq-eyebrow,.faq-title',{opacity:0,y:25});
+gsap.set('.faq-item',{opacity:0,y:20});
 gsap.set('.case-eyebrow,.case-title,.case-subtitle',{opacity:0,y:25});
 gsap.set('.case-phase',{opacity:0,x:-30});
 gsap.set('#ctaTitle',{opacity:0,y:45});
@@ -1519,7 +1633,34 @@ ScrollTrigger.create({trigger:'#case-study',start:'top 80%',once:true,
   }
 });
 
-/* CTA */
+/* FAQ */
+ScrollTrigger.create({trigger:'#faq',start:'top 80%',once:true,
+  onEnter(){
+    gsap.to('.faq-eyebrow,.faq-title',{opacity:1,y:0,stagger:.1,duration:.8,ease:'power3.out'});
+    gsap.to('.faq-item',{opacity:1,y:0,stagger:.06,duration:.7,ease:'power3.out',delay:.2});
+  }
+});
+
+/* FAQ Toggle */
+window.toggleFaq=function(btn){
+  const item=btn.parentElement;
+  const answer=item.querySelector('.faq-answer');
+  const inner=item.querySelector('.faq-answer-inner');
+  const wasActive=item.classList.contains('active');
+  
+  /* Close all */
+  document.querySelectorAll('.faq-item.active').forEach(function(el){
+    el.classList.remove('active');
+    el.querySelector('.faq-answer').style.maxHeight='0';
+  });
+  
+  if(!wasActive){
+    item.classList.add('active');
+    answer.style.maxHeight=inner.scrollHeight+'px';
+  }
+};
+
+
 ['orb1','orb2','orb3'].forEach((id,i)=>{const orb=document.getElementById(id);if(!orb)return;ScrollTrigger.create({trigger:'#cta',start:'top 82%',once:true,onEnter(){gsap.to(orb,{scale:1,opacity:1,duration:1.4,ease:'power3.out',delay:i*.15});gsap.to(orb,{rotation:360,duration:22+i*8,ease:'none',repeat:-1})}})});
 ScrollTrigger.create({trigger:'#cta',start:'top 80%',once:true,onEnter(){gsap.to('#ctaTitle',{opacity:1,y:0,duration:1.1,ease:'power3.out'})}});
 
