@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Search, Calendar, ChevronRight, Plus, ArrowLeft, Check, ChevronDown, ChevronUp, Building2, User, Clock } from "lucide-react";
+import { FileText, Search, Calendar, ChevronRight, Plus, ArrowLeft, Check, ChevronDown, ChevronUp, Building2, User, Clock, TrendingUp, TrendingDown, Minus, Briefcase, Lightbulb, AlertTriangle, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLeads } from "./LeadsContext";
 import type { Lead } from "./types";
@@ -72,31 +72,40 @@ const INVESTMENT_OPTIONS = ["Muito baixa", "Baixa", "Moderada", "Alta", "Muito a
 const STAKEHOLDERS = ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6+ pessoas"];
 const DECISION_PROCESSES = ["Decisão individual", "Sócios decidem juntos", "Conselho/comitê", "Processo complexo"];
 
+// ───── Beezzy Solutions Mapping ─────
+const PAIN_SOLUTIONS: Record<string, { solution: string; description: string }> = {
+  "Falta de processos definidos": { solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais, comerciais e administrativos com acompanhamento contínuo." },
+  "Dificuldade em gerar leads": { solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound marketing, funis de conversão, automação de marketing e campanhas de performance." },
+  "Time de vendas desorganizado": { solution: "Reestruturação Comercial", description: "Implementação de CRM, scripts de vendas, pipeline estruturado, treinamento de equipe e metas claras com KPIs." },
+  "Falta de presença digital": { solution: "Posicionamento Digital", description: "Branding digital, gestão de redes sociais, website profissional, SEO e estratégia de conteúdo." },
+  "Não consegue escalar": { solution: "Aceleração & Escala", description: "Diagnóstico de gargalos, automação de operações, estruturação de processos escaláveis e planejamento de crescimento." },
+  "Gestão financeira precária": { solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." },
+  "Falta de liderança": { solution: "Desenvolvimento de Liderança", description: "Mentoria executiva, treinamento de gestores, cultura organizacional e governance." },
+  "Comunicação interna ruim": { solution: "Comunicação Organizacional", description: "Ferramentas de comunicação interna, rituais de alinhamento, cultura de feedback e transparência." },
+  "Retenção de talentos": { solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." },
+  "Transformação digital": { solution: "Transformação Digital", description: "Migração de ferramentas, automação de processos, integração de sistemas e capacitação tecnológica da equipe." },
+};
+
 function calculateScore(form: Record<string, any>): { score: number; classification: string; summary: string } {
   let score = 0;
 
-  // Company maturity (max 20)
   const years = YEARS.indexOf(form.years_in_market || "");
   score += Math.min(years * 4, 16);
   if (form.has_defined_processes) score += 4;
 
-  // Digital & Strategy (max 20)
   const digital = DIGITAL_LEVELS.indexOf(form.digital_presence_level || "");
   score += digital * 5;
   if (form.has_marketing_strategy) score += 5;
 
-  // Pain & Urgency (max 20)
   const urgency = URGENCIES.indexOf(form.decision_urgency || "");
   score += (3 - urgency) * 5;
   const challenges = (form.main_challenges || []).length;
   score += Math.min(challenges * 2, 10);
 
-  // Budget & Decision (max 20)
   if (form.budget_defined) score += 8;
   const budgetIdx = BUDGET_RANGES.indexOf(form.budget_range || "");
   score += Math.min(budgetIdx * 3, 12);
 
-  // Investment capacity (max 20)
   const inv = INVESTMENT_OPTIONS.indexOf(form.investment_capacity || "");
   score += inv * 5;
 
@@ -120,6 +129,101 @@ function calculateScore(form: Record<string, any>): { score: number; classificat
   }
 
   return { score, classification, summary };
+}
+
+// ───── Generate comparative summary ─────
+function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): { changes: Array<{ field: string; from: string; to: string; type: "improved" | "declined" | "changed" }>; evolutionSummary: string } {
+  const changes: Array<{ field: string; from: string; to: string; type: "improved" | "declined" | "changed" }> = [];
+
+  const orderedFields: Array<{ key: string; label: string; options?: string[] }> = [
+    { key: "company_size", label: "Porte", options: COMPANY_SIZES },
+    { key: "employees_count", label: "Colaboradores", options: EMPLOYEES },
+    { key: "annual_revenue", label: "Faturamento", options: REVENUES },
+    { key: "digital_presence_level", label: "Presença digital", options: DIGITAL_LEVELS },
+    { key: "investment_capacity", label: "Capacidade de investimento", options: INVESTMENT_OPTIONS },
+    { key: "decision_urgency", label: "Urgência", options: URGENCIES },
+    { key: "budget_range", label: "Faixa de orçamento", options: BUDGET_RANGES },
+    { key: "growth_timeline", label: "Prazo de crescimento", options: TIMELINES },
+  ];
+
+  for (const f of orderedFields) {
+    const prev = (previous as any)[f.key] || "";
+    const curr = (current as any)[f.key] || "";
+    if (prev !== curr && (prev || curr)) {
+      let type: "improved" | "declined" | "changed" = "changed";
+      if (f.options) {
+        const prevIdx = f.options.indexOf(prev);
+        const currIdx = f.options.indexOf(curr);
+        if (prevIdx >= 0 && currIdx >= 0) {
+          // For urgency, lower index = more urgent = improved
+          if (f.key === "decision_urgency") {
+            type = currIdx < prevIdx ? "improved" : "declined";
+          } else {
+            type = currIdx > prevIdx ? "improved" : "declined";
+          }
+        }
+      }
+      changes.push({ field: f.label, from: prev || "-", to: curr || "-", type });
+    }
+  }
+
+  const boolFields: Array<{ key: string; label: string }> = [
+    { key: "has_defined_processes", label: "Processos definidos" },
+    { key: "has_marketing_strategy", label: "Estratégia de marketing" },
+    { key: "has_sales_team", label: "Time comercial" },
+    { key: "budget_defined", label: "Orçamento definido" },
+  ];
+
+  for (const f of boolFields) {
+    const prev = (previous as any)[f.key];
+    const curr = (current as any)[f.key];
+    if (prev !== curr) {
+      changes.push({ field: f.label, from: prev ? "Sim" : "Não", to: curr ? "Sim" : "Não", type: curr ? "improved" : "declined" });
+    }
+  }
+
+  const textFields: Array<{ key: string; label: string }> = [
+    { key: "biggest_pain", label: "Maior dor" },
+    { key: "short_term_goals", label: "Metas curto prazo" },
+    { key: "long_term_goals", label: "Metas longo prazo" },
+    { key: "revenue_goal", label: "Meta de faturamento" },
+  ];
+
+  for (const f of textFields) {
+    const prev = (previous as any)[f.key] || "";
+    const curr = (current as any)[f.key] || "";
+    if (prev !== curr && (prev || curr)) {
+      changes.push({ field: f.label, from: prev || "-", to: curr || "-", type: "changed" });
+    }
+  }
+
+  // Challenges diff
+  const prevChallenges = previous.main_challenges || [];
+  const currChallenges = current.main_challenges || [];
+  const newChallenges = currChallenges.filter(c => !prevChallenges.includes(c));
+  const resolvedChallenges = prevChallenges.filter(c => !currChallenges.includes(c));
+  if (newChallenges.length > 0) {
+    changes.push({ field: "Novos desafios", from: "-", to: newChallenges.join(", "), type: "declined" });
+  }
+  if (resolvedChallenges.length > 0) {
+    changes.push({ field: "Desafios resolvidos", from: resolvedChallenges.join(", "), to: "Resolvido", type: "improved" });
+  }
+
+  const scoreDiff = current.score - previous.score;
+  let evolutionSummary = "";
+  if (scoreDiff > 15) {
+    evolutionSummary = `Evolução significativa (+${scoreDiff} pts). O lead amadureceu consideravelmente desde o último diagnóstico, demonstrando maior urgência e capacidade de investimento.`;
+  } else if (scoreDiff > 0) {
+    evolutionSummary = `Evolução positiva (+${scoreDiff} pts). Houve avanços pontuais desde a última avaliação, indicando progresso no amadurecimento.`;
+  } else if (scoreDiff === 0) {
+    evolutionSummary = "Cenário estável. Não houve alteração significativa no score. Recomenda-se ações para acelerar o amadurecimento.";
+  } else if (scoreDiff > -15) {
+    evolutionSummary = `Leve regressão (${scoreDiff} pts). Alguns indicadores pioraram. Atenção ao engajamento e comunicação com o lead.`;
+  } else {
+    evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do lead antes de prosseguir.`;
+  }
+
+  return { changes, evolutionSummary };
 }
 
 // ───── Main Component ─────
@@ -222,10 +326,13 @@ export default function DiagnosticsList() {
 
   // ───── Viewing a Single Diagnostic Result ─────
   if (viewDiag) {
+    const diagIdx = diagnostics.findIndex(d => d.id === viewDiag.id);
+    const previousDiag = diagIdx < diagnostics.length - 1 ? diagnostics[diagIdx + 1] : null;
     return (
       <DiagnosticResult
         diagnostic={viewDiag}
         lead={selectedLead}
+        previousDiagnostic={previousDiag}
         onBack={() => setViewDiag(null)}
       />
     );
@@ -236,6 +343,7 @@ export default function DiagnosticsList() {
     return (
       <DiagnosticForm
         lead={selectedLead}
+        lastDiagnostic={diagnostics.length > 0 ? diagnostics[0] : null}
         onBack={() => setShowForm(false)}
         onSaved={() => {
           setShowForm(false);
@@ -256,7 +364,7 @@ export default function DiagnosticsList() {
           <div>
             <p className="section-eyebrow">Diagnósticos</p>
             <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
-              {selectedLead.name} — {selectedLead.company}
+              {selectedLead.name} | {selectedLead.company}
             </h2>
           </div>
         </div>
@@ -293,6 +401,8 @@ export default function DiagnosticsList() {
               desqualificado: "text-red-400 bg-red-500/10 border-red-500/30",
             };
             const colorClass = classColors[diag.classification] || classColors.frio;
+            const prevDiag = i < diagnostics.length - 1 ? diagnostics[i + 1] : null;
+            const scoreDiff = prevDiag ? diag.score - prevDiag.score : null;
             return (
               <motion.button
                 key={diag.id}
@@ -309,15 +419,22 @@ export default function DiagnosticsList() {
                     </div>
                     <div>
                       <p className="font-heading text-sm text-foreground font-semibold">
-                        Diagnóstico — {new Date(diag.meeting_date).toLocaleDateString("pt-BR")}
+                        Diagnóstico | {new Date(diag.meeting_date).toLocaleDateString("pt-BR")}
                       </p>
                       <p className="font-heading text-[10px] text-muted-foreground/50">
-                        {diag.meeting_type === "online" ? "Reunião Online" : "Presencial"}
+                        {diag.meeting_type === "online" ? "Reunião Online" : diag.meeting_type === "presencial" ? "Presencial" : "Telefone"}
                         {diag.commercial_name && ` · ${diag.commercial_name}`}
+                        {i === 0 && diagnostics.length > 1 && <span className="text-gold/60 ml-2">· Mais recente</span>}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
+                    {scoreDiff !== null && (
+                      <span className={`font-heading text-[10px] font-semibold flex items-center gap-0.5 ${scoreDiff > 0 ? "text-green-400" : scoreDiff < 0 ? "text-red-400" : "text-muted-foreground/40"}`}>
+                        {scoreDiff > 0 ? <TrendingUp size={11} /> : scoreDiff < 0 ? <TrendingDown size={11} /> : <Minus size={11} />}
+                        {scoreDiff > 0 ? `+${scoreDiff}` : scoreDiff}
+                      </span>
+                    )}
                     <div className="text-right">
                       <p className="font-heading text-lg font-bold text-gold">{diag.score}<span className="text-xs text-muted-foreground/40">/100</span></p>
                     </div>
@@ -337,10 +454,12 @@ export default function DiagnosticsList() {
 }
 
 // ───── Diagnostic Form Component ─────
-function DiagnosticForm({ lead, onBack, onSaved }: { lead: Lead; onBack: () => void; onSaved: () => void }) {
+function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead; lastDiagnostic: Diagnostic | null; onBack: () => void; onSaved: () => void }) {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<Record<string, any>>({
+  const [prefilled, setPrefilled] = useState(false);
+
+  const defaultForm: Record<string, any> = {
     meeting_date: new Date().toISOString().split("T")[0],
     meeting_type: "online",
     commercial_name: "",
@@ -371,7 +490,38 @@ function DiagnosticForm({ lead, onBack, onSaved }: { lead: Lead; onBack: () => v
     competitor_analysis: "",
     additional_notes: "",
     next_steps: "",
-  });
+  };
+
+  // Pre-fill from last diagnostic
+  const initialForm = useMemo(() => {
+    if (!lastDiagnostic) return defaultForm;
+    const f = { ...defaultForm };
+    const keysToCarry = [
+      "commercial_name", "company_segment", "company_size", "employees_count",
+      "annual_revenue", "years_in_market", "main_challenges", "current_tools",
+      "has_defined_processes", "has_marketing_strategy", "has_sales_team",
+      "digital_presence_level", "short_term_goals", "long_term_goals",
+      "revenue_goal", "growth_timeline", "biggest_pain", "tried_solutions",
+      "investment_capacity", "decision_urgency", "decision_maker",
+      "decision_process", "stakeholders_count", "budget_defined", "budget_range",
+      "competitor_analysis",
+    ];
+    for (const key of keysToCarry) {
+      const val = (lastDiagnostic as any)[key];
+      if (val !== null && val !== undefined) {
+        f[key] = val;
+      }
+    }
+    return f;
+  }, [lastDiagnostic]);
+
+  const [form, setForm] = useState<Record<string, any>>(initialForm);
+
+  useEffect(() => {
+    if (lastDiagnostic && !prefilled) {
+      setPrefilled(true);
+    }
+  }, [lastDiagnostic]);
 
   const update = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
   const toggleChallenge = (c: string) => {
@@ -422,10 +572,27 @@ function DiagnosticForm({ lead, onBack, onSaved }: { lead: Lead; onBack: () => v
         <div>
           <p className="section-eyebrow">Novo Diagnóstico</p>
           <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
-            {lead.name} — {lead.company}
+            {lead.name} | {lead.company}
           </h2>
         </div>
       </div>
+
+      {/* Pre-fill notice */}
+      {lastDiagnostic && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-lg border border-gold-border/30 bg-gold/5 px-4 py-3 flex items-start gap-3"
+        >
+          <Lightbulb size={16} className="text-gold shrink-0 mt-0.5" />
+          <div>
+            <p className="font-heading text-xs text-gold font-semibold">Dados do último diagnóstico carregados</p>
+            <p className="font-heading text-[10px] text-muted-foreground/60 mt-0.5">
+              As respostas do diagnóstico de {new Date(lastDiagnostic.meeting_date).toLocaleDateString("pt-BR")} foram pré-carregadas. Atualize apenas o que mudou.
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Step indicator */}
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pb-2">
@@ -723,7 +890,8 @@ function DiagnosticForm({ lead, onBack, onSaved }: { lead: Lead; onBack: () => v
 }
 
 // ───── Diagnostic Result View ─────
-function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic; lead: Lead; onBack: () => void }) {
+function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { diagnostic: Diagnostic; lead: Lead; previousDiagnostic: Diagnostic | null; onBack: () => void }) {
+  const [activeTab, setActiveTab] = useState(0);
   const classColors: Record<string, { bg: string; text: string; border: string; label: string }> = {
     quente: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/30", label: "LEAD QUENTE 🔥" },
     morno: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30", label: "LEAD MORNO ☀️" },
@@ -731,6 +899,39 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
     desqualificado: { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/30", label: "DESQUALIFICADO ⛔" },
   };
   const cc = classColors[diagnostic.classification] || classColors.frio;
+
+  const comparison = previousDiagnostic ? generateComparativeSummary(diagnostic, previousDiagnostic) : null;
+
+  const challenges = diagnostic.main_challenges || [];
+  const commercialSolutions = challenges
+    .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || { solution: "Consultoria Personalizada", description: "Análise e desenvolvimento de solução sob medida para este desafio específico." }) }));
+
+  // Additional solutions based on other fields
+  if (diagnostic.biggest_pain) {
+    const painLower = diagnostic.biggest_pain.toLowerCase();
+    if (painLower.includes("vend") || painLower.includes("comercial") || painLower.includes("cliente")) {
+      if (!commercialSolutions.find(s => s.solution === "Reestruturação Comercial")) {
+        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Reestruturação Comercial", description: "Pipeline estruturado, CRM, metas e treinamento de equipe comercial para maximizar conversões." });
+      }
+    }
+    if (painLower.includes("financ") || painLower.includes("caixa") || painLower.includes("lucr") || painLower.includes("prejuízo")) {
+      if (!commercialSolutions.find(s => s.solution === "Gestão Financeira")) {
+        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão Financeira", description: "DRE, fluxo de caixa, planejamento orçamentário, dashboards financeiros e controle de custos." });
+      }
+    }
+    if (painLower.includes("equipe") || painLower.includes("time") || painLower.includes("pessoas") || painLower.includes("funcionário")) {
+      if (!commercialSolutions.find(s => s.solution === "Gestão de Pessoas")) {
+        commercialSolutions.push({ pain: "Dor principal: " + diagnostic.biggest_pain, solution: "Gestão de Pessoas", description: "Plano de carreira, política salarial, clima organizacional, onboarding e employer branding." });
+      }
+    }
+  }
+
+  if (!diagnostic.has_defined_processes && !commercialSolutions.find(s => s.pain === "Falta de processos definidos")) {
+    commercialSolutions.push({ pain: "Sem processos definidos", solution: "Gestão de Processos", description: "Mapeamento, documentação e implementação de processos operacionais com acompanhamento contínuo." });
+  }
+  if (!diagnostic.has_marketing_strategy && !commercialSolutions.find(s => s.solution === "MarTech & Aquisição")) {
+    commercialSolutions.push({ pain: "Sem estratégia de marketing", solution: "MarTech & Aquisição", description: "Estratégias de inbound e outbound, funis de conversão, automação e campanhas de performance." });
+  }
 
   const sections = [
     {
@@ -764,15 +965,6 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
       ],
     },
     {
-      title: "Dores & Soluções",
-      items: [
-        { label: "Maior dor", value: diagnostic.biggest_pain },
-        { label: "Soluções tentadas", value: diagnostic.tried_solutions },
-        { label: "Capacidade de investimento", value: diagnostic.investment_capacity },
-        { label: "Urgência", value: diagnostic.decision_urgency },
-      ],
-    },
-    {
       title: "Tomada de Decisão",
       items: [
         { label: "Decisor", value: diagnostic.decision_maker },
@@ -784,6 +976,12 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
     },
   ];
 
+  const tabs = [
+    { label: "Resultado", icon: <Target size={12} /> },
+    ...(comparison ? [{ label: "Evolução", icon: <TrendingUp size={12} /> }] : []),
+    { label: "Diagnóstico Comercial", icon: <Briefcase size={12} /> },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -793,7 +991,7 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
         <div>
           <p className="section-eyebrow">Resultado do Diagnóstico</p>
           <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
-            {lead.name} — {new Date(diagnostic.meeting_date).toLocaleDateString("pt-BR")}
+            {lead.name} | {new Date(diagnostic.meeting_date).toLocaleDateString("pt-BR")}
           </h2>
         </div>
       </div>
@@ -808,6 +1006,23 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
           <div>
             <p className={`font-heading text-lg font-bold ${cc.text}`}>{cc.label}</p>
             <p className="font-heading text-sm text-foreground/70 mt-1 max-w-lg">{diagnostic.summary}</p>
+            {comparison && (
+              <div className="mt-3 flex items-center gap-2">
+                {diagnostic.score > (previousDiagnostic?.score || 0) ? (
+                  <TrendingUp size={14} className="text-green-400" />
+                ) : diagnostic.score < (previousDiagnostic?.score || 0) ? (
+                  <TrendingDown size={14} className="text-red-400" />
+                ) : (
+                  <Minus size={14} className="text-muted-foreground/40" />
+                )}
+                <span className="font-heading text-[11px] text-foreground/50">
+                  {previousDiagnostic && `Score anterior: ${previousDiagnostic.score}/100`}
+                  <span className={`ml-2 font-bold ${diagnostic.score > (previousDiagnostic?.score || 0) ? "text-green-400" : diagnostic.score < (previousDiagnostic?.score || 0) ? "text-red-400" : "text-muted-foreground/40"}`}>
+                    ({diagnostic.score - (previousDiagnostic?.score || 0) > 0 ? "+" : ""}{diagnostic.score - (previousDiagnostic?.score || 0)} pts)
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
           <div className="text-center">
             <div className="relative w-24 h-24">
@@ -833,50 +1048,222 @@ function DiagnosticResult({ diagnostic, lead, onBack }: { diagnostic: Diagnostic
         </div>
       </motion.div>
 
-      {/* Detail sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {sections.map((section, si) => (
-          <motion.div
-            key={section.title}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: si * 0.05 }}
-            className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-5"
+      {/* Tabs */}
+      <div className="flex border-b border-border/30 gap-0 overflow-x-auto scrollbar-none">
+        {tabs.map((t, i) => (
+          <button
+            key={t.label}
+            onClick={() => setActiveTab(i)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 font-heading text-[10px] tracking-[0.1em] font-semibold whitespace-nowrap border-b-2 transition-all ${
+              activeTab === i ? "text-gold border-gold" : "text-muted-foreground/40 border-transparent hover:text-muted-foreground/60"
+            }`}
           >
-            <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">{section.title.toUpperCase()}</p>
-            <div className="space-y-2.5">
-              {section.items.map((item) => (
-                <div key={item.label} className="flex justify-between items-start gap-2">
-                  <span className="font-heading text-[10px] text-muted-foreground/50 shrink-0">{item.label}</span>
-                  <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "—"}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            {t.icon} {t.label}
+          </button>
         ))}
       </div>
 
-      {/* Additional notes */}
-      {(diagnostic.additional_notes || diagnostic.next_steps || diagnostic.competitor_analysis) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {diagnostic.competitor_analysis && (
+      {/* Tab: Resultado */}
+      {activeTab === 0 && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {sections.map((section, si) => (
+              <motion.div
+                key={section.title}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: si * 0.05 }}
+                className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-5"
+              >
+                <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">{section.title.toUpperCase()}</p>
+                <div className="space-y-2.5">
+                  {section.items.map((item) => (
+                    <div key={item.label} className="flex justify-between items-start gap-2">
+                      <span className="font-heading text-[10px] text-muted-foreground/50 shrink-0">{item.label}</span>
+                      <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "-"}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {(diagnostic.additional_notes || diagnostic.next_steps || diagnostic.competitor_analysis) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {diagnostic.competitor_analysis && (
+                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">CONCORRENTES</p>
+                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.competitor_analysis}</p>
+                </div>
+              )}
+              {diagnostic.next_steps && (
+                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">PRÓXIMOS PASSOS</p>
+                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.next_steps}</p>
+                </div>
+              )}
+              {diagnostic.additional_notes && (
+                <div className="rounded-lg border border-border/40 bg-card/10 p-5 lg:col-span-2">
+                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">OBSERVAÇÕES</p>
+                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.additional_notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Tab: Evolução (only if previous exists) */}
+      {comparison && activeTab === 1 && (
+        <div className="space-y-5">
+          {/* Evolution summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg border border-border/40 bg-card/10 p-5"
+          >
+            <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">RESUMO DA EVOLUÇÃO</p>
+            <p className="font-heading text-sm text-foreground/70">{comparison.evolutionSummary}</p>
+            <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border/20">
+              <div className="text-center">
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-1">ANTERIOR</p>
+                <p className="font-heading text-lg font-bold text-muted-foreground/60">{previousDiagnostic!.score}</p>
+              </div>
+              <div className="flex-1 h-px bg-border/30 relative">
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 rounded font-heading text-[10px] font-bold ${
+                  diagnostic.score > previousDiagnostic!.score ? "bg-green-500/10 text-green-400" : diagnostic.score < previousDiagnostic!.score ? "bg-red-500/10 text-red-400" : "bg-border/20 text-muted-foreground/40"
+                }`}>
+                  {diagnostic.score - previousDiagnostic!.score > 0 ? "+" : ""}{diagnostic.score - previousDiagnostic!.score} pts
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-1">ATUAL</p>
+                <p className={`font-heading text-lg font-bold ${cc.text}`}>{diagnostic.score}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Changes list */}
+          {comparison.changes.length > 0 ? (
             <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">CONCORRENTES</p>
-              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.competitor_analysis}</p>
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">O QUE MUDOU</p>
+              <div className="space-y-3">
+                {comparison.changes.map((change, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="flex items-start gap-3 py-2.5 border-b border-border/15 last:border-0"
+                  >
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                      change.type === "improved" ? "bg-green-500/10" : change.type === "declined" ? "bg-red-500/10" : "bg-gold/10"
+                    }`}>
+                      {change.type === "improved" ? <TrendingUp size={11} className="text-green-400" /> : change.type === "declined" ? <TrendingDown size={11} className="text-red-400" /> : <Minus size={11} className="text-gold" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-heading text-xs text-foreground/80 font-semibold">{change.field}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="font-heading text-[10px] text-muted-foreground/40 line-through">{change.from}</span>
+                        <ChevronRight size={10} className="text-muted-foreground/20" />
+                        <span className={`font-heading text-[10px] font-medium ${
+                          change.type === "improved" ? "text-green-400" : change.type === "declined" ? "text-red-400" : "text-gold"
+                        }`}>{change.to}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border/30 bg-card/10 p-8 text-center">
+              <Minus size={24} className="text-muted-foreground/20 mx-auto mb-2" />
+              <p className="font-heading text-sm text-muted-foreground/40">Nenhuma mudança identificada entre os diagnósticos.</p>
             </div>
           )}
-          {diagnostic.next_steps && (
-            <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">PRÓXIMOS PASSOS</p>
-              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.next_steps}</p>
+        </div>
+      )}
+
+      {/* Tab: Diagnóstico Comercial */}
+      {activeTab === (comparison ? 2 : 1) && (
+        <div className="space-y-5">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg border border-gold-border/30 bg-gold/5 p-5"
+          >
+            <div className="flex items-start gap-3">
+              <Briefcase size={18} className="text-gold shrink-0 mt-0.5" />
+              <div>
+                <p className="font-heading text-sm text-gold font-bold">Diagnóstico Comercial Beezzy</p>
+                <p className="font-heading text-[11px] text-foreground/50 mt-1">
+                  Mapeamento de dores identificadas e soluções Beezzy recomendadas para {lead.company}. 
+                  Use este relatório como guia na apresentação comercial.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {commercialSolutions.length > 0 ? (
+            <div className="space-y-3">
+              {commercialSolutions.map((sol, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06 }}
+                  className="rounded-lg border border-border/40 bg-card/10 p-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                      <AlertTriangle size={16} className="text-red-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-heading text-[9px] tracking-[0.15em] text-red-400/70 font-semibold mb-1">DOR IDENTIFICADA</p>
+                      <p className="font-heading text-sm text-foreground/80 font-semibold">{sol.pain}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border/20 flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold-border/30 flex items-center justify-center shrink-0">
+                      <Lightbulb size={16} className="text-gold" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold mb-1">SOLUÇÃO BEEZZY</p>
+                      <p className="font-heading text-sm text-gold font-bold">{sol.solution}</p>
+                      <p className="font-heading text-[11px] text-foreground/50 mt-1.5 leading-relaxed">{sol.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border/30 bg-card/10 p-8 text-center">
+              <Lightbulb size={24} className="text-muted-foreground/20 mx-auto mb-2" />
+              <p className="font-heading text-sm text-muted-foreground/40">Nenhuma dor específica mapeada. Selecione desafios no diagnóstico para gerar recomendações.</p>
             </div>
           )}
-          {diagnostic.additional_notes && (
-            <div className="rounded-lg border border-border/40 bg-card/10 p-5 lg:col-span-2">
-              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">OBSERVAÇÕES</p>
-              <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.additional_notes}</p>
+
+          {/* Summary box */}
+          <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+            <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">RESUMO PARA O COMERCIAL</p>
+            <div className="space-y-2 font-heading text-xs text-foreground/60 leading-relaxed">
+              <p>
+                <strong className="text-foreground/80">Cliente:</strong> {lead.company} ({diagnostic.company_segment || "Segmento não informado"})
+              </p>
+              <p>
+                <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "-"} · {diagnostic.employees_count || "-"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
+              </p>
+              <p>
+                <strong className="text-foreground/80">Dores:</strong> {challenges.length} desafios mapeados{diagnostic.biggest_pain ? ` | Principal: "${diagnostic.biggest_pain}"` : ""}
+              </p>
+              <p>
+                <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "-"} · Urgência {diagnostic.decision_urgency || "-"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
+              </p>
+              <p>
+                <strong className="text-foreground/80">Soluções recomendadas:</strong> {commercialSolutions.map(s => s.solution).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
+              </p>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
