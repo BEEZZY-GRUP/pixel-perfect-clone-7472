@@ -39,30 +39,66 @@ const VaultGlobalReports = () => {
     queryFn: async () => { const { data } = await supabase.from("vault_employees").select("*"); return data ?? []; },
   });
 
+  // Build monthly aggregates from vault_entries (vault_monthly_data may be empty)
+  const computedMonthly = useMemo(() => {
+    const allEntries = entries ?? [];
+    const map: Record<string, { company_id: string; month_date: string; revenue: number; expenses: number }> = {};
+    allEntries.forEach((e: any) => {
+      const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+      const monthKey = (date as string).substring(0, 7); // YYYY-MM
+      const key = `${e.company_id}_${monthKey}`;
+      if (!map[key]) map[key] = { company_id: e.company_id, month_date: monthKey, revenue: 0, expenses: 0 };
+      if (e.entry_type === "faturamento" || e.entry_type === "receita") {
+        map[key].revenue += Number(e.amount);
+      } else {
+        map[key].expenses += Number(e.amount);
+      }
+    });
+    // Merge with vault_monthly_data if it has data
+    (monthlyData ?? []).forEach((m: any) => {
+      const monthKey = (m.month_date as string).substring(0, 7);
+      const key = `${m.company_id}_${monthKey}`;
+      if (!map[key]) {
+        map[key] = { company_id: m.company_id, month_date: monthKey, revenue: Number(m.revenue), expenses: Number(m.expenses) };
+      }
+    });
+    return Object.values(map);
+  }, [entries, monthlyData]);
+
   // Filtered data
   const filteredMonthly = useMemo(() => {
-    let data = monthlyData ?? [];
-    if (filterYear) data = data.filter((m: any) => (m.month_date as string).startsWith(filterYear));
-    if (filterCo.length > 0) data = data.filter((m: any) => filterCo.includes(m.company_id));
+    let data = computedMonthly;
+    if (filterYear) data = data.filter(m => m.month_date.startsWith(filterYear));
+    if (filterCo.length > 0) data = data.filter(m => filterCo.includes(m.company_id));
     return data;
-  }, [monthlyData, filterYear, filterCo]);
+  }, [computedMonthly, filterYear, filterCo]);
 
   const filteredEntries = useMemo(() => {
     let data = entries ?? [];
-    if (filterYear) data = data.filter((e: any) => (e.created_at as string).startsWith(filterYear));
+    if (filterYear) {
+      data = data.filter((e: any) => {
+        const date = e.entry_date || e.due_date || (e.created_at as string).substring(0, 10);
+        return (date as string).startsWith(filterYear);
+      });
+    }
     if (filterCo.length > 0) data = data.filter((e: any) => filterCo.includes(e.company_id));
     return data;
   }, [entries, filterYear, filterCo]);
 
-  const months = [...new Set(filteredMonthly.map((m: any) => m.month_date))].sort();
-  const years = [...new Set((monthlyData ?? []).map((m: any) => (m.month_date as string).substring(0, 4)))].sort();
+  const months = [...new Set(filteredMonthly.map(m => m.month_date))].sort();
+  const years = useMemo(() => {
+    const allMonths = computedMonthly.map(m => m.month_date.substring(0, 4));
+    const set = new Set(allMonths);
+    if (!set.has("2026")) set.add("2026");
+    return [...set].sort();
+  }, [computedMonthly]);
 
   // Chart data
   const chartData = months.map(m => {
-    const rows = filteredMonthly.filter((d: any) => d.month_date === m);
-    const rev = rows.reduce((a: number, r: any) => a + Number(r.revenue), 0);
-    const exp = rows.reduce((a: number, r: any) => a + Number(r.expenses), 0);
-    const [y, mo] = (m as string).split("-");
+    const rows = filteredMonthly.filter(d => d.month_date === m);
+    const rev = rows.reduce((a, r) => a + r.revenue, 0);
+    const exp = rows.reduce((a, r) => a + r.expenses, 0);
+    const [y, mo] = m.split("-");
     return { name: `${mo}/${y}`, Faturamento: rev, Despesas: exp, Resultado: rev - exp };
   });
 
