@@ -40,7 +40,7 @@ export default function LeadsList() {
       else if (sortField === "name") cmp = a.name.localeCompare(b.name);
       else if (sortField === "company") cmp = a.company.localeCompare(b.company);
       else if (sortField === "status") {
-        const order = STATUS_OPTIONS.map(s => s.key);
+        const order = STATUS_OPTIONS.map(s => s.key as string);
         cmp = order.indexOf(a.status) - order.indexOf(b.status);
       }
       else if (sortField === "priority") {
