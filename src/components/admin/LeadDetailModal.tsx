@@ -449,7 +449,7 @@ export default function LeadDetailModal({ lead, onClose }: Props) {
 
                     {/* Type selector */}
                     <div className="flex gap-1.5 flex-wrap">
-                      {ACTIVITY_TYPES.map((t) => {
+                      {ACTIVITY_TYPES.filter(t => !["movimentacao", "edicao", "diagnostico", "nota"].includes(t.key)).map((t) => {
                         const Icon = t.icon;
                         const isSelected = newActivity.activity_type === t.key;
                         return (
