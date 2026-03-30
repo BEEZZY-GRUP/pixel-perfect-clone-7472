@@ -55,9 +55,12 @@ export default function SalesDashboard() {
     { label: "LIXEIRA", value: archivedLeads.length, icon: Clock, accent: "from-muted/30 to-muted/10", iconColor: "text-muted-foreground", sub: "arquivados" },
   ];
 
+  // Funnel data: cumulative percentage from top to bottom
+  const funnelStages = STATUS_OPTIONS.filter(s => s.key !== "perdido");
+  const funnelTotal = leads.length || 1;
+
   return (
     <div className="space-y-8">
-      {/* Section header */}
       <div>
         <p className="section-eyebrow">Dashboard</p>
         <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
@@ -92,32 +95,52 @@ export default function SalesDashboard() {
 
       {/* Funnel + Chart row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Funnel */}
+        {/* Visual Funnel */}
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           className="rounded-lg border border-border/50 bg-card/10 backdrop-blur-sm p-6"
         >
-          <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-5 font-semibold">FUNIL DE CONVERSÃO</p>
-          <div className="space-y-2.5">
+          <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-6 font-semibold">FUNIL DE CONVERSÃO</p>
+          <div className="flex flex-col items-center gap-1">
             {STATUS_OPTIONS.map((s, i) => {
               const count = stats.byStatus[s.key] || 0;
               const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
+              // Funnel width: wider at top, narrower at bottom
+              const maxWidth = 100;
+              const minWidth = 30;
+              const widthPct = maxWidth - ((maxWidth - minWidth) * (i / (STATUS_OPTIONS.length - 1)));
+              
               return (
-                <div key={s.key} className="flex items-center gap-3 group">
-                  <p className="font-heading text-[10px] text-muted-foreground/70 w-24 truncate group-hover:text-foreground/80 transition-colors">{s.label}</p>
-                  <div className="flex-1 h-7 bg-secondary/30 rounded overflow-hidden relative">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.7, delay: i * 0.08, ease: "easeOut" }}
-                      className={`h-full ${s.color}/20 rounded`}
-                    />
-                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 font-heading text-[9px] text-muted-foreground/60 font-semibold">{count}</span>
+                <motion.div
+                  key={s.key}
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  animate={{ opacity: 1, scaleX: 1 }}
+                  transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                  className="relative group cursor-default"
+                  style={{ width: `${widthPct}%` }}
+                >
+                  <div
+                    className="relative h-12 flex items-center justify-between px-4 overflow-hidden rounded-sm"
+                    style={{
+                      background: `linear-gradient(90deg, hsl(50 100% 50% / ${0.35 - i * 0.04}), hsl(50 100% 50% / ${0.15 - i * 0.015}))`,
+                      borderLeft: '2px solid hsl(50 100% 50% / 0.4)',
+                      borderRight: '2px solid hsl(50 100% 50% / 0.4)',
+                      ...(i === 0 ? { borderTop: '2px solid hsl(50 100% 50% / 0.4)', borderTopLeftRadius: '8px', borderTopRightRadius: '8px' } : {}),
+                      ...(i === STATUS_OPTIONS.length - 1 ? { borderBottom: '2px solid hsl(50 100% 50% / 0.4)', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' } : {}),
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${s.color}`} />
+                      <span className="font-heading text-[10px] tracking-[0.1em] text-foreground/80 font-semibold">{s.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-heading text-lg font-bold text-gold">{count}</span>
+                      <span className="font-heading text-[9px] text-muted-foreground/60">({pct.toFixed(0)}%)</span>
+                    </div>
                   </div>
-                  <p className="font-heading text-[10px] text-foreground/70 w-10 text-right font-semibold">{pct.toFixed(0)}%</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>

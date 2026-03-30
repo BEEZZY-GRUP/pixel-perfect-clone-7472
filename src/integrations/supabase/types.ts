@@ -172,6 +172,134 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnostics: {
+        Row: {
+          additional_notes: string | null
+          annual_revenue: string | null
+          biggest_pain: string | null
+          budget_defined: boolean | null
+          budget_range: string | null
+          classification: string | null
+          commercial_name: string | null
+          company_segment: string | null
+          company_size: string | null
+          competitor_analysis: string | null
+          created_at: string
+          current_tools: string | null
+          decision_maker: string | null
+          decision_process: string | null
+          decision_urgency: string | null
+          digital_presence_level: string | null
+          employees_count: string | null
+          growth_timeline: string | null
+          has_defined_processes: boolean | null
+          has_marketing_strategy: boolean | null
+          has_sales_team: boolean | null
+          id: string
+          investment_capacity: string | null
+          lead_id: string
+          long_term_goals: string | null
+          main_challenges: string[] | null
+          meeting_date: string
+          meeting_type: string
+          next_steps: string | null
+          revenue_goal: string | null
+          score: number | null
+          short_term_goals: string | null
+          stakeholders_count: string | null
+          summary: string | null
+          tried_solutions: string | null
+          updated_at: string
+          years_in_market: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          annual_revenue?: string | null
+          biggest_pain?: string | null
+          budget_defined?: boolean | null
+          budget_range?: string | null
+          classification?: string | null
+          commercial_name?: string | null
+          company_segment?: string | null
+          company_size?: string | null
+          competitor_analysis?: string | null
+          created_at?: string
+          current_tools?: string | null
+          decision_maker?: string | null
+          decision_process?: string | null
+          decision_urgency?: string | null
+          digital_presence_level?: string | null
+          employees_count?: string | null
+          growth_timeline?: string | null
+          has_defined_processes?: boolean | null
+          has_marketing_strategy?: boolean | null
+          has_sales_team?: boolean | null
+          id?: string
+          investment_capacity?: string | null
+          lead_id: string
+          long_term_goals?: string | null
+          main_challenges?: string[] | null
+          meeting_date?: string
+          meeting_type?: string
+          next_steps?: string | null
+          revenue_goal?: string | null
+          score?: number | null
+          short_term_goals?: string | null
+          stakeholders_count?: string | null
+          summary?: string | null
+          tried_solutions?: string | null
+          updated_at?: string
+          years_in_market?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          annual_revenue?: string | null
+          biggest_pain?: string | null
+          budget_defined?: boolean | null
+          budget_range?: string | null
+          classification?: string | null
+          commercial_name?: string | null
+          company_segment?: string | null
+          company_size?: string | null
+          competitor_analysis?: string | null
+          created_at?: string
+          current_tools?: string | null
+          decision_maker?: string | null
+          decision_process?: string | null
+          decision_urgency?: string | null
+          digital_presence_level?: string | null
+          employees_count?: string | null
+          growth_timeline?: string | null
+          has_defined_processes?: boolean | null
+          has_marketing_strategy?: boolean | null
+          has_sales_team?: boolean | null
+          id?: string
+          investment_capacity?: string | null
+          lead_id?: string
+          long_term_goals?: string | null
+          main_challenges?: string[] | null
+          meeting_date?: string
+          meeting_type?: string
+          next_steps?: string | null
+          revenue_goal?: string | null
+          score?: number | null
+          short_term_goals?: string | null
+          stakeholders_count?: string | null
+          summary?: string | null
+          tried_solutions?: string | null
+          updated_at?: string
+          years_in_market?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostics_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       glossary: {
         Row: {
           category: string | null
