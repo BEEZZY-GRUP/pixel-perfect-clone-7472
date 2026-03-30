@@ -70,6 +70,7 @@ const VaultEntryForm = ({ open, onClose, companyId, entry, defaultType }: Props)
       amount: numAmount,
       due_date: form.due_date || null,
       entry_date: form.entry_date || null,
+      payment_date: form.payment_date || null,
       status: form.status,
       payment_method: form.payment_method || null,
       notes: form.notes || null,
