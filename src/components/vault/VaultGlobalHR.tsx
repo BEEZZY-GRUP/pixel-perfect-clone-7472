@@ -61,7 +61,7 @@ const VaultGlobalHR = () => {
   const getCoName = (id: string) => companies?.find((c: any) => c.id === id)?.name ?? "-";
   const getCoColor = (id: string) => companies?.find((c: any) => c.id === id)?.color ?? "#888";
 
-  const tabs = ["Colaboradores", "Folha de Pagamento", "Férias & Afastamentos", "Aniversários"];
+  const tabs = ["Colaboradores", "Folha de Pagamento", "Férias & Afastamentos", "Aniversários", "RH"];
 
   return (
     <div>
