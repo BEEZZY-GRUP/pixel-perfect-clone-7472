@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PageBackground from "@/components/PageBackground";
-import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw } from "lucide-react";
+import { LogOut, LayoutGrid, List, BarChart3, FileText, Trash2, Plus, RefreshCw, Users } from "lucide-react";
 import { LeadsProvider, useLeads } from "@/components/admin/LeadsContext";
 import KanbanBoard from "@/components/admin/KanbanBoard";
 import LeadsList from "@/components/admin/LeadsList";
@@ -10,6 +10,7 @@ import SalesDashboard from "@/components/admin/SalesDashboard";
 import DiagnosticsList from "@/components/admin/DiagnosticsList";
 import TrashPanel from "@/components/admin/TrashPanel";
 import AddLeadModal from "@/components/admin/AddLeadModal";
+import ConsoleUsersTab from "@/components/admin/ConsoleUsersTab";
 
 const TABS = [
   { key: "Dashboard", label: "DASHBOARD", icon: BarChart3 },
@@ -17,6 +18,7 @@ const TABS = [
   { key: "Leads", label: "LEADS", icon: List },
   { key: "Diagnosticos", label: "DIAGNÓSTICOS", icon: FileText },
   { key: "Lixeira", label: "LIXEIRA", icon: Trash2 },
+  { key: "Usuarios", label: "USUÁRIOS", icon: Users, adminOnly: true },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
