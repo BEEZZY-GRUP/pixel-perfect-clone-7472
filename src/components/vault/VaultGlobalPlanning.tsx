@@ -279,21 +279,65 @@ const VaultGlobalPlanning = () => {
                 {companies?.map((c: any) => <option key={c.id} value={c.id} className="bg-[#111]">{c.name}</option>)}
               </select>
             </div>
-            {[{ label: "Descrição", key: "description" }, { label: "Tipo (MRR, Churn...)", key: "goal_type" }].map(f => (
-              <div key={f.key}>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{f.label}</label>
-                <input value={(form as any)[f.key]} onChange={e => setForm(fo => ({ ...fo, [f.key]: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
-              </div>
-            ))}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Descrição</label>
+              <input value={form.description} onChange={e => setForm(fo => ({ ...fo, description: e.target.value }))} placeholder="Ex: Atingir R$ 100k de MRR" className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20" />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Meta</label>
-                <input type="number" value={form.target_value} onChange={e => setForm(f => ({ ...f, target_value: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
+                <select value={form.goal_type} onChange={e => setForm(f => ({ ...f, goal_type: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  <option value="" className="bg-[#111]">Selecione...</option>
+                  {["MRR", "Churn", "Receita", "Clientes", "NPS", "Conversão", "Leads", "Outro"].map(t => <option key={t} value={t} className="bg-[#111]">{t}</option>)}
+                </select>
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Realizado</label>
-                <input type="number" value={form.current_value} onChange={e => setForm(f => ({ ...f, current_value: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none" />
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Unidade</label>
+                <select value={form.unit_type} onChange={e => {
+                  const newUnit = e.target.value;
+                  setForm(f => ({ ...f, unit_type: newUnit, target_value: "", current_value: "" }));
+                }} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                  {[
+                    { value: "valor", label: "Valor (R$)" },
+                    { value: "quantidade", label: "Quantidade" },
+                    { value: "percentual", label: "Percentual (%)" },
+                  ].map(u => <option key={u.value} value={u.value} className="bg-[#111]">{u.label}</option>)}
+                </select>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Meta {form.unit_type === "percentual" ? "(%)" : form.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
+                <input
+                  type={form.unit_type === "valor" ? "text" : "number"}
+                  inputMode={form.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={form.unit_type === "valor" ? "R$ 0,00" : form.unit_type === "percentual" ? "0" : "0"}
+                  value={form.target_value}
+                  onChange={e => setForm(f => ({ ...f, target_value: form.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>
+                  Realizado {form.unit_type === "percentual" ? "(%)" : form.unit_type === "valor" ? "(R$)" : "(Qtd)"}
+                </label>
+                <input
+                  type={form.unit_type === "valor" ? "text" : "number"}
+                  inputMode={form.unit_type === "valor" ? "decimal" : "numeric"}
+                  placeholder={form.unit_type === "valor" ? "R$ 0,00" : "0"}
+                  value={form.current_value}
+                  onChange={e => setForm(f => ({ ...f, current_value: form.unit_type === "valor" ? maskCurrency(e.target.value) : e.target.value }))}
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none placeholder:text-white/20"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Ano</label>
+              <select value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] outline-none">
+                {["2025", "2026", "2027"].map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
+              </select>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-3">
