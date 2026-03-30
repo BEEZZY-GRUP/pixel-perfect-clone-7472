@@ -492,7 +492,7 @@ export default function DiagnosticsList() {
                       <p className="font-heading text-[10px] text-muted-foreground/50">
                         {diag.meeting_type === "online" ? "Reunião Online" : diag.meeting_type === "presencial" ? "Presencial" : "Telefone"}
                         {diag.commercial_name && ` · ${diag.commercial_name}`}
-                        {i === 0 && diagnostics.length > 1 && <span className="text-gold/60 ml-2">· Mais recente</span>}
+                        {i === diagnostics.length - 1 && diagnostics.length > 1 && <span className="text-gold/60 ml-2">· Mais recente</span>}
                       </p>
                     </div>
                   </div>
