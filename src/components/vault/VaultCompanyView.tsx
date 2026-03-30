@@ -10,6 +10,7 @@ import VaultEmployeeForm from "./VaultEmployeeForm";
 import VaultBankAccountForm from "./VaultBankAccountForm";
 import VaultTransactionForm from "./VaultTransactionForm";
 import VaultDeleteConfirm from "./VaultDeleteConfirm";
+import { maskCNPJ, maskPhone, maskCNAE, maskAgency, maskAccountNumber } from "@/lib/masks";
 
 interface Props {
   company: any;
@@ -663,8 +664,18 @@ const VaultCompanyView = ({ company, tab, onTabChange, hasPerm, onDeleteCompany 
                       <span className="text-sm">{settingsForm[f.key]}</span>
                     </div>
                   ) : (
-                    <input type={f.type} value={settingsForm[f.key] ?? ""} onChange={e => setSettingsForm(s => ({ ...s, [f.key]: e.target.value }))}
-                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none" />
+                    <input
+                      type={["cnpj","phone","cnae","agency","account_number"].includes(f.key) ? "text" : f.type}
+                      inputMode={["cnpj","phone","cnae","agency","account_number"].includes(f.key) ? "numeric" : undefined}
+                      maxLength={{ cnpj: 18, phone: 15, cnae: 9, agency: 6, account_number: 15 }[f.key]}
+                      value={settingsForm[f.key] ?? ""}
+                      onChange={e => {
+                        const maskFns: Record<string, (v: string) => string> = { cnpj: maskCNPJ, phone: maskPhone, cnae: maskCNAE, agency: maskAgency, account_number: maskAccountNumber };
+                        const fn = maskFns[f.key];
+                        setSettingsForm(s => ({ ...s, [f.key]: fn ? fn(e.target.value) : e.target.value }));
+                      }}
+                      className="w-full bg-white/5 border border-white/10 rounded-md px-2 py-1.5 text-sm text-[#F2F0E8] outline-none"
+                    />
                   )
                 ) : (
                   <div className="text-sm">{f.type === "color" ? (

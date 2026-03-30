@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { maskAgency, maskAccountNumber, maskCurrency, unmaskCurrency } from "@/lib/masks";
 
 interface Props {
   open: boolean;
@@ -11,6 +12,12 @@ interface Props {
   companyId: string;
   account?: any;
 }
+
+const initCurrency = (v: any) => {
+  const n = Number(v);
+  if (!v || n === 0) return "";
+  return maskCurrency(n.toFixed(2).replace(".", ","));
+};
 
 const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
   const qc = useQueryClient();
@@ -20,8 +27,8 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
     agency: account?.agency ?? "",
     account_number: account?.account_number ?? "",
     account_type: account?.account_type ?? "Corrente",
-    balance: account?.balance?.toString() ?? "0",
-    credit_limit: account?.credit_limit?.toString() ?? "0",
+    balance: initCurrency(account?.balance),
+    credit_limit: initCurrency(account?.credit_limit),
     active: account?.active ?? true,
   });
   const [loading, setLoading] = useState(false);
@@ -35,8 +42,8 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
       agency: form.agency || null,
       account_number: form.account_number || null,
       account_type: form.account_type,
-      balance: Number(form.balance) || 0,
-      credit_limit: Number(form.credit_limit) || 0,
+      balance: Number(unmaskCurrency(form.balance)) || 0,
+      credit_limit: Number(unmaskCurrency(form.credit_limit)) || 0,
       active: form.active,
     };
     const { error } = isEdit
@@ -49,18 +56,7 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
     onClose();
   };
 
-  const inputField = (label: string, key: string, type = "text", placeholder?: string) => (
-    <div>
-      <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>{label}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={(form as any)[key]}
-        onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20"
-      />
-    </div>
-  );
+  const cls = "w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none placeholder:text-white/20";
 
   return (
     <Dialog open={open} onOpenChange={() => onClose()}>
@@ -69,34 +65,46 @@ const VaultBankAccountForm = ({ open, onClose, companyId, account }: Props) => {
           <DialogTitle className="text-[#F2F0E8]">{isEdit ? "Editar Conta" : "Nova Conta Bancária"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {inputField("Banco", "bank_name", "text", "Ex: Nubank, Itaú, Bradesco...")}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Banco</label>
+            <input type="text" placeholder="Ex: Nubank, Itaú, Bradesco..." value={form.bank_name}
+              onChange={e => setForm(f => ({ ...f, bank_name: e.target.value }))} className={cls} />
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            {inputField("Agência", "agency", "text", "0000")}
-            {inputField("Nº Conta", "account_number", "text", "00000-0")}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Agência</label>
+              <input type="text" inputMode="numeric" placeholder="0000-0" value={form.agency}
+                onChange={e => setForm(f => ({ ...f, agency: maskAgency(e.target.value) }))} className={cls} maxLength={6} />
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Nº Conta</label>
+              <input type="text" inputMode="numeric" placeholder="00000-0" value={form.account_number}
+                onChange={e => setForm(f => ({ ...f, account_number: maskAccountNumber(e.target.value) }))} className={cls} maxLength={15} />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Tipo</label>
-              <select
-                value={form.account_type}
-                onChange={e => setForm(f => ({ ...f, account_type: e.target.value }))}
-                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none"
-              >
+              <select value={form.account_type} onChange={e => setForm(f => ({ ...f, account_type: e.target.value }))}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-[#F2F0E8] focus:border-[#FFD600]/50 outline-none">
                 {["Corrente", "Poupança", "Investimento", "Digital", "Salário"].map(o => (
                   <option key={o} value={o} className="bg-[#111]">{o}</option>
                 ))}
               </select>
             </div>
-            {inputField("Saldo (R$)", "balance", "number", "0,00")}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Saldo</label>
+              <input type="text" inputMode="decimal" placeholder="R$ 0,00" value={form.balance}
+                onChange={e => setForm(f => ({ ...f, balance: maskCurrency(e.target.value) }))} className={cls} />
+            </div>
           </div>
-          {inputField("Limite de Crédito (R$)", "credit_limit", "number", "0,00")}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest mb-1 block" style={{ color: "rgba(242,240,232,0.4)" }}>Limite de Crédito</label>
+            <input type="text" inputMode="decimal" placeholder="R$ 0,00" value={form.credit_limit}
+              onChange={e => setForm(f => ({ ...f, credit_limit: maskCurrency(e.target.value) }))} className={cls} />
+          </div>
           <label className="flex items-center gap-2 text-xs cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.active}
-              onChange={e => setForm(f => ({ ...f, active: e.target.checked }))}
-              className="accent-[#FFD600]"
-            />
+            <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="accent-[#FFD600]" />
             Conta ativa
           </label>
         </div>
