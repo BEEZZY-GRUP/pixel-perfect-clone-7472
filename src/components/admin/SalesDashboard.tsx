@@ -181,22 +181,45 @@ export default function SalesDashboard() {
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
-          className="rounded-lg border border-border/50 bg-card/10 backdrop-blur-sm p-6"
+          className="rounded-lg border border-border/50 bg-card/10 backdrop-blur-sm p-6 flex flex-col"
         >
-          <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-5 font-semibold">LEADS · ÚLTIMOS 14 DIAS</p>
-          <div className="flex items-end gap-1.5 h-40">
-            {stats.daily.map((d, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
-                <span className="font-heading text-[8px] text-gold/70 font-bold opacity-0 group-hover:opacity-100 transition-opacity">{d.count > 0 ? d.count : ""}</span>
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${Math.max((d.count / maxDaily) * 100, 4)}%` }}
-                  transition={{ delay: i * 0.04, duration: 0.5 }}
-                  className={`w-full rounded-sm ${d.count > 0 ? "bg-gold/20 border border-gold-border/50 hover:bg-gold/30 transition-colors" : "bg-secondary/20"}`}
-                />
-                <span className="font-heading text-[7px] text-muted-foreground/40 -rotate-45 origin-top-left whitespace-nowrap mt-1">{d.label}</span>
-              </div>
-            ))}
+          <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">LEADS · ÚLTIMOS 14 DIAS</p>
+          
+          {/* Total badge */}
+          <div className="flex items-center gap-3 mb-5">
+            <span className="font-heading text-2xl font-bold text-gold">{stats.daily.reduce((s, d) => s + d.count, 0)}</span>
+            <span className="font-heading text-[9px] text-muted-foreground/50">leads no período</span>
+          </div>
+
+          {/* Chart area */}
+          <div className="flex-1 flex flex-col justify-end min-h-[160px]">
+            <div className="flex items-end gap-[6px] h-[140px]">
+              {stats.daily.map((d, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center justify-end h-full group cursor-default">
+                  <span className={`font-heading text-[9px] font-bold mb-1 transition-opacity ${d.count > 0 ? "text-gold/80 opacity-0 group-hover:opacity-100" : "opacity-0"}`}>
+                    {d.count}
+                  </span>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: d.count > 0 ? `${Math.max((d.count / maxDaily) * 100, 8)}%` : "3px" }}
+                    transition={{ delay: i * 0.04, duration: 0.5, ease: "easeOut" }}
+                    className={`w-full rounded-t-sm transition-colors ${
+                      d.count > 0
+                        ? "bg-gradient-to-t from-gold/30 to-gold/10 border border-b-0 border-gold-border/40 group-hover:from-gold/45 group-hover:to-gold/20"
+                        : "bg-border/15 rounded-sm"
+                    }`}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* X-axis labels */}
+            <div className="flex gap-[6px] mt-2 border-t border-border/20 pt-2">
+              {stats.daily.map((d, i) => (
+                <div key={i} className="flex-1 text-center">
+                  <span className="font-heading text-[8px] text-muted-foreground/40 leading-none">{d.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>
