@@ -16,6 +16,7 @@ interface Props {
   tab: number;
   onTabChange: (tab: number) => void;
   hasPerm: (p: string) => boolean;
+  onDeleteCompany?: (id: string) => void;
 }
 
 const fmt = (v: number) => "R$ " + Math.round(v).toLocaleString("pt-BR");
