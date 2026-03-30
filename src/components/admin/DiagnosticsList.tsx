@@ -318,7 +318,7 @@ export default function DiagnosticsList() {
       .from("diagnostics")
       .select("*")
       .eq("lead_id", leadId)
-      .order("meeting_date", { ascending: false });
+      .order("meeting_date", { ascending: true });
     setDiagnostics((data as unknown as Diagnostic[]) || []);
     setLoading(false);
   };
