@@ -29,6 +29,7 @@ export function LeadsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    setLoading(true);
     const [active, archived] = await Promise.all([
       supabase.from("leads").select("*").eq("archived", false).order("created_at", { ascending: false }),
       supabase.from("leads").select("*").eq("archived", true).order("archived_at", { ascending: false }),
