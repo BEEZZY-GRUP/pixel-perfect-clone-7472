@@ -185,11 +185,11 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
         <div className="rounded-xl border border-white/5 p-4" style={{ background: "#0e0e0a" }}>
           <h3 className="text-xs font-medium mb-3">Faturamento por Empresa</h3>
           {revByCompany.length > 0 ? (
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={revByCompany} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={40}
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart margin={{ top: 20, bottom: 10, left: 10, right: 10 }}>
+                <Pie data={revByCompany} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={35}
                   label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}>
+                  labelLine={false} style={{ fontSize: 11 }}>
                   {revByCompany.map((entry, idx) => <Cell key={idx} fill={entry.color || COLORS[idx % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "#F2F0E8", fontSize: 12, padding: "8px 12px" }} itemStyle={{ color: "#F2F0E8" }} formatter={(v: number) => fmt(v)} />
