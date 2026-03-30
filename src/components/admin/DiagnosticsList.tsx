@@ -1284,16 +1284,16 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
           </motion.div>
 
           {commercialSolutions.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {commercialSolutions.map((sol, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06 }}
-                  className="rounded-lg border border-border/40 bg-card/10 p-5"
+                  className="rounded-lg border border-border/40 bg-card/10 overflow-hidden"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="p-5 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
                       <AlertTriangle size={16} className="text-red-400" />
                     </div>
@@ -1302,14 +1302,36 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                       <p className="font-heading text-sm text-foreground/80 font-semibold">{sol.pain}</p>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border/20 flex items-start gap-4">
+                  <div className="px-5 pb-5 pt-4 border-t border-border/20 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold-border/30 flex items-center justify-center shrink-0">
                       <Lightbulb size={16} className="text-gold" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold mb-1">SOLUÇÃO BEEZZY</p>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold">SOLUÇÃO BEEZZY</p>
+                        {sol.module && <span className="font-heading text-[8px] px-2 py-0.5 rounded bg-gold/10 text-gold/60 border border-gold-border/20">{sol.module}</span>}
+                      </div>
                       <p className="font-heading text-sm text-gold font-bold">{sol.solution}</p>
                       <p className="font-heading text-[11px] text-foreground/50 mt-1.5 leading-relaxed">{sol.description}</p>
+                      {sol.deliverables && sol.deliverables.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-border/15">
+                          <p className="font-heading text-[8px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-2">ENTREGÁVEIS</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {sol.deliverables.map((d: string, di: number) => (
+                              <div key={di} className="flex items-center gap-1.5">
+                                <div className="w-1 h-1 rounded-full bg-gold/40 shrink-0" />
+                                <span className="font-heading text-[10px] text-foreground/60">{d}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {sol.methodology_pillar && (
+                        <div className="mt-2.5 flex items-center gap-1.5">
+                          <Target size={9} className="text-muted-foreground/30" />
+                          <span className="font-heading text-[9px] text-muted-foreground/40 italic">{sol.methodology_pillar}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>
