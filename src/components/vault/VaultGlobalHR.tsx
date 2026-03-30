@@ -535,7 +535,7 @@ const EmployeeProfile = ({
             {salaryHistory.length > 0 && (() => {
               const lastChange = salaryHistory[0];
               const diff = Number(lastChange.new_salary) - Number(lastChange.previous_salary);
-              const pct = Number(lastChange.previous_salary) > 0 ? ((diff / Number(lastChange.previous_salary)) * 100).toFixed(1) : "—";
+              const pct = Number(lastChange.previous_salary) > 0 ? ((diff / Number(lastChange.previous_salary)) * 100).toFixed(1) : "-";
               return (
                 <div className="ml-auto flex items-center gap-1.5">
                   {diff > 0 ? <TrendingUp className="w-4 h-4 text-green-400" /> : diff < 0 ? <TrendingDown className="w-4 h-4 text-red-400" /> : <Minus className="w-4 h-4 text-white/30" />}
@@ -604,7 +604,7 @@ const EmployeeProfile = ({
                 <tbody>
                   {salaryHistory.map((s: any) => {
                     const diff = Number(s.new_salary) - Number(s.previous_salary);
-                    const pct = Number(s.previous_salary) > 0 ? ((diff / Number(s.previous_salary)) * 100).toFixed(1) : "—";
+                    const pct = Number(s.previous_salary) > 0 ? ((diff / Number(s.previous_salary)) * 100).toFixed(1) : "-";
                     return (
                       <tr key={s.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                         <td className="px-4 py-2.5 text-xs" style={{ color: "rgba(242,240,232,0.4)" }}>{fmtDate(s.change_date)}</td>
@@ -654,7 +654,7 @@ const BirthdayTab = ({ employees, companies, getCoName, getCoColor }: {
       if (!existing || existing.length === 0) {
         await supabase.from("vault_notifications").insert({
           message: msg,
-          sub_message: `${e.position ?? ""} — ${getCoName(e.company_id)}`,
+          sub_message: `${e.position ?? ""} - ${getCoName(e.company_id)}`,
           notification_type: "birthday",
           icon: "🎂",
           color: "#FFD600",

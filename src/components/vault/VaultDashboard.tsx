@@ -230,7 +230,7 @@ const VaultDashboard = ({ companies, onSelectCompany }: Props) => {
           {overdueEntries.length > 0 && (
             <div className="px-4 py-2.5 border-t border-red-500/10 flex items-center gap-2 text-[10px] text-red-400">
               <AlertTriangle size={10} />
-              {overdueEntries.length} conta{overdueEntries.length > 1 ? "s" : ""} vencida{overdueEntries.length > 1 ? "s" : ""} — {fmtK(overdueEntries.reduce((a: number, e: any) => a + Number(e.amount), 0))}
+              {overdueEntries.length} conta{overdueEntries.length > 1 ? "s" : ""} vencida{overdueEntries.length > 1 ? "s" : ""} - {fmtK(overdueEntries.reduce((a: number, e: any) => a + Number(e.amount), 0))}
             </div>
           )}
         </div>
