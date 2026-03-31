@@ -296,54 +296,48 @@ body.page-ready{overflow-y:clip}
 
 /* ── Card ── */
 .sol-card{
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(10,10,8,.08);
+  background:#0A0A08;
+  border:1px solid #0A0A08;
   border-radius:14px;padding:2.4rem 2rem 2rem;
   position:relative;overflow:hidden;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
   transition:all .45s cubic-bezier(.4,0,.2,1);
 }
 .sol-card:hover{
-  background:#0A0A08;
-  border-color:#0A0A08;
   transform:translateY(-6px);
-  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
+  box-shadow:0 32px 56px -12px rgba(10,10,8,.35);
 }
-.sol-card:hover .sol-card-icon{opacity:1}
-.sol-card:hover .sol-card-num{color:rgba(255,214,0,.35)}
-.sol-card:hover .sol-card-title{color:#FFD600}
-.sol-card:hover .sol-card-text{color:rgba(255,255,255,.55)}
-.sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0)}
+
 
 /* Icon */
 .sol-card-icon{
   width:64px;height:64px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:1.2rem;opacity:.8;
+  margin-bottom:1.2rem;opacity:1;
   transition:opacity .4s,filter .4s;
 }
 .sol-card-icon img{width:56px;height:56px;object-fit:contain}
 
 .sol-card-num{
   font-family:'Montserrat',sans-serif;font-size:.55rem;font-weight:700;
-  letter-spacing:.2em;color:rgba(10,10,8,.2);margin-bottom:.8rem;
+  letter-spacing:.2em;color:rgba(255,214,0,.35);margin-bottom:.8rem;
   transition:color .4s;
 }
 
 .sol-card-title{
   font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800;
-  color:#0A0A08;margin-bottom:.5rem;letter-spacing:-.02em;
+  color:#FFD600;margin-bottom:.5rem;letter-spacing:-.02em;
   transition:color .4s;
 }
 
-.sol-card-text{font-size:.83rem;line-height:1.8;color:rgba(10,10,8,.65);transition:color .4s}
+.sol-card-text{font-size:.83rem;line-height:1.8;color:rgba(255,255,255,.55);transition:color .4s}
 
 /* Card arrow */
 .sol-card-arrow{
   position:absolute;bottom:1.6rem;right:1.6rem;
   width:28px;height:28px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  opacity:0;transform:translate(-6px,6px);
+  opacity:1;transform:translate(0,0);
   transition:opacity .4s,transform .4s;
 }
 .sol-card-arrow svg{width:14px;height:14px;stroke:#FFD600;stroke-width:2;fill:none}
