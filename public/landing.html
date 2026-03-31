@@ -296,23 +296,17 @@ body.page-ready{overflow-y:clip}
 
 /* ── Card ── */
 .sol-card{
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(10,10,8,.08);
+  background:#0A0A08;
+  border:1px solid #0A0A08;
   border-radius:14px;padding:2.4rem 2rem 2rem;
   position:relative;overflow:hidden;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
   transition:all .45s cubic-bezier(.4,0,.2,1);
 }
 .sol-card:hover{
-  background:#0A0A08;
-  border-color:#0A0A08;
   transform:translateY(-6px);
-  box-shadow:0 24px 48px -12px rgba(10,10,8,.25);
+  box-shadow:0 32px 56px -12px rgba(10,10,8,.35);
 }
-.sol-card:hover .sol-card-icon{opacity:1}
-.sol-card:hover .sol-card-num{color:rgba(255,214,0,.35)}
-.sol-card:hover .sol-card-title{color:#FFD600}
-.sol-card:hover .sol-card-text{color:rgba(255,255,255,.55)}
 .sol-card:hover .sol-card-arrow{opacity:1;transform:translate(0,0)}
 
 /* Icon */
