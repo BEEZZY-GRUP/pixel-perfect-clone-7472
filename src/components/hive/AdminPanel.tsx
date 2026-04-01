@@ -68,6 +68,15 @@ const AdminPanel = () => {
     enabled: isAdmin,
   });
 
+  const { data: userEmails } = useQuery({
+    queryKey: ["user_emails"],
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_user_emails");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
   const { data: companies } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
@@ -169,13 +178,25 @@ const AdminPanel = () => {
     return companies?.find((c) => c.id === companyId)?.name ?? null;
   };
 
+  const getUserEmail = (userId: string) => {
+    return (userEmails as any[])?.find((e: any) => e.user_id === userId)?.email ?? null;
+  };
+
+  const getDisplayName = (profile: any) => {
+    if (profile.name) return profile.name;
+    const email = getUserEmail(profile.user_id);
+    return email || profile.company_name;
+  };
+
   // Filter
   let filtered = profiles?.filter((p: any) => {
     if (search) {
       const s = search.toLowerCase();
-      const matchName = p.company_name?.toLowerCase().includes(s);
+      const displayName = getDisplayName(p)?.toLowerCase() || "";
+      const matchName = displayName.includes(s) || p.company_name?.toLowerCase().includes(s);
       const matchCnpj = p.cnpj?.includes(s);
-      if (!matchName && !matchCnpj) return false;
+      const matchEmail = getUserEmail(p.user_id)?.toLowerCase().includes(s);
+      if (!matchName && !matchCnpj && !matchEmail) return false;
     }
     if (filterBy === "admin") return isUserAdmin(p.user_id);
     if (filterBy === "moderator") return isUserModerator(p.user_id);
@@ -378,9 +399,9 @@ const AdminPanel = () => {
                       )}
 
                       <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-                        <UserAvatar
+                      <UserAvatar
                           avatarUrl={profile.avatar_url}
-                          name={profile.company_name}
+                          name={getDisplayName(profile)}
                           size="md"
                           className="w-full h-full"
                         />
@@ -389,7 +410,7 @@ const AdminPanel = () => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2.5">
                           <p className="text-foreground text-base font-medium truncate">
-                            {profile.company_name}
+                            {getDisplayName(profile)}
                           </p>
                           {admin && (
                             <span className="text-xs bg-gold/10 text-gold px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
@@ -433,7 +454,7 @@ const AdminPanel = () => {
                       {/* Detail grid */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
-                          { label: "Nome", value: profile.company_name },
+                          { label: "Nome", value: getDisplayName(profile) },
                           { label: "CNPJ", value: profile.cnpj || "—" },
                           { label: "Empresa", value: linkedCompany || "Nenhuma" },
                           {
