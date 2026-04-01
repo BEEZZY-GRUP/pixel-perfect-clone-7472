@@ -280,15 +280,15 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
   const scoreDiff = current.score - previous.score;
   let evolutionSummary = "";
   if (scoreDiff > 15) {
-    evolutionSummary = `Evolução significativa (+${scoreDiff} pts). O lead amadureceu consideravelmente desde o último diagnóstico, demonstrando maior urgência e capacidade de investimento.`;
+    evolutionSummary = `Evolução significativa (+${scoreDiff} pts). O cliente amadureceu consideravelmente desde o último diagnóstico, demonstrando maior urgência e capacidade de investimento.`;
   } else if (scoreDiff > 0) {
     evolutionSummary = `Evolução positiva (+${scoreDiff} pts). Houve avanços pontuais desde a última avaliação, indicando progresso no amadurecimento.`;
   } else if (scoreDiff === 0) {
     evolutionSummary = "Cenário estável. Não houve alteração significativa no score. Recomenda-se ações para acelerar o amadurecimento.";
   } else if (scoreDiff > -15) {
-    evolutionSummary = `Leve regressão (${scoreDiff} pts). Alguns indicadores pioraram. Atenção ao engajamento e comunicação com o lead.`;
+    evolutionSummary = `Leve regressão (${scoreDiff} pts). Alguns indicadores pioraram. Atenção ao engajamento e comunicação com o cliente.`;
   } else {
-    evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do lead antes de prosseguir.`;
+    evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do cliente antes de prosseguir.`;
   }
 
   return { changes, evolutionSummary };
