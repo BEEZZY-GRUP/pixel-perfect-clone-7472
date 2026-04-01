@@ -494,7 +494,7 @@ const CompanyManagement = () => {
                             className="flex items-center justify-between py-1.5 px-2 hover:bg-secondary/50 transition-colors"
                           >
                             <div>
-                              <p className="text-foreground text-sm">{member.company_name}</p>
+                              <p className="text-foreground text-sm">{getDisplayName(member)}</p>
                               <p className="text-muted-foreground text-[.6rem]">
                                 Lv.{member.level} · {member.xp} XP
                               </p>
