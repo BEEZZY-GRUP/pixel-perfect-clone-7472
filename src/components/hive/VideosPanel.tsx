@@ -150,8 +150,8 @@ const VideosPanel = () => {
                       {video.description && <p className="text-muted-foreground text-[.7rem] mt-1 line-clamp-2 leading-relaxed">{video.description}</p>}
                       <div className="flex items-center gap-3 mt-2">
                         <p className="text-muted-foreground/50 text-[.6rem]">{formatDistanceToNow(new Date(video.created_at), { addSuffix: true, locale: ptBR })}</p>
-                        <button
-                          onClick={() => setTheaterVideo(video)}
+                     <button
+                          onClick={() => { setPlayingId(null); setTheaterVideo(video); }}
                           className="flex items-center gap-1 text-muted-foreground/50 hover:text-gold text-[.6rem] transition-colors"
                         >
                           <MessageCircle size={10} /> Comentários
