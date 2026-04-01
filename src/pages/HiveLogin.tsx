@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import LoadingScreen from "@/components/hive/LoadingScreen";
 import PageBackground from "@/components/PageBackground";
@@ -14,6 +13,7 @@ const HiveLogin = () => {
   const [loading, setLoading] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
 
@@ -41,6 +41,23 @@ const HiveLogin = () => {
       setTimeout(() => {
         navigate("/the-hive/community");
       }, 1800);
+    }
+  };
+
+  const handleRecoverPassword = async () => {
+    if (!email.trim()) {
+      toast.error("Preencha o campo de email acima.");
+      return;
+    }
+    setRecovering(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/the-hive/reset-password`,
+    });
+    setRecovering(false);
+    if (error) {
+      toast.error("Erro ao enviar email de recuperação.");
+    } else {
+      toast.success("Se o email existir, você receberá um link de recuperação.");
     }
   };
 
@@ -114,6 +131,15 @@ const HiveLogin = () => {
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
+
+          <button
+            type="button"
+            onClick={handleRecoverPassword}
+            disabled={recovering}
+            className="w-full mt-3 text-muted-foreground hover:text-gold font-heading text-[.6rem] tracking-[.12em] uppercase transition-colors duration-200 py-2"
+          >
+            {recovering ? "Enviando..." : "Esqueci minha senha"}
+          </button>
 
           {/* Bottom decorative */}
           <div className="mt-10 flex items-center gap-3">
