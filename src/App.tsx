@@ -24,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/the-hive" element={<HiveLogin />} />
+          <Route path="/the-hive/reset-password" element={<HiveResetPassword />} />
           <Route path="/the-hive/setup-password" element={<SetupPassword />} />
           <Route path="/the-hive/community" element={<HiveCommunity />} />
           <Route path="/the-hive/community/:view" element={<HiveCommunity />} />
