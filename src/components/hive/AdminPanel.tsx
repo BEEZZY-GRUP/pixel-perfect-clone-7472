@@ -178,6 +178,16 @@ const AdminPanel = () => {
     return companies?.find((c) => c.id === companyId)?.name ?? null;
   };
 
+  const getUserEmail = (userId: string) => {
+    return (userEmails as any[])?.find((e: any) => e.user_id === userId)?.email ?? null;
+  };
+
+  const getDisplayName = (profile: any) => {
+    if (profile.name) return profile.name;
+    const email = getUserEmail(profile.user_id);
+    return email || profile.company_name;
+  };
+
   // Filter
   let filtered = profiles?.filter((p: any) => {
     if (search) {
