@@ -471,7 +471,7 @@ const CompanyManagement = () => {
                             onClick={() => addMember.mutate({ profileId: p.id, companyId: company.id })}
                             className="w-full text-left px-2 py-1.5 text-sm text-foreground hover:bg-secondary/80 transition-colors flex items-center justify-between"
                           >
-                            <span>{p.company_name}</span>
+                            <span>{getDisplayName(p)}</span>
                             <UserPlus size={12} className="text-gold shrink-0" />
                           </button>
                         ))}
