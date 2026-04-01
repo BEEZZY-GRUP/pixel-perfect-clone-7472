@@ -192,7 +192,11 @@ const AdminPanel = () => {
 
   const getDisplayName = (profile: any) => {
     if (profile.name?.trim()) return profile.name.trim();
-    if (profile.company_name && profile.company_name !== "Empresa") return profile.company_name;
+    const companyNames = new Set((companies ?? []).map((c: any) => c.name?.toLowerCase()));
+    const isCompanyName = profile.company_name && (
+      profile.company_name === "Empresa" || companyNames.has(profile.company_name.toLowerCase())
+    );
+    if (profile.company_name?.trim() && !isCompanyName) return profile.company_name.trim();
     const email = getUserEmail(profile.user_id);
     return email || profile.company_name;
   };
