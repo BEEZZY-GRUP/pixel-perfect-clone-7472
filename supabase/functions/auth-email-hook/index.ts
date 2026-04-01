@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'Confirme seu email — Beezzy Group',
+  invite: 'Você foi convidado — Beezzy Group',
+  magiclink: 'Seu link de login — Beezzy Group',
+  recovery: 'Redefinir sua senha — Beezzy Group',
+  email_change: 'Confirme a alteração de email — Beezzy Group',
+  reauthentication: 'Seu código de verificação — Beezzy Group',
 }
 
 // Template mapping
@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "pixel-perfect-clone-7472"
+const SITE_NAME = "Beezzy Group"
 const SENDER_DOMAIN = "notify.beezzygroup.com"
 const ROOT_DOMAIN = "beezzygroup.com"
 const FROM_DOMAIN = "beezzygroup.com" // Domain shown in From address (may be root or sender subdomain)
@@ -46,7 +46,7 @@ const FROM_DOMAIN = "beezzygroup.com" // Domain shown in From address (may be ro
 // The sample email uses a fixed placeholder (RFC 6761 .test TLD) so the Go backend
 // can always find-and-replace it with the actual recipient when sending test emails,
 // even if the project's domain has changed since the template was scaffolded.
-const SAMPLE_PROJECT_URL = "https://pixel-perfect-clone-7472.lovable.app"
+const SAMPLE_PROJECT_URL = "https://beezzygroup.com"
 const SAMPLE_EMAIL = "user@example.test"
 const SAMPLE_DATA: Record<string, object> = {
   signup: {

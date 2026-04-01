@@ -27,13 +27,13 @@ export const MagicLinkEmail = ({
     <Preview>Seu link de login — {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Seu link de login</Heading>
+        <Heading style={h1}>Seu link de acesso</Heading>
         <Text style={text}>
-          Clique no botão abaixo para entrar no {siteName}. Este link expira em
-          breve.
+          Use o botão abaixo para acessar sua conta no {siteName}. 
+          Este link é válido por tempo limitado.
         </Text>
         <Button style={button} href={confirmationUrl}>
-          Entrar
+          Acessar Minha Conta
         </Button>
         <Text style={footer}>
           Se você não solicitou este link, ignore este email com segurança.

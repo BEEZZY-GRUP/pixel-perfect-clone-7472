@@ -32,26 +32,19 @@ export const SignupEmail = ({
     <Preview>Confirme seu email — {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirme seu email</Heading>
+        <Heading style={h1}>Bem-vindo ao {siteName}!</Heading>
         <Text style={text}>
-          Obrigado por se cadastrar no{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          !
-        </Text>
-        <Text style={text}>
-          Confirme seu endereço de email (
+          Ficamos felizes em ter você conosco. Para ativar sua conta, confirme seu endereço de email (
           <Link href={`mailto:${recipient}`} style={link}>
             {recipient}
           </Link>
           ) clicando no botão abaixo:
         </Text>
         <Button style={button} href={confirmationUrl}>
-          Verificar Email
+          Confirmar Meu Email
         </Button>
         <Text style={footer}>
-          Se você não criou uma conta, ignore este email com segurança.
+          Se você não criou uma conta no {siteName}, ignore este email com segurança.
         </Text>
       </Container>
     </Body>
