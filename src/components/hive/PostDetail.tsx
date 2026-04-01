@@ -13,6 +13,7 @@ import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 import CommentItem from "./CommentItem";
 import RoleBadge from "./RoleBadge";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 const CONFESSIONARIO_SLUG = "confessionario";
 
@@ -33,7 +34,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("avatar_url, company_name")
+        .select("avatar_url, name, company_name")
         .eq("user_id", user!.id)
         .maybeSingle();
       return data;
@@ -52,7 +53,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
       if (!data) return null;
 
       const [{ data: profile }, { data: roleData }] = await Promise.all([
-        supabase.from("profiles").select("company_name, avatar_url").eq("user_id", data.user_id).maybeSingle(),
+        supabase.from("profiles").select("name, company_name, avatar_url").eq("user_id", data.user_id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", data.user_id).maybeSingle(),
       ]);
 
@@ -72,7 +73,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
 
       const userIds = [...new Set(data.map((c) => c.user_id))];
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("user_id, company_name, avatar_url").in("user_id", userIds),
+        supabase.from("profiles").select("user_id, name, company_name, avatar_url").in("user_id", userIds),
         supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
       ]);
 
@@ -161,6 +162,8 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
   const createdAt = new Date(post.created_at);
   const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
   const hideAuthor = isConfessionario && !isAdmin;
+  const postDisplayName = getDisplayName(post.profile);
+  const currentDisplayName = getDisplayName(currentProfile);
 
   return (
     <div>
@@ -197,7 +200,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
             >
               <UserAvatar
                 avatarUrl={hideAuthor ? null : (post.is_anonymous ? null : post.profile?.avatar_url)}
-                name={hideAuthor ? "A" : (post.is_anonymous ? "A" : post.profile?.company_name)}
+                name={hideAuthor ? "A" : (post.is_anonymous ? "A" : postDisplayName)}
                 size="lg"
               />
             </button>
@@ -207,7 +210,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
                   onClick={() => !hideAuthor && !post.is_anonymous && navigateRouter(`/the-hive/community/profile/${post.user_id}`)}
                   className={`text-foreground font-medium text-sm ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
                 >
-                  {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                  {hideAuthor || post.is_anonymous ? "Anônimo" : postDisplayName}
                 </button>
                 {!hideAuthor && !post.is_anonymous && post.userRole && post.userRole !== "user" && (
                   <RoleBadge role={post.userRole} />
@@ -293,7 +296,7 @@ const PostDetail = ({ postId, onBack, isAdmin }: Props) => {
           <div className="flex gap-3">
             <UserAvatar
               avatarUrl={isConfessionario ? null : currentProfile?.avatar_url ?? null}
-              name={isConfessionario ? "A" : currentProfile?.company_name ?? "Você"}
+              name={isConfessionario ? "A" : currentDisplayName}
               size="sm"
               className="mt-1"
             />

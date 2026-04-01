@@ -6,6 +6,7 @@ import { Flame, Zap, MessageSquare, FileText, Crown, TrendingUp, Users, Award, S
 import { getDailyInsight } from "./dailyInsights";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 const SidebarWidgets = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const SidebarWidgets = () => {
   const { data: topMembers } = useQuery({
     queryKey: ["top_3_members"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, name, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,
@@ -37,7 +38,7 @@ const SidebarWidgets = () => {
   const { data: myProfile } = useQuery({
     queryKey: ["my_quick_profile", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("level, xp, company_name").eq("user_id", user!.id).single();
+      const { data } = await supabase.from("profiles").select("level, xp, name, company_name").eq("user_id", user!.id).single();
       return data;
     },
     enabled: !!user,
@@ -175,7 +176,7 @@ const SidebarWidgets = () => {
                 className="flex items-center gap-2 w-full text-left hover:bg-secondary/50 rounded-sm p-1 -m-1 transition-colors"
               >
                 <span className={`text-[.6rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>#{idx + 1}</span>
-                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{member.company_name}</p></div>
+                <div className="flex-1 min-w-0"><p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{getDisplayName(member)}</p></div>
                 <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
               </button>
             ))}
