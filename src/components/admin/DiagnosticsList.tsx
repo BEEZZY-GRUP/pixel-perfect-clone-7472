@@ -1428,6 +1428,45 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             </div>
           )}
 
+          {/* Context from diagnostic answers */}
+          {(diagnostic.biggest_pain || diagnostic.tried_solutions || diagnostic.short_term_goals || diagnostic.long_term_goals) && (
+            <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">CONTEXTO DO CLIENTE</p>
+              <div className="space-y-4">
+                {diagnostic.biggest_pain && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-red-400/70 font-semibold mb-1">🔥 MAIOR DOR</p>
+                    <p className="font-heading text-sm text-foreground/80 whitespace-pre-wrap">{diagnostic.biggest_pain}</p>
+                  </div>
+                )}
+                {diagnostic.tried_solutions && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🔄 JÁ TENTOU</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.tried_solutions}</p>
+                  </div>
+                )}
+                {diagnostic.short_term_goals && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🎯 METAS CURTO PRAZO</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.short_term_goals}</p>
+                  </div>
+                )}
+                {diagnostic.long_term_goals && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🏔️ METAS LONGO PRAZO</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.long_term_goals}</p>
+                  </div>
+                )}
+                {diagnostic.next_steps && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold mb-1">▶️ PRÓXIMOS PASSOS</p>
+                    <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap font-medium">{diagnostic.next_steps}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Summary box */}
           <div className="rounded-lg border border-border/40 bg-card/10 p-5">
             <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">RESUMO PARA O COMERCIAL</p>
@@ -1436,13 +1475,16 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                 <strong className="text-foreground/80">Cliente:</strong> {lead.company} ({diagnostic.company_segment || "Segmento não informado"})
               </p>
               <p>
-                <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "-"} · {diagnostic.employees_count || "-"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
+                <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "—"} · {diagnostic.employees_count || "—"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
               </p>
               <p>
                 <strong className="text-foreground/80">Dores:</strong> {challenges.length} desafios mapeados{diagnostic.biggest_pain ? ` | Principal: "${diagnostic.biggest_pain}"` : ""}
               </p>
               <p>
-                <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "-"} · Urgência {diagnostic.decision_urgency || "-"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
+                <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "—"} · Urgência {diagnostic.decision_urgency || "—"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
+              </p>
+              <p>
+                <strong className="text-foreground/80">Decisor:</strong> {diagnostic.decision_maker || "—"} · Processo: {diagnostic.decision_process || "—"}
               </p>
               <p>
                 <strong className="text-foreground/80">Soluções recomendadas:</strong> {commercialSolutions.map(s => s.solution).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
