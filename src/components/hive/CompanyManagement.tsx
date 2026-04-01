@@ -19,7 +19,9 @@ import {
   Mail,
   Send,
   X,
+  Eye,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Company {
   id: string;

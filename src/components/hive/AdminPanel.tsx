@@ -22,8 +22,10 @@ import {
   Award,
   Pencil,
   Trash2,
+  Eye,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CompanyManagement from "./CompanyManagement";
 
 type AdminTab = "empresas" | "membros";
