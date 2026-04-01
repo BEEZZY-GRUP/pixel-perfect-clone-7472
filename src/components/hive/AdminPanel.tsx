@@ -397,9 +397,9 @@ const AdminPanel = () => {
                       )}
 
                       <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-                        <UserAvatar
+                      <UserAvatar
                           avatarUrl={profile.avatar_url}
-                          name={profile.company_name}
+                          name={getDisplayName(profile)}
                           size="md"
                           className="w-full h-full"
                         />
