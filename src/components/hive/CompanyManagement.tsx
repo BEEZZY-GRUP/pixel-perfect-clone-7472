@@ -34,6 +34,7 @@ interface Profile {
   id: string;
   user_id: string;
   company_name: string;
+  name: string | null;
   company_id: string | null;
   cnpj: string | null;
   level: number;
@@ -71,12 +72,27 @@ const CompanyManagement = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, user_id, company_name, company_id, cnpj, level, xp")
+        .select("id, user_id, company_name, name, company_id, cnpj, level, xp")
         .order("company_name");
       return (data ?? []) as Profile[];
     },
     enabled: isAdmin,
   });
+
+  const { data: userEmails } = useQuery({
+    queryKey: ["user_emails"],
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_user_emails");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
+  const getDisplayName = (profile: Profile) => {
+    if (profile.name) return profile.name;
+    const email = (userEmails as any[])?.find((e: any) => e.user_id === profile.user_id)?.email;
+    return email || profile.company_name;
+  };
 
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["companies"] });
@@ -455,7 +471,7 @@ const CompanyManagement = () => {
                             onClick={() => addMember.mutate({ profileId: p.id, companyId: company.id })}
                             className="w-full text-left px-2 py-1.5 text-sm text-foreground hover:bg-secondary/80 transition-colors flex items-center justify-between"
                           >
-                            <span>{p.company_name}</span>
+                            <span>{getDisplayName(p)}</span>
                             <UserPlus size={12} className="text-gold shrink-0" />
                           </button>
                         ))}
@@ -478,7 +494,7 @@ const CompanyManagement = () => {
                             className="flex items-center justify-between py-1.5 px-2 hover:bg-secondary/50 transition-colors"
                           >
                             <div>
-                              <p className="text-foreground text-sm">{member.company_name}</p>
+                              <p className="text-foreground text-sm">{getDisplayName(member)}</p>
                               <p className="text-muted-foreground text-[.6rem]">
                                 Lv.{member.level} · {member.xp} XP
                               </p>
