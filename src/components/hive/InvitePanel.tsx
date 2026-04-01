@@ -25,7 +25,11 @@ const InvitePanel = () => {
       const { data, error } = await supabase.functions.invoke("invite-member", {
         body: { email: email.trim(), company_id: companyId },
       });
-      if (error) throw error;
+      if (error) {
+        // Try to extract message from the response
+        const msg = (data as any)?.error || error.message || "Erro ao enviar convite.";
+        throw new Error(msg);
+      }
       if (data?.error) throw new Error(data.error);
       return data;
     },
