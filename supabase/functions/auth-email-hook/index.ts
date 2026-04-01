@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "pixel-perfect-clone-7472"
+const SITE_NAME = "Beezzy Group"
 const SENDER_DOMAIN = "notify.beezzygroup.com"
 const ROOT_DOMAIN = "beezzygroup.com"
 const FROM_DOMAIN = "beezzygroup.com" // Domain shown in From address (may be root or sender subdomain)
