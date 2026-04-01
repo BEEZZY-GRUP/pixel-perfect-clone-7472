@@ -68,6 +68,15 @@ const AdminPanel = () => {
     enabled: isAdmin,
   });
 
+  const { data: userEmails } = useQuery({
+    queryKey: ["user_emails"],
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_user_emails");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
   const { data: companies } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
