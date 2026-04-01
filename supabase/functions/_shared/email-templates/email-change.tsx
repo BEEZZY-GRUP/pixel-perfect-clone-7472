@@ -32,9 +32,9 @@ export const EmailChangeEmail = ({
     <Preview>Confirme a alteração de email — {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirme a alteração de email</Heading>
+        <Heading style={h1}>Alteração de email</Heading>
         <Text style={text}>
-          Você solicitou a alteração do seu email no {siteName} de{' '}
+          Você solicitou a alteração do email da sua conta no {siteName} de{' '}
           <Link href={`mailto:${email}`} style={link}>
             {email}
           </Link>{' '}
@@ -45,13 +45,13 @@ export const EmailChangeEmail = ({
           .
         </Text>
         <Text style={text}>
-          Clique no botão abaixo para confirmar esta alteração:
+          Para confirmar, clique no botão abaixo:
         </Text>
         <Button style={button} href={confirmationUrl}>
-          Confirmar Alteração
+          Confirmar Novo Email
         </Button>
         <Text style={footer}>
-          Se você não solicitou esta alteração, proteja sua conta imediatamente.
+          Se você não fez essa solicitação, recomendamos proteger sua conta imediatamente.
         </Text>
       </Container>
     </Body>

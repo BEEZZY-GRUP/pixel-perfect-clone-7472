@@ -22,12 +22,11 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
     <Preview>Seu código de verificação</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Confirme sua identidade</Heading>
-        <Text style={text}>Use o código abaixo para confirmar sua identidade:</Text>
+        <Heading style={h1}>Verificação de identidade</Heading>
+        <Text style={text}>Use o código abaixo para confirmar sua identidade na sua conta Beezzy Group:</Text>
         <Text style={codeStyle}>{token}</Text>
         <Text style={footer}>
-          Este código expira em breve. Se você não solicitou isso, ignore este
-          email com segurança.
+          Este código é válido por tempo limitado. Se você não solicitou essa verificação, ignore este email com segurança.
         </Text>
       </Container>
     </Body>
