@@ -134,8 +134,8 @@ const VideosPanel = () => {
                     </button>
                   )}
                   {/* Theater mode button */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setTheaterVideo(video); }}
+                   <button
+                    onClick={(e) => { e.stopPropagation(); setPlayingId(null); setTheaterVideo(video); }}
                     className="absolute top-2 right-2 bg-background/70 hover:bg-background/90 text-foreground p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-10"
                     title="Modo Teatro"
                   >
