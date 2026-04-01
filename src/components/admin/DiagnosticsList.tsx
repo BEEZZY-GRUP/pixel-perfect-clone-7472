@@ -184,16 +184,16 @@ function calculateScore(form: Record<string, any>): { score: number; classificat
 
   if (score >= 80) {
     classification = "quente";
-    summary = "Lead altamente qualificado. Alta urgência, orçamento definido e maturidade empresarial elevada. Recomenda-se proposta comercial imediata.";
+    summary = "Cliente altamente qualificado. Alta urgência, orçamento definido e maturidade empresarial elevada. Recomenda-se proposta comercial imediata.";
   } else if (score >= 60) {
     classification = "morno";
-    summary = "Lead com bom potencial. Possui interesse e capacidade de investimento moderada. Recomenda-se nurturing direcionado e follow-up em 1-2 semanas.";
+    summary = "Cliente com bom potencial. Possui interesse e capacidade de investimento moderada. Recomenda-se nurturing direcionado e follow-up em 1-2 semanas.";
   } else if (score >= 40) {
     classification = "frio";
-    summary = "Lead em fase inicial. Necessita amadurecimento antes de avançar no funil. Recomenda-se conteúdo educativo e acompanhamento mensal.";
+    summary = "Cliente em fase inicial. Necessita amadurecimento antes de avançar no funil. Recomenda-se conteúdo educativo e acompanhamento mensal.";
   } else {
     classification = "desqualificado";
-    summary = "Lead com baixo potencial no momento. Orçamento limitado ou baixa urgência. Recomenda-se manter na base e reavaliar em 3-6 meses.";
+    summary = "Cliente com baixo potencial no momento. Orçamento limitado ou baixa urgência. Recomenda-se manter na base e reavaliar em 3-6 meses.";
   }
 
   return { score, classification, summary };
@@ -280,15 +280,15 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
   const scoreDiff = current.score - previous.score;
   let evolutionSummary = "";
   if (scoreDiff > 15) {
-    evolutionSummary = `Evolução significativa (+${scoreDiff} pts). O lead amadureceu consideravelmente desde o último diagnóstico, demonstrando maior urgência e capacidade de investimento.`;
+    evolutionSummary = `Evolução significativa (+${scoreDiff} pts). O cliente amadureceu consideravelmente desde o último diagnóstico, demonstrando maior urgência e capacidade de investimento.`;
   } else if (scoreDiff > 0) {
     evolutionSummary = `Evolução positiva (+${scoreDiff} pts). Houve avanços pontuais desde a última avaliação, indicando progresso no amadurecimento.`;
   } else if (scoreDiff === 0) {
     evolutionSummary = "Cenário estável. Não houve alteração significativa no score. Recomenda-se ações para acelerar o amadurecimento.";
   } else if (scoreDiff > -15) {
-    evolutionSummary = `Leve regressão (${scoreDiff} pts). Alguns indicadores pioraram. Atenção ao engajamento e comunicação com o lead.`;
+    evolutionSummary = `Leve regressão (${scoreDiff} pts). Alguns indicadores pioraram. Atenção ao engajamento e comunicação com o cliente.`;
   } else {
-    evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do lead antes de prosseguir.`;
+    evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do cliente antes de prosseguir.`;
   }
 
   return { changes, evolutionSummary };
@@ -961,9 +961,9 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
 function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { diagnostic: Diagnostic; lead: Lead; previousDiagnostic: Diagnostic | null; onBack: () => void }) {
   const [activeTab, setActiveTab] = useState(0);
   const classColors: Record<string, { bg: string; text: string; border: string; label: string }> = {
-    quente: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/30", label: "LEAD QUENTE 🔥" },
-    morno: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30", label: "LEAD MORNO ☀️" },
-    frio: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/30", label: "LEAD FRIO ❄️" },
+    quente: { bg: "bg-green-500/10", text: "text-green-400", border: "border-green-500/30", label: "CLIENTE QUENTE 🔥" },
+    morno: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30", label: "CLIENTE MORNO ☀️" },
+    frio: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/30", label: "CLIENTE FRIO ❄️" },
     desqualificado: { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/30", label: "DESQUALIFICADO ⛔" },
   };
   const cc = classColors[diagnostic.classification] || classColors.frio;
@@ -1019,39 +1019,93 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
         { label: "Segmento", value: diagnostic.company_segment },
         { label: "Porte", value: diagnostic.company_size },
         { label: "Colaboradores", value: diagnostic.employees_count },
-        { label: "Faturamento", value: diagnostic.annual_revenue },
+        { label: "Faturamento anual", value: diagnostic.annual_revenue },
         { label: "Tempo de mercado", value: diagnostic.years_in_market },
+        { label: "Comercial responsável", value: diagnostic.commercial_name },
       ],
     },
     {
       title: "Situação Atual",
       items: [
-        { label: "Desafios", value: (diagnostic.main_challenges || []).join(", ") },
-        { label: "Ferramentas", value: diagnostic.current_tools },
-        { label: "Processos definidos", value: diagnostic.has_defined_processes ? "Sim" : "Não" },
-        { label: "Estratégia de marketing", value: diagnostic.has_marketing_strategy ? "Sim" : "Não" },
-        { label: "Time comercial", value: diagnostic.has_sales_team ? "Sim" : "Não" },
+        { label: "Ferramentas atuais", value: diagnostic.current_tools },
+        { label: "Processos definidos", value: diagnostic.has_defined_processes ? "✅ Sim" : "❌ Não" },
+        { label: "Estratégia de marketing", value: diagnostic.has_marketing_strategy ? "✅ Sim" : "❌ Não" },
+        { label: "Time comercial", value: diagnostic.has_sales_team ? "✅ Sim" : "❌ Não" },
         { label: "Presença digital", value: diagnostic.digital_presence_level },
-      ],
-    },
-    {
-      title: "Metas & Objetivos",
-      items: [
-        { label: "Curto prazo", value: diagnostic.short_term_goals },
-        { label: "Longo prazo", value: diagnostic.long_term_goals },
-        { label: "Meta de faturamento", value: diagnostic.revenue_goal },
-        { label: "Prazo", value: diagnostic.growth_timeline },
+        { label: "Capacidade de investimento", value: diagnostic.investment_capacity },
+        { label: "Urgência da decisão", value: diagnostic.decision_urgency },
       ],
     },
     {
       title: "Tomada de Decisão",
       items: [
-        { label: "Decisor", value: diagnostic.decision_maker },
-        { label: "Processo", value: diagnostic.decision_process },
-        { label: "Stakeholders", value: diagnostic.stakeholders_count },
-        { label: "Orçamento definido", value: diagnostic.budget_defined ? "Sim" : "Não" },
+        { label: "Decisor principal", value: diagnostic.decision_maker },
+        { label: "Processo decisório", value: diagnostic.decision_process },
+        { label: "Stakeholders envolvidos", value: diagnostic.stakeholders_count },
+        { label: "Orçamento definido", value: diagnostic.budget_defined ? "✅ Sim" : "❌ Não" },
         { label: "Faixa de orçamento", value: diagnostic.budget_range },
       ],
+    },
+  ];
+
+  // Rich text sections that deserve their own full-width blocks
+  const richSections = [
+    {
+      title: "DESAFIOS IDENTIFICADOS",
+      icon: "🚨",
+      items: (diagnostic.main_challenges || []).map(c => c),
+      type: "chips" as const,
+    },
+    {
+      title: "METAS DE CURTO PRAZO (3-6 MESES)",
+      icon: "🎯",
+      content: diagnostic.short_term_goals,
+      type: "text" as const,
+    },
+    {
+      title: "METAS DE LONGO PRAZO (1-3 ANOS)",
+      icon: "🏔️",
+      content: diagnostic.long_term_goals,
+      type: "text" as const,
+    },
+    {
+      title: "META DE FATURAMENTO",
+      icon: "💰",
+      content: diagnostic.revenue_goal,
+      type: "text" as const,
+      extra: diagnostic.growth_timeline ? `Prazo para crescimento: ${diagnostic.growth_timeline}` : null,
+    },
+    {
+      title: "MAIOR DOR DO CLIENTE",
+      icon: "🔥",
+      content: diagnostic.biggest_pain,
+      type: "text" as const,
+      highlight: true,
+    },
+    {
+      title: "SOLUÇÕES JÁ TENTADAS",
+      icon: "🔄",
+      content: diagnostic.tried_solutions,
+      type: "text" as const,
+    },
+    {
+      title: "ANÁLISE DE CONCORRENTES",
+      icon: "🏁",
+      content: diagnostic.competitor_analysis,
+      type: "text" as const,
+    },
+    {
+      title: "OBSERVAÇÕES ADICIONAIS",
+      icon: "📝",
+      content: diagnostic.additional_notes,
+      type: "text" as const,
+    },
+    {
+      title: "PRÓXIMOS PASSOS",
+      icon: "▶️",
+      content: diagnostic.next_steps,
+      type: "text" as const,
+      highlight: true,
     },
   ];
 
@@ -1145,7 +1199,8 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
       {/* Tab: Resultado */}
       {activeTab === 0 && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Compact info sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {sections.map((section, si) => (
               <motion.div
                 key={section.title}
@@ -1159,7 +1214,7 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                   {section.items.map((item) => (
                     <div key={item.label} className="flex justify-between items-start gap-2">
                       <span className="font-heading text-[10px] text-muted-foreground/50 shrink-0">{item.label}</span>
-                      <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "-"}</span>
+                      <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "—"}</span>
                     </div>
                   ))}
                 </div>
@@ -1167,28 +1222,57 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             ))}
           </div>
 
-          {(diagnostic.additional_notes || diagnostic.next_steps || diagnostic.competitor_analysis) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {diagnostic.competitor_analysis && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">CONCORRENTES</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.competitor_analysis}</p>
-                </div>
-              )}
-              {diagnostic.next_steps && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">PRÓXIMOS PASSOS</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.next_steps}</p>
-                </div>
-              )}
-              {diagnostic.additional_notes && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5 lg:col-span-2">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">OBSERVAÇÕES</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.additional_notes}</p>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Rich text sections - full width, all fields shown */}
+          <div className="space-y-4">
+            {richSections.map((section, si) => {
+              if (section.type === "chips" && section.items && section.items.length > 0) {
+                return (
+                  <motion.div
+                    key={section.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: si * 0.04 }}
+                    className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-5"
+                  >
+                    <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold flex items-center gap-2">
+                      <span>{section.icon}</span> {section.title}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {section.items.map((item: string, ii: number) => (
+                        <span key={ii} className="font-heading text-[10px] px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              }
+              if (section.type === "text" && section.content) {
+                return (
+                  <motion.div
+                    key={section.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: si * 0.04 }}
+                    className={`rounded-lg border ${section.highlight ? "border-gold-border/40 bg-gold/5" : "border-border/40 bg-card/10"} backdrop-blur-sm p-5`}
+                  >
+                    <p className={`font-heading text-[10px] tracking-[0.2em] ${section.highlight ? "text-gold" : "text-gold/80"} mb-3 font-semibold flex items-center gap-2`}>
+                      <span>{section.icon}</span> {section.title}
+                    </p>
+                    <p className={`font-heading text-sm ${section.highlight ? "text-foreground/90 font-medium" : "text-foreground/70"} whitespace-pre-wrap leading-relaxed`}>
+                      {section.content}
+                    </p>
+                    {(section as any).extra && (
+                      <p className="font-heading text-[10px] text-muted-foreground/50 mt-2 pt-2 border-t border-border/20">
+                        {(section as any).extra}
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              }
+              return null;
+            })}
+          </div>
         </>
       )}
 
@@ -1344,6 +1428,45 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             </div>
           )}
 
+          {/* Context from diagnostic answers */}
+          {(diagnostic.biggest_pain || diagnostic.tried_solutions || diagnostic.short_term_goals || diagnostic.long_term_goals) && (
+            <div className="rounded-lg border border-border/40 bg-card/10 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">CONTEXTO DO CLIENTE</p>
+              <div className="space-y-4">
+                {diagnostic.biggest_pain && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-red-400/70 font-semibold mb-1">🔥 MAIOR DOR</p>
+                    <p className="font-heading text-sm text-foreground/80 whitespace-pre-wrap">{diagnostic.biggest_pain}</p>
+                  </div>
+                )}
+                {diagnostic.tried_solutions && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🔄 JÁ TENTOU</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.tried_solutions}</p>
+                  </div>
+                )}
+                {diagnostic.short_term_goals && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🎯 METAS CURTO PRAZO</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.short_term_goals}</p>
+                  </div>
+                )}
+                {diagnostic.long_term_goals && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🏔️ METAS LONGO PRAZO</p>
+                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.long_term_goals}</p>
+                  </div>
+                )}
+                {diagnostic.next_steps && (
+                  <div>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-gold/70 font-semibold mb-1">▶️ PRÓXIMOS PASSOS</p>
+                    <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap font-medium">{diagnostic.next_steps}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Summary box */}
           <div className="rounded-lg border border-border/40 bg-card/10 p-5">
             <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">RESUMO PARA O COMERCIAL</p>
@@ -1352,13 +1475,16 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                 <strong className="text-foreground/80">Cliente:</strong> {lead.company} ({diagnostic.company_segment || "Segmento não informado"})
               </p>
               <p>
-                <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "-"} · {diagnostic.employees_count || "-"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
+                <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "—"} · {diagnostic.employees_count || "—"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
               </p>
               <p>
                 <strong className="text-foreground/80">Dores:</strong> {challenges.length} desafios mapeados{diagnostic.biggest_pain ? ` | Principal: "${diagnostic.biggest_pain}"` : ""}
               </p>
               <p>
-                <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "-"} · Urgência {diagnostic.decision_urgency || "-"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
+                <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "—"} · Urgência {diagnostic.decision_urgency || "—"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
+              </p>
+              <p>
+                <strong className="text-foreground/80">Decisor:</strong> {diagnostic.decision_maker || "—"} · Processo: {diagnostic.decision_process || "—"}
               </p>
               <p>
                 <strong className="text-foreground/80">Soluções recomendadas:</strong> {commercialSolutions.map(s => s.solution).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
