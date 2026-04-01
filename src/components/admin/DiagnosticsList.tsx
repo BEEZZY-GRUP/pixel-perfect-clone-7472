@@ -1019,39 +1019,93 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
         { label: "Segmento", value: diagnostic.company_segment },
         { label: "Porte", value: diagnostic.company_size },
         { label: "Colaboradores", value: diagnostic.employees_count },
-        { label: "Faturamento", value: diagnostic.annual_revenue },
+        { label: "Faturamento anual", value: diagnostic.annual_revenue },
         { label: "Tempo de mercado", value: diagnostic.years_in_market },
+        { label: "Comercial responsável", value: diagnostic.commercial_name },
       ],
     },
     {
       title: "Situação Atual",
       items: [
-        { label: "Desafios", value: (diagnostic.main_challenges || []).join(", ") },
-        { label: "Ferramentas", value: diagnostic.current_tools },
-        { label: "Processos definidos", value: diagnostic.has_defined_processes ? "Sim" : "Não" },
-        { label: "Estratégia de marketing", value: diagnostic.has_marketing_strategy ? "Sim" : "Não" },
-        { label: "Time comercial", value: diagnostic.has_sales_team ? "Sim" : "Não" },
+        { label: "Ferramentas atuais", value: diagnostic.current_tools },
+        { label: "Processos definidos", value: diagnostic.has_defined_processes ? "✅ Sim" : "❌ Não" },
+        { label: "Estratégia de marketing", value: diagnostic.has_marketing_strategy ? "✅ Sim" : "❌ Não" },
+        { label: "Time comercial", value: diagnostic.has_sales_team ? "✅ Sim" : "❌ Não" },
         { label: "Presença digital", value: diagnostic.digital_presence_level },
-      ],
-    },
-    {
-      title: "Metas & Objetivos",
-      items: [
-        { label: "Curto prazo", value: diagnostic.short_term_goals },
-        { label: "Longo prazo", value: diagnostic.long_term_goals },
-        { label: "Meta de faturamento", value: diagnostic.revenue_goal },
-        { label: "Prazo", value: diagnostic.growth_timeline },
+        { label: "Capacidade de investimento", value: diagnostic.investment_capacity },
+        { label: "Urgência da decisão", value: diagnostic.decision_urgency },
       ],
     },
     {
       title: "Tomada de Decisão",
       items: [
-        { label: "Decisor", value: diagnostic.decision_maker },
-        { label: "Processo", value: diagnostic.decision_process },
-        { label: "Stakeholders", value: diagnostic.stakeholders_count },
-        { label: "Orçamento definido", value: diagnostic.budget_defined ? "Sim" : "Não" },
+        { label: "Decisor principal", value: diagnostic.decision_maker },
+        { label: "Processo decisório", value: diagnostic.decision_process },
+        { label: "Stakeholders envolvidos", value: diagnostic.stakeholders_count },
+        { label: "Orçamento definido", value: diagnostic.budget_defined ? "✅ Sim" : "❌ Não" },
         { label: "Faixa de orçamento", value: diagnostic.budget_range },
       ],
+    },
+  ];
+
+  // Rich text sections that deserve their own full-width blocks
+  const richSections = [
+    {
+      title: "DESAFIOS IDENTIFICADOS",
+      icon: "🚨",
+      items: (diagnostic.main_challenges || []).map(c => c),
+      type: "chips" as const,
+    },
+    {
+      title: "METAS DE CURTO PRAZO (3-6 MESES)",
+      icon: "🎯",
+      content: diagnostic.short_term_goals,
+      type: "text" as const,
+    },
+    {
+      title: "METAS DE LONGO PRAZO (1-3 ANOS)",
+      icon: "🏔️",
+      content: diagnostic.long_term_goals,
+      type: "text" as const,
+    },
+    {
+      title: "META DE FATURAMENTO",
+      icon: "💰",
+      content: diagnostic.revenue_goal,
+      type: "text" as const,
+      extra: diagnostic.growth_timeline ? `Prazo para crescimento: ${diagnostic.growth_timeline}` : null,
+    },
+    {
+      title: "MAIOR DOR DO CLIENTE",
+      icon: "🔥",
+      content: diagnostic.biggest_pain,
+      type: "text" as const,
+      highlight: true,
+    },
+    {
+      title: "SOLUÇÕES JÁ TENTADAS",
+      icon: "🔄",
+      content: diagnostic.tried_solutions,
+      type: "text" as const,
+    },
+    {
+      title: "ANÁLISE DE CONCORRENTES",
+      icon: "🏁",
+      content: diagnostic.competitor_analysis,
+      type: "text" as const,
+    },
+    {
+      title: "OBSERVAÇÕES ADICIONAIS",
+      icon: "📝",
+      content: diagnostic.additional_notes,
+      type: "text" as const,
+    },
+    {
+      title: "PRÓXIMOS PASSOS",
+      icon: "▶️",
+      content: diagnostic.next_steps,
+      type: "text" as const,
+      highlight: true,
     },
   ];
 
