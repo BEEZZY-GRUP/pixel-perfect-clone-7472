@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import UserAvatar from "./UserAvatar";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 interface Props {
   onCreatePost: () => void;
@@ -35,7 +36,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
         .limit(5);
       if (!data?.length) return [];
       const userIds = [...new Set(data.map((p) => p.user_id))];
-      const { data: profiles } = await supabase.from("profiles").select("user_id, company_name, avatar_url").in("user_id", userIds);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, name, company_name, avatar_url").in("user_id", userIds);
       const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
       return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) }));
     },
@@ -60,7 +61,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
   const { data: topMembers } = useQuery({
     queryKey: ["top_3_home"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, name, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,
@@ -87,19 +88,21 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
     return "Boa noite";
   };
 
+  const profileDisplayName = getDisplayName(profile);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Hero greeting */}
       <div className="border border-border bg-card overflow-hidden">
         <div className="bg-gradient-to-br from-gold/10 via-gold/5 to-transparent p-4 md:p-6">
           <div className="flex items-center gap-3 md:gap-4">
-            <UserAvatar avatarUrl={profile?.avatar_url} name={profile?.company_name} size="lg" />
+            <UserAvatar avatarUrl={profile?.avatar_url} name={profileDisplayName} size="lg" />
             <div className="flex-1 min-w-0">
               <p className="text-muted-foreground text-[.7rem] font-heading tracking-wider uppercase">
                 {getGreeting()}
               </p>
               <h1 className="text-foreground text-xl font-medium truncate">
-                {profile?.company_name ?? "Membro"}
+                {profileDisplayName}
               </h1>
             </div>
             <Button
@@ -174,6 +177,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
             {recentPosts?.map((post: any) => {
               const isConfessionario = post.categories?.slug === "confessionario";
               const isAnon = isConfessionario || post.is_anonymous;
+              const postDisplayName = getDisplayName(post.profile);
               return (
                 <button
                   key={post.id}
@@ -182,7 +186,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
                 >
                   <UserAvatar
                     avatarUrl={isAnon ? null : post.profile?.avatar_url}
-                    name={isAnon ? "A" : post.profile?.company_name}
+                    name={isAnon ? "A" : postDisplayName}
                     size="sm"
                   />
                   <div className="flex-1 min-w-0">
@@ -192,7 +196,7 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
                         {post.categories?.emoji} {post.categories?.name}
                       </span>
                       <span className="text-muted-foreground text-[.55rem]">
-                        {isAnon ? "Anônimo" : (post.profile?.company_name || "Membro")} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
+                        {isAnon ? "Anônimo" : postDisplayName} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ptBR })}
                       </span>
                     </div>
                   </div>
@@ -262,22 +266,25 @@ const WelcomeHome = ({ onCreatePost }: Props) => {
               </button>
             </div>
             <div className="space-y-3">
-              {topMembers?.map((member: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
-                  className="flex items-center gap-3 w-full text-left hover:bg-secondary/30 -mx-1 px-1 py-1 rounded-sm transition-colors"
-                >
-                  <span className={`text-[.65rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>
-                    #{idx + 1}
-                  </span>
-                  <UserAvatar avatarUrl={member.avatar_url} name={member.company_name} size="sm" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{member.company_name}</p>
-                  </div>
-                  <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
-                </button>
-              ))}
+              {topMembers?.map((member: any, idx: number) => {
+                const memberName = getDisplayName(member);
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
+                    className="flex items-center gap-3 w-full text-left hover:bg-secondary/30 -mx-1 px-1 py-1 rounded-sm transition-colors"
+                  >
+                    <span className={`text-[.65rem] font-heading font-bold w-5 ${idx === 0 ? "text-gold" : "text-muted-foreground"}`}>
+                      #{idx + 1}
+                    </span>
+                    <UserAvatar avatarUrl={member.avatar_url} name={memberName} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-foreground text-[.7rem] truncate hover:text-gold transition-colors">{memberName}</p>
+                    </div>
+                    <span className="text-gold text-[.6rem] font-heading font-semibold shrink-0">Lv.{member.level}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

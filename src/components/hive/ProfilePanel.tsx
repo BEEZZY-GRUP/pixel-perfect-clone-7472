@@ -1,3 +1,4 @@
+import { getDisplayName } from "@/lib/getDisplayName";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -219,7 +220,7 @@ const ProfilePanel = () => {
               <div className="flex items-end justify-between mb-4">
                 <div className="relative group" data-onboarding="avatar">
                   <div className="w-20 h-20 rounded-full border-4 border-background overflow-hidden bg-secondary">
-                    <UserAvatar avatarUrl={profile.avatar_url} name={(profile as any).name || profile.company_name} size="lg" className="w-full h-full text-lg" />
+                    <UserAvatar avatarUrl={profile.avatar_url} name={getDisplayName(profile)} size="lg" className="w-full h-full text-lg" />
                   </div>
                   <button
                     onClick={() => fileInputRef.current?.click()}
@@ -290,14 +291,10 @@ const ProfilePanel = () => {
               ) : (
                 <>
                   <div className="flex items-center gap-2 flex-wrap">
-                    {(profile as any).name ? (
-                      <h2 className="text-foreground text-lg font-medium">{(profile as any).name}</h2>
-                    ) : (
-                      <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
-                    )}
+                    <h2 className="text-foreground text-lg font-medium">{getDisplayName(profile)}</h2>
                     {userRole && userRole !== "user" && <RoleBadge role={userRole} size="md" />}
                   </div>
-                  {(profile as any).name && (
+                  {profile.name?.trim() && profile.company_name && (
                     <p className="text-muted-foreground text-sm mt-0.5">{profile.company_name}</p>
                   )}
                   {profile.bio && (

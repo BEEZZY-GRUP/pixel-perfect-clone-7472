@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UserAvatar from "./UserAvatar";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -17,7 +18,7 @@ const RankingPanel = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("user_id, company_name, avatar_url, xp, level")
+        .select("user_id, name, company_name, avatar_url, xp, level")
         .order("xp", { ascending: false });
       return data ?? [];
     },
@@ -57,6 +58,7 @@ const RankingPanel = () => {
       <div className="space-y-2">
         {paginated.map((profile, i) => {
           const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + i;
+          const displayName = getDisplayName(profile);
           return (
             <div
               key={profile.user_id}
@@ -72,12 +74,12 @@ const RankingPanel = () => {
               </span>
               <UserAvatar
                 avatarUrl={profile.avatar_url}
-                name={profile.company_name}
+                name={displayName}
                 size="sm"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-foreground text-sm font-medium truncate hover:text-gold transition-colors">
-                  {profile.company_name}
+                  {displayName}
                 </p>
                 <p className="text-muted-foreground text-[.65rem]">
                   Nível {profile.level}

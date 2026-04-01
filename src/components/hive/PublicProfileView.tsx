@@ -5,6 +5,7 @@ import RoleBadge from "./RoleBadge";
 import BadgesPanel from "./BadgesPanel";
 import { ArrowLeft, FileText, MessageSquare, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 interface Props {
   userId: string;
@@ -75,6 +76,8 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
     ? ((profile.xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100
     : 0;
 
+  const displayName = getDisplayName(profile);
+
   return (
     <div className="space-y-6">
       <Button variant="ghost" onClick={onBack} className="text-muted-foreground hover:text-foreground text-[.65rem] tracking-wider uppercase font-heading h-8 gap-1 -ml-2">
@@ -87,21 +90,17 @@ const PublicProfileView = ({ userId, onBack }: Props) => {
           <div className="w-20 h-20 rounded-full border-4 border-background overflow-hidden bg-secondary mb-4">
             <UserAvatar
               avatarUrl={profile.avatar_url}
-              name={profile.company_name}
+              name={displayName}
               size="lg"
               className="w-full h-full text-lg"
             />
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {(profile as any).name ? (
-              <h2 className="text-foreground text-lg font-medium">{(profile as any).name}</h2>
-            ) : (
-              <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
-            )}
+            <h2 className="text-foreground text-lg font-medium">{displayName}</h2>
             {userRole && userRole !== "user" && <RoleBadge role={userRole} size="md" />}
           </div>
-          {(profile as any).name && (
+          {profile.name?.trim() && profile.company_name && (
             <p className="text-muted-foreground text-sm mt-0.5">{profile.company_name}</p>
           )}
           {profile.bio && (

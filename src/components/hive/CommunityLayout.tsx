@@ -96,7 +96,7 @@ const CommunityLayout = () => {
       const userIds = [...new Set(data.map((p) => p.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, company_name, avatar_url")
+        .select("user_id, name, company_name, avatar_url")
         .in("user_id", userIds);
       const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
       return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
@@ -120,7 +120,7 @@ const CommunityLayout = () => {
   const { isLoading: topMembersLoading } = useQuery({
     queryKey: ["top_3_members"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("user_id, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
+      const { data } = await supabase.from("profiles").select("user_id, name, company_name, level, xp, avatar_url").order("xp", { ascending: false }).limit(3);
       return data ?? [];
     },
     staleTime: 60_000,

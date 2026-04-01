@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import PostReactions from "./PostReactions";
 import UserAvatar from "./UserAvatar";
 import RoleBadge from "./RoleBadge";
+import { getDisplayName } from "@/lib/getDisplayName";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Category = Tables<"categories">;
@@ -50,7 +51,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
 
       const userIds = [...new Set(data.map((p) => p.user_id))];
       const [{ data: profiles }, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("user_id, company_name, avatar_url").in("user_id", userIds),
+        supabase.from("profiles").select("user_id, name, company_name, avatar_url").in("user_id", userIds),
         supabase.from("user_roles").select("user_id, role").in("user_id", userIds),
       ]);
 
@@ -109,6 +110,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
             : post.content;
           const isConfessionario = post.categories?.slug === CONFESSIONARIO_SLUG;
           const hideAuthor = isConfessionario && !isAdmin;
+          const displayName = getDisplayName(post.profile);
 
           return (
             <article
@@ -122,7 +124,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                 <div className="flex items-center gap-3 mb-3">
                   <UserAvatar
                     avatarUrl={hideAuthor ? null : (post.is_anonymous ? null : post.profile?.avatar_url)}
-                    name={hideAuthor ? "A" : (post.is_anonymous ? "A" : post.profile?.company_name)}
+                    name={hideAuthor ? "A" : (post.is_anonymous ? "A" : displayName)}
                     size="md"
                   />
                   <div className="flex-1 min-w-0">
@@ -136,7 +138,7 @@ const PostList = ({ categorySlug, categories, isAdmin }: Props) => {
                         }}
                         className={`text-foreground text-sm font-medium truncate ${!hideAuthor && !post.is_anonymous ? "hover:text-gold transition-colors" : ""}`}
                       >
-                        {hideAuthor || post.is_anonymous ? "Anônimo" : post.profile?.company_name || "Membro"}
+                        {hideAuthor || post.is_anonymous ? "Anônimo" : displayName}
                       </button>
                       {!hideAuthor && !post.is_anonymous && post.userRole && post.userRole !== "user" && (
                         <RoleBadge role={post.userRole} />

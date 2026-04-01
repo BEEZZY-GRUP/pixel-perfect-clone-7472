@@ -11,6 +11,7 @@ import UserAvatar from "./UserAvatar";
 import RoleBadge from "./RoleBadge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { getDisplayName } from "@/lib/getDisplayName";
 
 interface CommentData {
   id: string;
@@ -19,7 +20,7 @@ interface CommentData {
   parent_id: string | null;
   content: string;
   created_at: string;
-  profile: { user_id: string; company_name: string; avatar_url: string | null } | null;
+  profile: { user_id: string; name?: string | null; company_name: string; avatar_url: string | null } | null;
   userRole?: string | null;
   replies?: CommentData[];
 }
@@ -29,7 +30,7 @@ interface Props {
   postId: string;
   isAdmin: boolean;
   isConfessionario: boolean;
-  currentProfile: { avatar_url: string | null; company_name: string } | null;
+  currentProfile: { avatar_url: string | null; name?: string | null; company_name: string } | null;
   depth?: number;
 }
 
@@ -115,6 +116,8 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
 
   const commentDate = new Date(comment.created_at);
   const maxDepth = 2; // limit nesting
+  const commentDisplayName = getDisplayName(comment.profile);
+  const currentDisplayName = getDisplayName(currentProfile);
 
   return (
     <div className={depth > 0 ? "relative" : ""}>
@@ -137,7 +140,7 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
 
         <UserAvatar
           avatarUrl={hideAuthor ? null : comment.profile?.avatar_url ?? null}
-          name={hideAuthor ? "A" : comment.profile?.company_name ?? "M"}
+          name={hideAuthor ? "A" : commentDisplayName}
           size="sm"
         />
         <div className="flex-1 min-w-0">
@@ -150,7 +153,7 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
                 onClick={() => !hideAuthor && navigateRouter(`/the-hive/community/profile/${comment.user_id}`)}
                 className={`text-foreground text-[.8rem] font-medium truncate ${!hideAuthor ? "hover:text-gold transition-colors" : ""}`}
               >
-                {hideAuthor ? "Anônimo" : (comment.profile?.company_name || "Membro")}
+                {hideAuthor ? "Anônimo" : commentDisplayName}
               </button>
               {!hideAuthor && comment.userRole && comment.userRole !== "user" && (
                 <RoleBadge role={comment.userRole} />
@@ -206,7 +209,7 @@ const CommentItem = ({ comment, postId, isAdmin, isConfessionario, currentProfil
             <form onSubmit={handleSubmitReply} className="mt-3 flex gap-2 items-start">
               <UserAvatar
                 avatarUrl={hideAuthor ? null : currentProfile?.avatar_url ?? null}
-                name={hideAuthor ? "A" : currentProfile?.company_name ?? "V"}
+                name={hideAuthor ? "A" : currentDisplayName}
                 size="sm"
               />
               <div className="flex-1 space-y-2">
