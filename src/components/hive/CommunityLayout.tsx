@@ -96,7 +96,7 @@ const CommunityLayout = () => {
       const userIds = [...new Set(data.map((p) => p.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, company_name, avatar_url")
+        .select("user_id, name, company_name, avatar_url")
         .in("user_id", userIds);
       const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) ?? []);
       return data.map((post) => ({ ...post, profile: profileMap.get(post.user_id) ?? null }));
