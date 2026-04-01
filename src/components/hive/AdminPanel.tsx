@@ -181,6 +181,11 @@ const AdminPanel = () => {
     return companies?.find((c) => c.id === companyId)?.name ?? null;
   };
 
+  const getCompanyCnpj = (companyId: string | null) => {
+    if (!companyId) return null;
+    return companies?.find((c) => c.id === companyId)?.cnpj ?? null;
+  };
+
   const getUserEmail = (userId: string) => {
     return (userEmails as any[])?.find((e: any) => e.user_id === userId)?.email ?? null;
   };
