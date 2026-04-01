@@ -96,7 +96,7 @@ function ConsoleContent() {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={() => setAddOpen(true)}
-              className="flex items-center gap-1.5 font-heading text-[9px] sm:text-[10px] tracking-[0.15em] px-3 sm:px-4 py-2 bg-gold/90 text-background hover:bg-gold transition-all duration-300 rounded-lg font-bold shadow-[0_0_20px_hsl(var(--gold)/0.15)] hover:shadow-[0_0_30px_hsl(var(--gold)/0.25)]"
+              className="flex items-center gap-1.5 font-heading text-[10px] sm:text-[11px] tracking-[0.15em] px-3 sm:px-4 py-2.5 bg-gold/90 text-background hover:bg-gold transition-all duration-300 rounded-lg font-bold shadow-[0_0_20px_hsl(var(--gold)/0.15)] hover:shadow-[0_0_30px_hsl(var(--gold)/0.25)]"
             >
               <Plus size={12} /> <span className="hidden sm:inline">NOVO LEAD</span>
             </button>
