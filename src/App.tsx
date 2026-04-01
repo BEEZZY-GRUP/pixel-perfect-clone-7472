@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import HomePage from "./pages/HomePage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import HiveLogin from "./pages/HiveLogin.tsx";
+import HiveResetPassword from "./pages/HiveResetPassword.tsx";
 import HiveCommunity from "./pages/HiveCommunity.tsx";
 import SetupPassword from "./pages/SetupPassword.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
