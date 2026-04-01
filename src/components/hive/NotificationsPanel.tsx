@@ -112,19 +112,32 @@ const NotificationsPanel = () => {
             </span>
           )}
         </div>
-        {unreadCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => markAllRead.mutate()}
-            disabled={markAllRead.isPending}
-            className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5 self-start sm:self-auto"
-          >
-            <CheckCheck size={14} />
-            <span className="hidden sm:inline">Marcar todas como lidas</span>
-            <span className="sm:hidden">Marcar lidas</span>
-          </Button>
-        )}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => markAllRead.mutate()}
+              disabled={markAllRead.isPending}
+              className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5"
+            >
+              <CheckCheck size={14} />
+              <span className="hidden sm:inline">Marcar lidas</span>
+            </Button>
+          )}
+          {notifications && notifications.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => deleteAllNotifications.mutate()}
+              disabled={deleteAllNotifications.isPending}
+              className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-destructive/70 hover:text-destructive hover:bg-destructive/10 gap-1.5"
+            >
+              <Trash2 size={14} />
+              <span className="hidden sm:inline">Excluir todas</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLoading && (
