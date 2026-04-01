@@ -35,6 +35,7 @@ type MemberFilter = "all" | "admin" | "moderator" | "user" | "no-company";
 const AdminPanel = () => {
   const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AdminTab>("empresas");
   const [search, setSearch] = useState("");
   const [editingProfile, setEditingProfile] = useState<string | null>(null);
