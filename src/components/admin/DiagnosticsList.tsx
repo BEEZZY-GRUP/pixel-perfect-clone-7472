@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Search, Calendar, ChevronRight, Plus, ArrowLeft, Check, ChevronDown, ChevronUp, Building2, User, Clock, TrendingUp, TrendingDown, Minus, Briefcase, Lightbulb, AlertTriangle, Target } from "lucide-react";
+import { FileText, Search, Calendar, ChevronRight, Plus, ArrowLeft, Check, ChevronDown, ChevronUp, Building2, User, Clock, TrendingUp, TrendingDown, Minus, Briefcase, Lightbulb, AlertTriangle, Target, CheckCircle2, XCircle, ArrowRightLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLeads } from "./LeadsContext";
 import type { Lead } from "./types";
@@ -71,6 +71,90 @@ const BUDGET_RANGES = ["Até R$ 5k/mês", "R$ 5k-15k/mês", "R$ 15k-50k/mês", "
 const INVESTMENT_OPTIONS = ["Muito baixa", "Baixa", "Moderada", "Alta", "Muito alta"];
 const STAKEHOLDERS = ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6+ pessoas"];
 const DECISION_PROCESSES = ["Decisão individual", "Sócios decidem juntos", "Conselho/comitê", "Processo complexo"];
+
+// ───── NEW: Selectable Options for Text Fields ─────
+const BIGGEST_PAIN_OPTIONS = [
+  "Faturamento estagnado ou caindo",
+  "Falta de clientes / leads qualificados",
+  "Equipe desalinhada ou desmotivada",
+  "Processos manuais ou caóticos",
+  "Margem de lucro muito baixa",
+  "Falta de presença digital",
+  "Dificuldade em reter talentos",
+  "Gestão financeira descontrolada",
+  "Falta de liderança preparada",
+  "Não consegue escalar o negócio",
+  "Comunicação interna falha",
+  "Concorrência muito agressiva",
+  "Dependência do dono na operação",
+  "Falta de planejamento estratégico",
+];
+
+const TRIED_SOLUTIONS_OPTIONS = [
+  "Consultoria tradicional",
+  "Agência de marketing/publicidade",
+  "Cursos e treinamentos online",
+  "Contratou gestor/diretor",
+  "Implementou software/ERP",
+  "Coaching empresarial",
+  "Mentoria individual",
+  "Tentou resolver internamente (DIY)",
+  "Contratou freelancers",
+  "Nada — nunca tentou resolver",
+];
+
+const SHORT_TERM_GOALS_OPTIONS = [
+  "Aumentar faturamento",
+  "Organizar processos internos",
+  "Montar/treinar equipe comercial",
+  "Implementar marketing digital",
+  "Reduzir custos operacionais",
+  "Melhorar atendimento ao cliente",
+  "Lançar novo produto/serviço",
+  "Estruturar o financeiro",
+  "Contratar talentos-chave",
+  "Automatizar operações",
+];
+
+const LONG_TERM_GOALS_OPTIONS = [
+  "Se tornar referência no segmento",
+  "Abrir filiais / expandir geograficamente",
+  "Faturar acima de R$ 10M/ano",
+  "Construir marca forte e reconhecida",
+  "Ter operação autônoma (sem depender do dono)",
+  "Preparar a empresa para venda / fusão",
+  "Internacionalizar a operação",
+  "Criar modelo de franquia",
+  "Desenvolver liderança interna",
+  "Alcançar excelência operacional",
+];
+
+const REVENUE_GOAL_OPTIONS = [
+  "Até R$ 500k/ano",
+  "R$ 500k - R$ 1M/ano",
+  "R$ 1M - R$ 3M/ano",
+  "R$ 3M - R$ 5M/ano",
+  "R$ 5M - R$ 10M/ano",
+  "R$ 10M - R$ 20M/ano",
+  "R$ 20M+/ano",
+];
+
+// ───── Helpers for chip-based fields ─────
+const CHIP_SEPARATOR = " | ";
+
+function parseChipsAndText(value: string | null | undefined, options: string[]): { chips: string[]; text: string } {
+  if (!value) return { chips: [], text: "" };
+  const parts = value.split(CHIP_SEPARATOR).map(s => s.trim()).filter(Boolean);
+  const chips = parts.filter(p => options.includes(p));
+  const text = parts.filter(p => !options.includes(p)).join(CHIP_SEPARATOR);
+  return { chips, text };
+}
+
+function combineChipsAndText(chips: string[], text: string): string | null {
+  const parts = [...chips];
+  if (text?.trim()) parts.push(text.trim());
+  return parts.length > 0 ? parts.join(CHIP_SEPARATOR) : null;
+}
 
 // ───── Beezzy Solutions Mapping (Complete) ─────
 interface BeezzySolution {
@@ -200,10 +284,26 @@ function calculateScore(form: Record<string, any>): { score: number; classificat
 }
 
 // ───── Generate comparative summary ─────
-function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): { changes: Array<{ field: string; from: string; to: string; type: "improved" | "declined" | "changed" }>; evolutionSummary: string } {
-  const changes: Array<{ field: string; from: string; to: string; type: "improved" | "declined" | "changed" }> = [];
+interface ComparisonChange {
+  field: string;
+  from: string;
+  to: string;
+  type: "improved" | "declined" | "changed" | "resolved" | "new_issue" | "unchanged";
+}
+
+function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): {
+  changes: ComparisonChange[];
+  unchanged: ComparisonChange[];
+  stillPending: string[];
+  resolvedItems: string[];
+  newIssues: string[];
+  evolutionSummary: string;
+} {
+  const changes: ComparisonChange[] = [];
+  const unchanged: ComparisonChange[] = [];
 
   const orderedFields: Array<{ key: string; label: string; options?: string[] }> = [
+    { key: "company_segment", label: "Segmento" },
     { key: "company_size", label: "Porte", options: COMPANY_SIZES },
     { key: "employees_count", label: "Colaboradores", options: EMPLOYEES },
     { key: "annual_revenue", label: "Faturamento", options: REVENUES },
@@ -212,18 +312,22 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
     { key: "decision_urgency", label: "Urgência", options: URGENCIES },
     { key: "budget_range", label: "Faixa de orçamento", options: BUDGET_RANGES },
     { key: "growth_timeline", label: "Prazo de crescimento", options: TIMELINES },
+    { key: "current_tools", label: "Ferramentas atuais" },
+    { key: "decision_maker", label: "Decisor principal" },
+    { key: "decision_process", label: "Processo decisório" },
+    { key: "stakeholders_count", label: "Stakeholders", options: STAKEHOLDERS },
+    { key: "commercial_name", label: "Comercial responsável" },
   ];
 
   for (const f of orderedFields) {
     const prev = (previous as any)[f.key] || "";
     const curr = (current as any)[f.key] || "";
     if (prev !== curr && (prev || curr)) {
-      let type: "improved" | "declined" | "changed" = "changed";
+      let type: ComparisonChange["type"] = "changed";
       if (f.options) {
         const prevIdx = f.options.indexOf(prev);
         const currIdx = f.options.indexOf(curr);
         if (prevIdx >= 0 && currIdx >= 0) {
-          // For urgency, lower index = more urgent = improved
           if (f.key === "decision_urgency") {
             type = currIdx < prevIdx ? "improved" : "declined";
           } else {
@@ -231,7 +335,9 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
           }
         }
       }
-      changes.push({ field: f.label, from: prev || "-", to: curr || "-", type });
+      changes.push({ field: f.label, from: prev || "—", to: curr || "—", type });
+    } else if (prev && curr && prev === curr) {
+      unchanged.push({ field: f.label, from: prev, to: curr, type: "unchanged" });
     }
   }
 
@@ -246,22 +352,31 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
     const prev = (previous as any)[f.key];
     const curr = (current as any)[f.key];
     if (prev !== curr) {
-      changes.push({ field: f.label, from: prev ? "Sim" : "Não", to: curr ? "Sim" : "Não", type: curr ? "improved" : "declined" });
+      changes.push({ field: f.label, from: prev ? "Sim" : "Não", to: curr ? "Sim" : "Não", type: curr ? "resolved" : "declined" });
+    } else {
+      unchanged.push({ field: f.label, from: prev ? "Sim" : "Não", to: curr ? "Sim" : "Não", type: "unchanged" });
     }
   }
 
-  const textFields: Array<{ key: string; label: string }> = [
-    { key: "biggest_pain", label: "Maior dor" },
-    { key: "short_term_goals", label: "Metas curto prazo" },
-    { key: "long_term_goals", label: "Metas longo prazo" },
-    { key: "revenue_goal", label: "Meta de faturamento" },
+  // Text fields comparison
+  const textFields: Array<{ key: string; label: string; options?: string[] }> = [
+    { key: "biggest_pain", label: "Maior dor", options: BIGGEST_PAIN_OPTIONS },
+    { key: "short_term_goals", label: "Metas curto prazo", options: SHORT_TERM_GOALS_OPTIONS },
+    { key: "long_term_goals", label: "Metas longo prazo", options: LONG_TERM_GOALS_OPTIONS },
+    { key: "revenue_goal", label: "Meta de faturamento", options: REVENUE_GOAL_OPTIONS },
+    { key: "tried_solutions", label: "Soluções tentadas", options: TRIED_SOLUTIONS_OPTIONS },
+    { key: "competitor_analysis", label: "Análise de concorrentes" },
+    { key: "next_steps", label: "Próximos passos" },
+    { key: "additional_notes", label: "Observações adicionais" },
   ];
 
   for (const f of textFields) {
     const prev = (previous as any)[f.key] || "";
     const curr = (current as any)[f.key] || "";
     if (prev !== curr && (prev || curr)) {
-      changes.push({ field: f.label, from: prev || "-", to: curr || "-", type: "changed" });
+      changes.push({ field: f.label, from: prev || "—", to: curr || "—", type: "changed" });
+    } else if (prev && curr && prev === curr) {
+      unchanged.push({ field: f.label, from: prev, to: curr, type: "unchanged" });
     }
   }
 
@@ -270,11 +385,26 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
   const currChallenges = current.main_challenges || [];
   const newChallenges = currChallenges.filter(c => !prevChallenges.includes(c));
   const resolvedChallenges = prevChallenges.filter(c => !currChallenges.includes(c));
+  const stillPendingChallenges = currChallenges.filter(c => prevChallenges.includes(c));
+
   if (newChallenges.length > 0) {
-    changes.push({ field: "Novos desafios", from: "-", to: newChallenges.join(", "), type: "declined" });
+    changes.push({ field: "Novos desafios identificados", from: "—", to: newChallenges.join(", "), type: "new_issue" });
   }
   if (resolvedChallenges.length > 0) {
-    changes.push({ field: "Desafios resolvidos", from: resolvedChallenges.join(", "), to: "Resolvido", type: "improved" });
+    changes.push({ field: "Desafios resolvidos ✅", from: resolvedChallenges.join(", "), to: "Resolvido", type: "resolved" });
+  }
+  if (stillPendingChallenges.length > 0) {
+    changes.push({ field: "Desafios ainda pendentes ⚠️", from: stillPendingChallenges.join(", "), to: "Sem resolução", type: "declined" });
+  }
+
+  // Bool flags still negative (issues not addressed)
+  const stillNegativeBools = boolFields.filter(f => !(current as any)[f.key] && !(previous as any)[f.key]);
+  if (stillNegativeBools.length > 0) {
+    for (const f of stillNegativeBools) {
+      if (!changes.find(c => c.field === f.label)) {
+        changes.push({ field: `${f.label} — ainda não implementado`, from: "Não", to: "Não", type: "new_issue" });
+      }
+    }
   }
 
   const scoreDiff = current.score - previous.score;
@@ -291,7 +421,36 @@ function generateComparativeSummary(current: Diagnostic, previous: Diagnostic): 
     evolutionSummary = `Regressão significativa (${scoreDiff} pts). É necessário reavaliar o interesse e disponibilidade do cliente antes de prosseguir.`;
   }
 
-  return { changes, evolutionSummary };
+  return {
+    changes,
+    unchanged,
+    stillPending: stillPendingChallenges,
+    resolvedItems: resolvedChallenges,
+    newIssues: newChallenges,
+    evolutionSummary,
+  };
+}
+
+// ───── Chip Selector Component ─────
+function ChipSelector({ options, selected, onToggle, label }: { options: string[]; selected: string[]; onToggle: (opt: string) => void; label?: string }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map(opt => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => onToggle(opt)}
+          className={`font-heading text-[10px] px-3 py-1.5 rounded-lg border transition-all ${
+            selected.includes(opt)
+              ? "bg-gold/15 text-gold border-gold-border font-semibold"
+              : "bg-card/20 text-muted-foreground/50 border-border/30 hover:border-border/50 hover:text-muted-foreground/70"
+          }`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 // ───── Main Component ─────
@@ -542,12 +701,17 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
     has_marketing_strategy: false,
     has_sales_team: false,
     digital_presence_level: "",
-    short_term_goals: "",
-    long_term_goals: "",
+    // Chip-based fields
+    short_term_goals_chips: [] as string[],
+    short_term_goals_text: "",
+    long_term_goals_chips: [] as string[],
+    long_term_goals_text: "",
     revenue_goal: "",
     growth_timeline: "",
-    biggest_pain: "",
-    tried_solutions: "",
+    biggest_pain_chips: [] as string[],
+    biggest_pain_text: "",
+    tried_solutions_chips: [] as string[],
+    tried_solutions_text: "",
     investment_capacity: "",
     decision_urgency: "",
     decision_maker: "",
@@ -564,21 +728,31 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
   const initialForm = useMemo(() => {
     if (!lastDiagnostic) return defaultForm;
     const f = { ...defaultForm };
-    const keysToCarry = [
+    // Direct copy fields
+    const directKeys = [
       "commercial_name", "company_segment", "company_size", "employees_count",
       "annual_revenue", "years_in_market", "main_challenges", "current_tools",
       "has_defined_processes", "has_marketing_strategy", "has_sales_team",
-      "digital_presence_level", "short_term_goals", "long_term_goals",
-      "revenue_goal", "growth_timeline", "biggest_pain", "tried_solutions",
+      "digital_presence_level", "revenue_goal", "growth_timeline",
       "investment_capacity", "decision_urgency", "decision_maker",
       "decision_process", "stakeholders_count", "budget_defined", "budget_range",
       "competitor_analysis",
     ];
-    for (const key of keysToCarry) {
+    for (const key of directKeys) {
       const val = (lastDiagnostic as any)[key];
-      if (val !== null && val !== undefined) {
-        f[key] = val;
-      }
+      if (val !== null && val !== undefined) f[key] = val;
+    }
+    // Parse chip-based fields from saved strings
+    const chipFields: Array<{ dbKey: string; chipsKey: string; textKey: string; options: string[] }> = [
+      { dbKey: "short_term_goals", chipsKey: "short_term_goals_chips", textKey: "short_term_goals_text", options: SHORT_TERM_GOALS_OPTIONS },
+      { dbKey: "long_term_goals", chipsKey: "long_term_goals_chips", textKey: "long_term_goals_text", options: LONG_TERM_GOALS_OPTIONS },
+      { dbKey: "biggest_pain", chipsKey: "biggest_pain_chips", textKey: "biggest_pain_text", options: BIGGEST_PAIN_OPTIONS },
+      { dbKey: "tried_solutions", chipsKey: "tried_solutions_chips", textKey: "tried_solutions_text", options: TRIED_SOLUTIONS_OPTIONS },
+    ];
+    for (const cf of chipFields) {
+      const parsed = parseChipsAndText((lastDiagnostic as any)[cf.dbKey], cf.options);
+      f[cf.chipsKey] = parsed.chips;
+      f[cf.textKey] = parsed.text;
     }
     return f;
   }, [lastDiagnostic]);
@@ -595,6 +769,10 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
   const toggleChallenge = (c: string) => {
     const current = form.main_challenges || [];
     update("main_challenges", current.includes(c) ? current.filter((x: string) => x !== c) : [...current, c]);
+  };
+  const toggleChip = (chipsKey: string, value: string) => {
+    const current: string[] = form[chipsKey] || [];
+    update(chipsKey, current.includes(value) ? current.filter((x: string) => x !== value) : [...current, value]);
   };
 
   const inputClass = "w-full bg-card/20 border border-border/40 rounded-lg px-3 py-2.5 text-sm font-heading text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-gold-border transition-colors";
@@ -613,10 +791,26 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
 
   const handleSave = async () => {
     setSaving(true);
-    const { score, classification, summary } = calculateScore(form);
+    // Combine chip-based fields into strings for DB
+    const dbForm = { ...form };
+    dbForm.short_term_goals = combineChipsAndText(form.short_term_goals_chips || [], form.short_term_goals_text || "");
+    dbForm.long_term_goals = combineChipsAndText(form.long_term_goals_chips || [], form.long_term_goals_text || "");
+    dbForm.biggest_pain = combineChipsAndText(form.biggest_pain_chips || [], form.biggest_pain_text || "");
+    dbForm.tried_solutions = combineChipsAndText(form.tried_solutions_chips || [], form.tried_solutions_text || "");
+    // Remove chip/text helper fields
+    delete dbForm.short_term_goals_chips;
+    delete dbForm.short_term_goals_text;
+    delete dbForm.long_term_goals_chips;
+    delete dbForm.long_term_goals_text;
+    delete dbForm.biggest_pain_chips;
+    delete dbForm.biggest_pain_text;
+    delete dbForm.tried_solutions_chips;
+    delete dbForm.tried_solutions_text;
+
+    const { score, classification, summary } = calculateScore(dbForm);
     const payload = {
       lead_id: lead.id,
-      ...form,
+      ...dbForm,
       score,
       classification,
       summary,
@@ -764,39 +958,37 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>PRINCIPAIS DESAFIOS (selecione todos que se aplicam)</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                <label className={labelClass}>PRINCIPAIS DESAFIOS</label>
+                <div className="flex flex-wrap gap-2">
                   {CHALLENGES_OPTIONS.map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => toggleChallenge(c)}
-                      className={`text-left px-3 py-2.5 rounded-lg border font-heading text-xs transition-all ${
+                      className={`font-heading text-[10px] px-3 py-1.5 rounded-lg border transition-all ${
                         (form.main_challenges || []).includes(c)
-                          ? "border-gold-border bg-gold/10 text-gold"
-                          : "border-border/30 text-muted-foreground/60 hover:border-border/60"
+                          ? "bg-red-500/15 text-red-400 border-red-500/30 font-semibold"
+                          : "bg-card/20 text-muted-foreground/50 border-border/30 hover:border-border/50"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
-                        {(form.main_challenges || []).includes(c) && <Check size={12} />}
-                        {c}
-                      </span>
+                      {c}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
                 <label className={labelClass}>FERRAMENTAS ATUAIS</label>
-                <input value={form.current_tools} onChange={(e) => update("current_tools", e.target.value)} className={inputClass} placeholder="Ex: Excel, ERP, CRM..." />
+                <input value={form.current_tools} onChange={(e) => update("current_tools", e.target.value)} className={inputClass} placeholder="Ex: Planilhas, ERP, CRM..." />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className={labelClass}>ESTRUTURA ATUAL</label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form.has_defined_processes} onChange={(e) => update("has_defined_processes", e.target.checked)} className="accent-[hsl(var(--gold))]" />
                   <span className="font-heading text-xs text-foreground/70">Processos definidos</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form.has_marketing_strategy} onChange={(e) => update("has_marketing_strategy", e.target.checked)} className="accent-[hsl(var(--gold))]" />
-                  <span className="font-heading text-xs text-foreground/70">Estratégia de marketing</span>
+                  <span className="font-heading text-xs text-foreground/70">Estratégia de marketing ativa</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" checked={form.has_sales_team} onChange={(e) => update("has_sales_team", e.target.checked)} className="accent-[hsl(var(--gold))]" />
@@ -814,19 +1006,44 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
           )}
 
           {step === 3 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label className={labelClass}>METAS DE CURTO PRAZO (3-6 meses)</label>
-                <textarea value={form.short_term_goals} onChange={(e) => update("short_term_goals", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="O que o cliente quer atingir nos próximos meses?" />
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-2">Selecione as metas aplicáveis e complemente se necessário</p>
+                <ChipSelector
+                  options={SHORT_TERM_GOALS_OPTIONS}
+                  selected={form.short_term_goals_chips || []}
+                  onToggle={(opt) => toggleChip("short_term_goals_chips", opt)}
+                />
+                <textarea
+                  value={form.short_term_goals_text || ""}
+                  onChange={(e) => update("short_term_goals_text", e.target.value)}
+                  className={`${inputClass} min-h-[60px] resize-y mt-2`}
+                  placeholder="Detalhes adicionais sobre metas de curto prazo..."
+                />
               </div>
               <div>
                 <label className={labelClass}>METAS DE LONGO PRAZO (1-3 anos)</label>
-                <textarea value={form.long_term_goals} onChange={(e) => update("long_term_goals", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Qual a visão de futuro do cliente?" />
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-2">Selecione as metas aplicáveis e complemente se necessário</p>
+                <ChipSelector
+                  options={LONG_TERM_GOALS_OPTIONS}
+                  selected={form.long_term_goals_chips || []}
+                  onToggle={(opt) => toggleChip("long_term_goals_chips", opt)}
+                />
+                <textarea
+                  value={form.long_term_goals_text || ""}
+                  onChange={(e) => update("long_term_goals_text", e.target.value)}
+                  className={`${inputClass} min-h-[60px] resize-y mt-2`}
+                  placeholder="Detalhes adicionais sobre a visão de futuro..."
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>META DE FATURAMENTO</label>
-                  <input value={form.revenue_goal} onChange={(e) => update("revenue_goal", e.target.value)} className={inputClass} placeholder="Ex: R$ 2M/ano" />
+                  <select value={form.revenue_goal} onChange={(e) => update("revenue_goal", e.target.value)} className={selectClass}>
+                    <option value="">Selecione a faixa</option>
+                    {REVENUE_GOAL_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className={labelClass}>PRAZO PARA CRESCIMENTO</label>
@@ -840,14 +1057,36 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
           )}
 
           {step === 4 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label className={labelClass}>MAIOR DOR DO CLIENTE</label>
-                <textarea value={form.biggest_pain} onChange={(e) => update("biggest_pain", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="Qual o principal problema que tira o sono do cliente?" />
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-2">Selecione as dores identificadas e detalhe se necessário</p>
+                <ChipSelector
+                  options={BIGGEST_PAIN_OPTIONS}
+                  selected={form.biggest_pain_chips || []}
+                  onToggle={(opt) => toggleChip("biggest_pain_chips", opt)}
+                />
+                <textarea
+                  value={form.biggest_pain_text || ""}
+                  onChange={(e) => update("biggest_pain_text", e.target.value)}
+                  className={`${inputClass} min-h-[60px] resize-y mt-2`}
+                  placeholder="Detalhes adicionais sobre a dor principal..."
+                />
               </div>
               <div>
                 <label className={labelClass}>SOLUÇÕES JÁ TENTADAS</label>
-                <textarea value={form.tried_solutions} onChange={(e) => update("tried_solutions", e.target.value)} className={`${inputClass} min-h-[80px] resize-y`} placeholder="O que já foi tentado para resolver?" />
+                <p className="font-heading text-[9px] text-muted-foreground/40 mb-2">O que o cliente já tentou para resolver?</p>
+                <ChipSelector
+                  options={TRIED_SOLUTIONS_OPTIONS}
+                  selected={form.tried_solutions_chips || []}
+                  onToggle={(opt) => toggleChip("tried_solutions_chips", opt)}
+                />
+                <textarea
+                  value={form.tried_solutions_text || ""}
+                  onChange={(e) => update("tried_solutions_text", e.target.value)}
+                  className={`${inputClass} min-h-[60px] resize-y mt-2`}
+                  placeholder="Detalhes sobre tentativas anteriores..."
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -957,6 +1196,35 @@ function DiagnosticForm({ lead, lastDiagnostic, onBack, onSaved }: { lead: Lead;
   );
 }
 
+// ───── Display chips from saved string ─────
+function DisplayChips({ value, options, highlightColor = "red" }: { value: string | null; options?: string[]; highlightColor?: "red" | "gold" | "blue" | "green" }) {
+  if (!value) return <span className="font-heading text-xs text-muted-foreground/40 italic">Não informado</span>;
+  const parts = value.split(CHIP_SEPARATOR).map(s => s.trim()).filter(Boolean);
+  const colorMap = {
+    red: "bg-red-500/10 text-red-400 border-red-500/20",
+    gold: "bg-gold/10 text-gold border-gold-border/30",
+    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    green: "bg-green-500/10 text-green-400 border-green-500/20",
+  };
+  const chipClass = colorMap[highlightColor];
+  const knownOptions = options || [];
+
+  return (
+    <div className="space-y-2">
+      {parts.some(p => knownOptions.includes(p)) && (
+        <div className="flex flex-wrap gap-1.5">
+          {parts.filter(p => knownOptions.includes(p)).map((p, i) => (
+            <span key={i} className={`font-heading text-[10px] px-3 py-1.5 rounded-lg border font-medium ${chipClass}`}>{p}</span>
+          ))}
+        </div>
+      )}
+      {parts.filter(p => !knownOptions.includes(p)).map((p, i) => (
+        <p key={i} className="font-heading text-sm text-foreground/70 whitespace-pre-wrap leading-relaxed">{p}</p>
+      ))}
+    </div>
+  );
+}
+
 // ───── Diagnostic Result View ─────
 function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { diagnostic: Diagnostic; lead: Lead; previousDiagnostic: Diagnostic | null; onBack: () => void }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -976,24 +1244,28 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
   const commercialSolutions: Array<{ pain: string } & BeezzySolution> = challenges
     .map(c => ({ pain: c, ...(PAIN_SOLUTIONS[c] || defaultSolution) }));
 
-  // Additional solutions based on biggest_pain free text
+  // Additional solutions based on biggest_pain
   if (diagnostic.biggest_pain) {
-    const painLower = diagnostic.biggest_pain.toLowerCase();
+    const painParts = diagnostic.biggest_pain.split(CHIP_SEPARATOR).map(s => s.trim().toLowerCase());
     const painMappings: Array<{ keywords: string[]; challengeKey: string; fallbackSolution: string }> = [
-      { keywords: ["vend", "comercial", "cliente", "receita", "faturamento baixo"], challengeKey: "Time de vendas desorganizado", fallbackSolution: "Reestruturação Comercial Completa" },
+      { keywords: ["vend", "comercial", "cliente", "receita", "faturamento"], challengeKey: "Time de vendas desorganizado", fallbackSolution: "Reestruturação Comercial Completa" },
       { keywords: ["financ", "caixa", "lucr", "prejuízo", "custo", "margem"], challengeKey: "Gestão financeira precária", fallbackSolution: "Gestão Financeira & Controle" },
-      { keywords: ["equipe", "time", "pessoas", "funcionário", "colaborador", "rh"], challengeKey: "Retenção de talentos", fallbackSolution: "Gestão de Pessoas & Employer Branding" },
-      { keywords: ["líder", "gestor", "gestão", "gerente", "direção"], challengeKey: "Falta de liderança", fallbackSolution: "Desenvolvimento de Liderança & Governance" },
+      { keywords: ["equipe", "time", "pessoas", "funcionário", "colaborador", "rh", "reter", "talento"], challengeKey: "Retenção de talentos", fallbackSolution: "Gestão de Pessoas & Employer Branding" },
+      { keywords: ["líder", "gestor", "gestão", "gerente", "direção", "liderança"], challengeKey: "Falta de liderança", fallbackSolution: "Desenvolvimento de Liderança & Governance" },
       { keywords: ["digital", "tecnolog", "sistema", "software", "automaç"], challengeKey: "Transformação digital", fallbackSolution: "Transformação Digital & Automação" },
-      { keywords: ["marketing", "marca", "divulg", "rede social", "instagram"], challengeKey: "Falta de presença digital", fallbackSolution: "Posicionamento Digital Estratégico" },
+      { keywords: ["marketing", "marca", "divulg", "rede social", "instagram", "presença"], challengeKey: "Falta de presença digital", fallbackSolution: "Posicionamento Digital Estratégico" },
       { keywords: ["cresc", "escal", "expand"], challengeKey: "Não consegue escalar", fallbackSolution: "Aceleração & Escalabilidade" },
-      { keywords: ["process", "organiz", "bagunça", "caos"], challengeKey: "Falta de processos definidos", fallbackSolution: "Gestão de Processos" },
+      { keywords: ["process", "organiz", "bagunça", "caos", "manual", "caótico"], challengeKey: "Falta de processos definidos", fallbackSolution: "Gestão de Processos" },
       { keywords: ["comunic", "alinha", "feedback"], challengeKey: "Comunicação interna ruim", fallbackSolution: "Comunicação Organizacional Integrada" },
+      { keywords: ["planejamento", "estratég"], challengeKey: "Não consegue escalar", fallbackSolution: "Aceleração & Escalabilidade" },
+      { keywords: ["dependência", "dono", "operação"], challengeKey: "Não consegue escalar", fallbackSolution: "Aceleração & Escalabilidade" },
+      { keywords: ["concorrência", "concorrente"], challengeKey: "Dificuldade em gerar leads", fallbackSolution: "MarTech & Aquisição de Clientes" },
     ];
     for (const mapping of painMappings) {
-      if (mapping.keywords.some(k => painLower.includes(k)) && !commercialSolutions.find(s => s.solution === (PAIN_SOLUTIONS[mapping.challengeKey]?.solution || mapping.fallbackSolution))) {
+      if (painParts.some(part => mapping.keywords.some(k => part.includes(k))) && !commercialSolutions.find(s => s.solution === (PAIN_SOLUTIONS[mapping.challengeKey]?.solution || mapping.fallbackSolution))) {
         const sol = PAIN_SOLUTIONS[mapping.challengeKey] || defaultSolution;
-        commercialSolutions.push({ pain: `Dor principal: "${diagnostic.biggest_pain}"`, ...sol });
+        const matchedPain = diagnostic.biggest_pain!.split(CHIP_SEPARATOR).find(p => mapping.keywords.some(k => p.toLowerCase().includes(k))) || diagnostic.biggest_pain!;
+        commercialSolutions.push({ pain: `Dor: "${matchedPain.trim()}"`, ...sol });
       }
     }
   }
@@ -1048,63 +1320,80 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
     },
   ];
 
-  // Rich text sections that deserve their own full-width blocks
-  const richSections = [
+  const richSections: Array<{
+    title: string;
+    icon: string;
+    content?: string | null;
+    items?: string[];
+    type: "chips" | "text" | "display_chips";
+    highlight?: boolean;
+    extra?: string | null;
+    options?: string[];
+    chipColor?: "red" | "gold" | "blue" | "green";
+  }> = [
     {
       title: "DESAFIOS IDENTIFICADOS",
       icon: "🚨",
-      items: (diagnostic.main_challenges || []).map(c => c),
-      type: "chips" as const,
-    },
-    {
-      title: "METAS DE CURTO PRAZO (3-6 MESES)",
-      icon: "🎯",
-      content: diagnostic.short_term_goals,
-      type: "text" as const,
-    },
-    {
-      title: "METAS DE LONGO PRAZO (1-3 ANOS)",
-      icon: "🏔️",
-      content: diagnostic.long_term_goals,
-      type: "text" as const,
-    },
-    {
-      title: "META DE FATURAMENTO",
-      icon: "💰",
-      content: diagnostic.revenue_goal,
-      type: "text" as const,
-      extra: diagnostic.growth_timeline ? `Prazo para crescimento: ${diagnostic.growth_timeline}` : null,
+      items: (diagnostic.main_challenges || []),
+      type: "chips",
     },
     {
       title: "MAIOR DOR DO CLIENTE",
       icon: "🔥",
       content: diagnostic.biggest_pain,
-      type: "text" as const,
+      type: "display_chips",
       highlight: true,
+      options: BIGGEST_PAIN_OPTIONS,
+      chipColor: "red",
+    },
+    {
+      title: "METAS DE CURTO PRAZO (3-6 MESES)",
+      icon: "🎯",
+      content: diagnostic.short_term_goals,
+      type: "display_chips",
+      options: SHORT_TERM_GOALS_OPTIONS,
+      chipColor: "gold",
+    },
+    {
+      title: "METAS DE LONGO PRAZO (1-3 ANOS)",
+      icon: "🏔️",
+      content: diagnostic.long_term_goals,
+      type: "display_chips",
+      options: LONG_TERM_GOALS_OPTIONS,
+      chipColor: "blue",
+    },
+    {
+      title: "META DE FATURAMENTO",
+      icon: "💰",
+      content: diagnostic.revenue_goal,
+      type: "text",
+      extra: diagnostic.growth_timeline ? `Prazo para crescimento: ${diagnostic.growth_timeline}` : null,
     },
     {
       title: "SOLUÇÕES JÁ TENTADAS",
       icon: "🔄",
       content: diagnostic.tried_solutions,
-      type: "text" as const,
+      type: "display_chips",
+      options: TRIED_SOLUTIONS_OPTIONS,
+      chipColor: "gold",
     },
     {
       title: "ANÁLISE DE CONCORRENTES",
       icon: "🏁",
       content: diagnostic.competitor_analysis,
-      type: "text" as const,
+      type: "text",
     },
     {
       title: "OBSERVAÇÕES ADICIONAIS",
       icon: "📝",
       content: diagnostic.additional_notes,
-      type: "text" as const,
+      type: "text",
     },
     {
       title: "PRÓXIMOS PASSOS",
       icon: "▶️",
       content: diagnostic.next_steps,
-      type: "text" as const,
+      type: "text",
       highlight: true,
     },
   ];
@@ -1124,71 +1413,48 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
         <div>
           <p className="section-eyebrow">Resultado do Diagnóstico</p>
           <h2 className="font-heading text-foreground text-xl font-light tracking-tight">
-            {lead.name} | {new Date(diagnostic.meeting_date).toLocaleDateString("pt-BR")}
+            {lead.name} | {lead.company}
           </h2>
         </div>
       </div>
 
-      {/* Score card */}
+      {/* Score header */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className={`rounded-lg border ${cc.border} ${cc.bg} p-6`}
       >
         <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <p className={`font-heading text-lg font-bold ${cc.text}`}>{cc.label}</p>
-            <p className="font-heading text-sm text-foreground/70 mt-1 max-w-lg">{diagnostic.summary}</p>
-            {comparison && (
-              <div className="mt-3 flex items-center gap-2">
-                {diagnostic.score > (previousDiagnostic?.score || 0) ? (
-                  <TrendingUp size={14} className="text-green-400" />
-                ) : diagnostic.score < (previousDiagnostic?.score || 0) ? (
-                  <TrendingDown size={14} className="text-red-400" />
-                ) : (
-                  <Minus size={14} className="text-muted-foreground/40" />
-                )}
-                <span className="font-heading text-[11px] text-foreground/50">
-                  {previousDiagnostic && `Score anterior: ${previousDiagnostic.score}/100`}
-                  <span className={`ml-2 font-bold ${diagnostic.score > (previousDiagnostic?.score || 0) ? "text-green-400" : diagnostic.score < (previousDiagnostic?.score || 0) ? "text-red-400" : "text-muted-foreground/40"}`}>
-                    ({diagnostic.score - (previousDiagnostic?.score || 0) > 0 ? "+" : ""}{diagnostic.score - (previousDiagnostic?.score || 0)} pts)
-                  </span>
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="text-center">
-            <div className="relative w-24 h-24">
-              <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--border))" strokeWidth="6" />
-                <motion.circle
-                  cx="50" cy="50" r="40" fill="none"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={`${diagnostic.score * 2.51} 251`}
-                  className={cc.text}
-                  initial={{ strokeDasharray: "0 251" }}
-                  animate={{ strokeDasharray: `${diagnostic.score * 2.51} 251` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`font-heading text-2xl font-bold ${cc.text}`}>{diagnostic.score}</span>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <p className={`font-heading text-3xl font-bold ${cc.text}`}>{diagnostic.score}</p>
+              <p className="font-heading text-[9px] text-muted-foreground/40 tracking-[0.1em]">SCORE</p>
             </div>
+            <div className="w-px h-12 bg-border/20" />
+            <div>
+              <span className={`font-heading text-sm font-bold tracking-[0.1em] ${cc.text}`}>{cc.label}</span>
+              <p className="font-heading text-[11px] text-foreground/50 mt-1 max-w-md">{diagnostic.summary}</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="font-heading text-[9px] text-muted-foreground/40">
+              {new Date(diagnostic.meeting_date).toLocaleDateString("pt-BR")} · {diagnostic.meeting_type === "online" ? "Online" : diagnostic.meeting_type === "presencial" ? "Presencial" : "Telefone"}
+            </p>
+            {diagnostic.commercial_name && (
+              <p className="font-heading text-[10px] text-muted-foreground/50 mt-0.5">{diagnostic.commercial_name}</p>
+            )}
           </div>
         </div>
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border/30 gap-0 overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-1 border-b border-border/20 pb-1">
         {tabs.map((t, i) => (
           <button
             key={t.label}
             onClick={() => setActiveTab(i)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 font-heading text-[10px] tracking-[0.1em] font-semibold whitespace-nowrap border-b-2 transition-all ${
-              activeTab === i ? "text-gold border-gold" : "text-muted-foreground/40 border-transparent hover:text-muted-foreground/60"
+            className={`flex items-center gap-1.5 px-4 py-2.5 font-heading text-[10px] tracking-[0.12em] font-semibold transition-all rounded-t-lg ${
+              activeTab === i ? "text-gold border-b-2 border-gold" : "text-muted-foreground/40 hover:text-muted-foreground/60"
             }`}
           >
             {t.icon} {t.label}
@@ -1222,7 +1488,7 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             ))}
           </div>
 
-          {/* Rich text sections - full width, all fields shown */}
+          {/* Rich sections */}
           <div className="space-y-4">
             {richSections.map((section, si) => {
               if (section.type === "chips" && section.items && section.items.length > 0) {
@@ -1247,6 +1513,27 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                   </motion.div>
                 );
               }
+              if (section.type === "display_chips" && section.content) {
+                return (
+                  <motion.div
+                    key={section.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: si * 0.04 }}
+                    className={`rounded-lg border ${section.highlight ? "border-gold-border/40 bg-gold/5" : "border-border/40 bg-card/10"} backdrop-blur-sm p-5`}
+                  >
+                    <p className={`font-heading text-[10px] tracking-[0.2em] ${section.highlight ? "text-gold" : "text-gold/80"} mb-3 font-semibold flex items-center gap-2`}>
+                      <span>{section.icon}</span> {section.title}
+                    </p>
+                    <DisplayChips value={section.content} options={section.options} highlightColor={section.chipColor || "gold"} />
+                    {section.extra && (
+                      <p className="font-heading text-[10px] text-muted-foreground/50 mt-2 pt-2 border-t border-border/20">
+                        {section.extra}
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              }
               if (section.type === "text" && section.content) {
                 return (
                   <motion.div
@@ -1262,9 +1549,9 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                     <p className={`font-heading text-sm ${section.highlight ? "text-foreground/90 font-medium" : "text-foreground/70"} whitespace-pre-wrap leading-relaxed`}>
                       {section.content}
                     </p>
-                    {(section as any).extra && (
+                    {section.extra && (
                       <p className="font-heading text-[10px] text-muted-foreground/50 mt-2 pt-2 border-t border-border/20">
-                        {(section as any).extra}
+                        {section.extra}
                       </p>
                     )}
                   </motion.div>
@@ -1276,7 +1563,7 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
         </>
       )}
 
-      {/* Tab: Evolução (only if previous exists) */}
+      {/* Tab: Evolução */}
       {comparison && activeTab === 1 && (
         <div className="space-y-5">
           {/* Evolution summary */}
@@ -1306,23 +1593,99 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             </div>
           </motion.div>
 
-          {/* Changes list */}
-          {comparison.changes.length > 0 ? (
+          {/* Quick stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-3 text-center">
+              <CheckCircle2 size={16} className="text-green-400 mx-auto mb-1" />
+              <p className="font-heading text-lg font-bold text-green-400">{comparison.resolvedItems.length}</p>
+              <p className="font-heading text-[8px] tracking-[0.15em] text-green-400/60">RESOLVIDOS</p>
+            </div>
+            <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-center">
+              <XCircle size={16} className="text-red-400 mx-auto mb-1" />
+              <p className="font-heading text-lg font-bold text-red-400">{comparison.stillPending.length}</p>
+              <p className="font-heading text-[8px] tracking-[0.15em] text-red-400/60">PENDENTES</p>
+            </div>
+            <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3 text-center">
+              <AlertTriangle size={16} className="text-yellow-400 mx-auto mb-1" />
+              <p className="font-heading text-lg font-bold text-yellow-400">{comparison.newIssues.length}</p>
+              <p className="font-heading text-[8px] tracking-[0.15em] text-yellow-400/60">NOVOS PROBLEMAS</p>
+            </div>
+            <div className="rounded-lg border border-border/30 bg-card/10 p-3 text-center">
+              <ArrowRightLeft size={16} className="text-muted-foreground/40 mx-auto mb-1" />
+              <p className="font-heading text-lg font-bold text-muted-foreground/60">{comparison.changes.length}</p>
+              <p className="font-heading text-[8px] tracking-[0.15em] text-muted-foreground/40">TOTAL ALTERAÇÕES</p>
+            </div>
+          </div>
+
+          {/* Resolved items */}
+          {comparison.resolvedItems.length > 0 && (
+            <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-green-400 mb-3 font-semibold flex items-center gap-2">
+                <CheckCircle2 size={12} /> DESAFIOS RESOLVIDOS
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {comparison.resolvedItems.map((item, i) => (
+                  <span key={i} className="font-heading text-[10px] px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 font-medium line-through">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Still pending */}
+          {comparison.stillPending.length > 0 && (
+            <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-red-400 mb-3 font-semibold flex items-center gap-2">
+                <XCircle size={12} /> DESAFIOS AINDA PENDENTES
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {comparison.stillPending.map((item, i) => (
+                  <span key={i} className="font-heading text-[10px] px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* New issues */}
+          {comparison.newIssues.length > 0 && (
+            <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-yellow-400 mb-3 font-semibold flex items-center gap-2">
+                <AlertTriangle size={12} /> NOVOS DESAFIOS IDENTIFICADOS
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {comparison.newIssues.map((item, i) => (
+                  <span key={i} className="font-heading text-[10px] px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* All changes detail */}
+          {comparison.changes.length > 0 && (
             <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">O QUE MUDOU</p>
+              <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-4 font-semibold">O QUE MUDOU — DETALHAMENTO COMPLETO</p>
               <div className="space-y-3">
                 {comparison.changes.map((change, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
+                    transition={{ delay: i * 0.03 }}
                     className="flex items-start gap-3 py-2.5 border-b border-border/15 last:border-0"
                   >
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                      change.type === "improved" ? "bg-green-500/10" : change.type === "declined" ? "bg-red-500/10" : "bg-gold/10"
+                      change.type === "improved" || change.type === "resolved" ? "bg-green-500/10" :
+                      change.type === "declined" || change.type === "new_issue" ? "bg-red-500/10" : "bg-gold/10"
                     }`}>
-                      {change.type === "improved" ? <TrendingUp size={11} className="text-green-400" /> : change.type === "declined" ? <TrendingDown size={11} className="text-red-400" /> : <Minus size={11} className="text-gold" />}
+                      {change.type === "improved" || change.type === "resolved" ? <TrendingUp size={11} className="text-green-400" /> :
+                       change.type === "declined" ? <TrendingDown size={11} className="text-red-400" /> :
+                       change.type === "new_issue" ? <AlertTriangle size={11} className="text-red-400" /> :
+                       <ArrowRightLeft size={11} className="text-gold" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-heading text-xs text-foreground/80 font-semibold">{change.field}</p>
@@ -1330,7 +1693,8 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                         <span className="font-heading text-[10px] text-muted-foreground/40 line-through">{change.from}</span>
                         <ChevronRight size={10} className="text-muted-foreground/20" />
                         <span className={`font-heading text-[10px] font-medium ${
-                          change.type === "improved" ? "text-green-400" : change.type === "declined" ? "text-red-400" : "text-gold"
+                          change.type === "improved" || change.type === "resolved" ? "text-green-400" :
+                          change.type === "declined" || change.type === "new_issue" ? "text-red-400" : "text-gold"
                         }`}>{change.to}</span>
                       </div>
                     </div>
@@ -1338,7 +1702,26 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                 ))}
               </div>
             </div>
-          ) : (
+          )}
+
+          {/* Unchanged items */}
+          {comparison.unchanged.length > 0 && (
+            <div className="rounded-lg border border-border/30 bg-card/5 p-5">
+              <p className="font-heading text-[10px] tracking-[0.2em] text-muted-foreground/50 mb-4 font-semibold flex items-center gap-2">
+                <Minus size={12} /> SEM ALTERAÇÃO ({comparison.unchanged.length} itens)
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {comparison.unchanged.map((item, i) => (
+                  <div key={i} className="flex justify-between items-center py-1.5 px-3 rounded bg-card/10">
+                    <span className="font-heading text-[10px] text-muted-foreground/40">{item.field}</span>
+                    <span className="font-heading text-[10px] text-muted-foreground/50 font-medium">{item.from}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {comparison.changes.length === 0 && comparison.unchanged.length === 0 && (
             <div className="rounded-lg border border-border/30 bg-card/10 p-8 text-center">
               <Minus size={24} className="text-muted-foreground/20 mx-auto mb-2" />
               <p className="font-heading text-sm text-muted-foreground/40">Nenhuma mudança identificada entre os diagnósticos.</p>
@@ -1435,26 +1818,26 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
               <div className="space-y-4">
                 {diagnostic.biggest_pain && (
                   <div>
-                    <p className="font-heading text-[9px] tracking-[0.15em] text-red-400/70 font-semibold mb-1">🔥 MAIOR DOR</p>
-                    <p className="font-heading text-sm text-foreground/80 whitespace-pre-wrap">{diagnostic.biggest_pain}</p>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-red-400/70 font-semibold mb-1.5">🔥 MAIOR DOR</p>
+                    <DisplayChips value={diagnostic.biggest_pain} options={BIGGEST_PAIN_OPTIONS} highlightColor="red" />
                   </div>
                 )}
                 {diagnostic.tried_solutions && (
                   <div>
-                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🔄 JÁ TENTOU</p>
-                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.tried_solutions}</p>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1.5">🔄 JÁ TENTOU</p>
+                    <DisplayChips value={diagnostic.tried_solutions} options={TRIED_SOLUTIONS_OPTIONS} highlightColor="gold" />
                   </div>
                 )}
                 {diagnostic.short_term_goals && (
                   <div>
-                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🎯 METAS CURTO PRAZO</p>
-                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.short_term_goals}</p>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1.5">🎯 METAS CURTO PRAZO</p>
+                    <DisplayChips value={diagnostic.short_term_goals} options={SHORT_TERM_GOALS_OPTIONS} highlightColor="gold" />
                   </div>
                 )}
                 {diagnostic.long_term_goals && (
                   <div>
-                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1">🏔️ METAS LONGO PRAZO</p>
-                    <p className="font-heading text-xs text-foreground/60 whitespace-pre-wrap">{diagnostic.long_term_goals}</p>
+                    <p className="font-heading text-[9px] tracking-[0.15em] text-muted-foreground/50 font-semibold mb-1.5">🏔️ METAS LONGO PRAZO</p>
+                    <DisplayChips value={diagnostic.long_term_goals} options={LONG_TERM_GOALS_OPTIONS} highlightColor="blue" />
                   </div>
                 )}
                 {diagnostic.next_steps && (
@@ -1478,7 +1861,7 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                 <strong className="text-foreground/80">Perfil:</strong> {diagnostic.company_size || "—"} · {diagnostic.employees_count || "—"} colaboradores · {diagnostic.annual_revenue || "Faturamento não informado"}
               </p>
               <p>
-                <strong className="text-foreground/80">Dores:</strong> {challenges.length} desafios mapeados{diagnostic.biggest_pain ? ` | Principal: "${diagnostic.biggest_pain}"` : ""}
+                <strong className="text-foreground/80">Dores:</strong> {challenges.length} desafios mapeados{diagnostic.biggest_pain ? ` | Principal: "${diagnostic.biggest_pain.split(CHIP_SEPARATOR)[0]}"` : ""}
               </p>
               <p>
                 <strong className="text-foreground/80">Capacidade:</strong> Investimento {diagnostic.investment_capacity || "—"} · Urgência {diagnostic.decision_urgency || "—"} · Orçamento {diagnostic.budget_defined ? diagnostic.budget_range || "Definido" : "Não definido"}
