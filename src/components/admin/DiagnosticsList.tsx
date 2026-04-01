@@ -1199,7 +1199,8 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
       {/* Tab: Resultado */}
       {activeTab === 0 && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Compact info sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {sections.map((section, si) => (
               <motion.div
                 key={section.title}
@@ -1213,7 +1214,7 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
                   {section.items.map((item) => (
                     <div key={item.label} className="flex justify-between items-start gap-2">
                       <span className="font-heading text-[10px] text-muted-foreground/50 shrink-0">{item.label}</span>
-                      <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "-"}</span>
+                      <span className="font-heading text-xs text-foreground/80 text-right">{item.value || "—"}</span>
                     </div>
                   ))}
                 </div>
@@ -1221,28 +1222,57 @@ function DiagnosticResult({ diagnostic, lead, previousDiagnostic, onBack }: { di
             ))}
           </div>
 
-          {(diagnostic.additional_notes || diagnostic.next_steps || diagnostic.competitor_analysis) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {diagnostic.competitor_analysis && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">CONCORRENTES</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.competitor_analysis}</p>
-                </div>
-              )}
-              {diagnostic.next_steps && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">PRÓXIMOS PASSOS</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.next_steps}</p>
-                </div>
-              )}
-              {diagnostic.additional_notes && (
-                <div className="rounded-lg border border-border/40 bg-card/10 p-5 lg:col-span-2">
-                  <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold">OBSERVAÇÕES</p>
-                  <p className="font-heading text-xs text-foreground/70 whitespace-pre-wrap">{diagnostic.additional_notes}</p>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Rich text sections - full width, all fields shown */}
+          <div className="space-y-4">
+            {richSections.map((section, si) => {
+              if (section.type === "chips" && section.items && section.items.length > 0) {
+                return (
+                  <motion.div
+                    key={section.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: si * 0.04 }}
+                    className="rounded-lg border border-border/40 bg-card/10 backdrop-blur-sm p-5"
+                  >
+                    <p className="font-heading text-[10px] tracking-[0.2em] text-gold/80 mb-3 font-semibold flex items-center gap-2">
+                      <span>{section.icon}</span> {section.title}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {section.items.map((item: string, ii: number) => (
+                        <span key={ii} className="font-heading text-[10px] px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              }
+              if (section.type === "text" && section.content) {
+                return (
+                  <motion.div
+                    key={section.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: si * 0.04 }}
+                    className={`rounded-lg border ${section.highlight ? "border-gold-border/40 bg-gold/5" : "border-border/40 bg-card/10"} backdrop-blur-sm p-5`}
+                  >
+                    <p className={`font-heading text-[10px] tracking-[0.2em] ${section.highlight ? "text-gold" : "text-gold/80"} mb-3 font-semibold flex items-center gap-2`}>
+                      <span>{section.icon}</span> {section.title}
+                    </p>
+                    <p className={`font-heading text-sm ${section.highlight ? "text-foreground/90 font-medium" : "text-foreground/70"} whitespace-pre-wrap leading-relaxed`}>
+                      {section.content}
+                    </p>
+                    {(section as any).extra && (
+                      <p className="font-heading text-[10px] text-muted-foreground/50 mt-2 pt-2 border-t border-border/20">
+                        {(section as any).extra}
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              }
+              return null;
+            })}
+          </div>
         </>
       )}
 
