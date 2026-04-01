@@ -34,6 +34,7 @@ interface Profile {
   id: string;
   user_id: string;
   company_name: string;
+  name: string | null;
   company_id: string | null;
   cnpj: string | null;
   level: number;
