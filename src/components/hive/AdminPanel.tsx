@@ -530,6 +530,18 @@ const AdminPanel = () => {
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
+                              navigate(`/the-hive/community/profile/${profile.user_id}`);
+                            }}
+                            className="text-gold hover:text-gold-light text-xs h-9 px-4 gap-1.5 uppercase tracking-wider font-heading"
+                          >
+                            <Eye size={13} />
+                            Ver Perfil
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setEditingProfile(profile.user_id);
                               setEditValues({
                                 company_name: profile.company_name,
