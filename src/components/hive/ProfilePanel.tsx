@@ -290,14 +290,10 @@ const ProfilePanel = () => {
               ) : (
                 <>
                   <div className="flex items-center gap-2 flex-wrap">
-                    {(profile as any).name ? (
-                      <h2 className="text-foreground text-lg font-medium">{(profile as any).name}</h2>
-                    ) : (
-                      <h2 className="text-foreground text-lg font-medium">{profile.company_name}</h2>
-                    )}
+                    <h2 className="text-foreground text-lg font-medium">{getDisplayName(profile)}</h2>
                     {userRole && userRole !== "user" && <RoleBadge role={userRole} size="md" />}
                   </div>
-                  {(profile as any).name && (
+                  {profile.name?.trim() && profile.company_name && (
                     <p className="text-muted-foreground text-sm mt-0.5">{profile.company_name}</p>
                   )}
                   {profile.bio && (
