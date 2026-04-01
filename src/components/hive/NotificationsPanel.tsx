@@ -65,6 +65,31 @@ const NotificationsPanel = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] }),
   });
 
+  const deleteNotification = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notifications").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["unread_notifications", user?.id] });
+    },
+    onError: () => toast.error("Erro ao excluir notificação."),
+  });
+
+  const deleteAllNotifications = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("notifications").delete().eq("user_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["unread_notifications", user?.id] });
+      toast.success("Todas as notificações foram excluídas.");
+    },
+    onError: () => toast.error("Erro ao excluir notificações."),
+  });
+
   const handleClick = (notif: any) => {
     if (!notif.read) markAsRead.mutate(notif.id);
     if (notif.link) navigate(notif.link);
