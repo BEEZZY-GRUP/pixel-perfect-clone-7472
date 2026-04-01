@@ -190,18 +190,30 @@ const NotificationsPanel = () => {
                     {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: ptBR })}
                   </p>
                 </div>
-                {!notif.read && (
+                <div className="flex items-center gap-1 shrink-0">
+                  {!notif.read && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsRead.mutate(notif.id);
+                      }}
+                      className="text-muted-foreground hover:text-foreground p-1"
+                      title="Marcar como lida"
+                    >
+                      <Check size={14} />
+                    </button>
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      markAsRead.mutate(notif.id);
+                      deleteNotification.mutate(notif.id);
                     }}
-                    className="text-muted-foreground hover:text-foreground p-1 shrink-0"
-                    title="Marcar como lida"
+                    className="text-destructive/40 hover:text-destructive p-1 transition-colors"
+                    title="Excluir notificação"
                   >
-                    <Check size={14} />
+                    <Trash2 size={14} />
                   </button>
-                )}
+                </div>
               </button>
             );
           })}
