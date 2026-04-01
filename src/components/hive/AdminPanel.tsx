@@ -192,9 +192,11 @@ const AdminPanel = () => {
   let filtered = profiles?.filter((p: any) => {
     if (search) {
       const s = search.toLowerCase();
-      const matchName = p.company_name?.toLowerCase().includes(s);
+      const displayName = getDisplayName(p)?.toLowerCase() || "";
+      const matchName = displayName.includes(s) || p.company_name?.toLowerCase().includes(s);
       const matchCnpj = p.cnpj?.includes(s);
-      if (!matchName && !matchCnpj) return false;
+      const matchEmail = getUserEmail(p.user_id)?.toLowerCase().includes(s);
+      if (!matchName && !matchCnpj && !matchEmail) return false;
     }
     if (filterBy === "admin") return isUserAdmin(p.user_id);
     if (filterBy === "moderator") return isUserModerator(p.user_id);
