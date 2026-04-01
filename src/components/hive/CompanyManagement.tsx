@@ -79,6 +79,15 @@ const CompanyManagement = () => {
     enabled: isAdmin,
   });
 
+  const { data: userEmails } = useQuery({
+    queryKey: ["user_emails"],
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_user_emails");
+      return data ?? [];
+    },
+    enabled: isAdmin,
+  });
+
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["companies"] });
     queryClient.invalidateQueries({ queryKey: ["all_profiles_for_companies"] });
