@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Bell, MessageCircle, Heart, Megaphone, Check, CheckCheck } from "lucide-react";
+import { Bell, MessageCircle, Heart, Megaphone, Check, CheckCheck, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -64,6 +65,31 @@ const NotificationsPanel = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] }),
   });
 
+  const deleteNotification = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notifications").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["unread_notifications", user?.id] });
+    },
+    onError: () => toast.error("Erro ao excluir notificação."),
+  });
+
+  const deleteAllNotifications = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("notifications").delete().eq("user_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["unread_notifications", user?.id] });
+      toast.success("Todas as notificações foram excluídas.");
+    },
+    onError: () => toast.error("Erro ao excluir notificações."),
+  });
+
   const handleClick = (notif: any) => {
     if (!notif.read) markAsRead.mutate(notif.id);
     if (notif.link) navigate(notif.link);
@@ -86,19 +112,32 @@ const NotificationsPanel = () => {
             </span>
           )}
         </div>
-        {unreadCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => markAllRead.mutate()}
-            disabled={markAllRead.isPending}
-            className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5 self-start sm:self-auto"
-          >
-            <CheckCheck size={14} />
-            <span className="hidden sm:inline">Marcar todas como lidas</span>
-            <span className="sm:hidden">Marcar lidas</span>
-          </Button>
-        )}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => markAllRead.mutate()}
+              disabled={markAllRead.isPending}
+              className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-muted-foreground hover:text-foreground gap-1.5"
+            >
+              <CheckCheck size={14} />
+              <span className="hidden sm:inline">Marcar lidas</span>
+            </Button>
+          )}
+          {notifications && notifications.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => deleteAllNotifications.mutate()}
+              disabled={deleteAllNotifications.isPending}
+              className="text-[.6rem] sm:text-xs h-8 sm:h-9 px-3 sm:px-4 uppercase tracking-wider font-heading text-destructive/70 hover:text-destructive hover:bg-destructive/10 gap-1.5"
+            >
+              <Trash2 size={14} />
+              <span className="hidden sm:inline">Excluir todas</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLoading && (
@@ -151,18 +190,30 @@ const NotificationsPanel = () => {
                     {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: ptBR })}
                   </p>
                 </div>
-                {!notif.read && (
+                <div className="flex items-center gap-1 shrink-0">
+                  {!notif.read && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsRead.mutate(notif.id);
+                      }}
+                      className="text-muted-foreground hover:text-foreground p-1"
+                      title="Marcar como lida"
+                    >
+                      <Check size={14} />
+                    </button>
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      markAsRead.mutate(notif.id);
+                      deleteNotification.mutate(notif.id);
                     }}
-                    className="text-muted-foreground hover:text-foreground p-1 shrink-0"
-                    title="Marcar como lida"
+                    className="text-destructive/40 hover:text-destructive p-1 transition-colors"
+                    title="Excluir notificação"
                   >
-                    <Check size={14} />
+                    <Trash2 size={14} />
                   </button>
-                )}
+                </div>
               </button>
             );
           })}
