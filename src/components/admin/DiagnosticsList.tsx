@@ -184,16 +184,16 @@ function calculateScore(form: Record<string, any>): { score: number; classificat
 
   if (score >= 80) {
     classification = "quente";
-    summary = "Lead altamente qualificado. Alta urgência, orçamento definido e maturidade empresarial elevada. Recomenda-se proposta comercial imediata.";
+    summary = "Cliente altamente qualificado. Alta urgência, orçamento definido e maturidade empresarial elevada. Recomenda-se proposta comercial imediata.";
   } else if (score >= 60) {
     classification = "morno";
-    summary = "Lead com bom potencial. Possui interesse e capacidade de investimento moderada. Recomenda-se nurturing direcionado e follow-up em 1-2 semanas.";
+    summary = "Cliente com bom potencial. Possui interesse e capacidade de investimento moderada. Recomenda-se nurturing direcionado e follow-up em 1-2 semanas.";
   } else if (score >= 40) {
     classification = "frio";
-    summary = "Lead em fase inicial. Necessita amadurecimento antes de avançar no funil. Recomenda-se conteúdo educativo e acompanhamento mensal.";
+    summary = "Cliente em fase inicial. Necessita amadurecimento antes de avançar no funil. Recomenda-se conteúdo educativo e acompanhamento mensal.";
   } else {
     classification = "desqualificado";
-    summary = "Lead com baixo potencial no momento. Orçamento limitado ou baixa urgência. Recomenda-se manter na base e reavaliar em 3-6 meses.";
+    summary = "Cliente com baixo potencial no momento. Orçamento limitado ou baixa urgência. Recomenda-se manter na base e reavaliar em 3-6 meses.";
   }
 
   return { score, classification, summary };
