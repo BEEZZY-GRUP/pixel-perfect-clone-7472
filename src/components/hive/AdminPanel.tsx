@@ -408,7 +408,7 @@ const AdminPanel = () => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2.5">
                           <p className="text-foreground text-base font-medium truncate">
-                            {profile.company_name}
+                            {getDisplayName(profile)}
                           </p>
                           {admin && (
                             <span className="text-xs bg-gold/10 text-gold px-2.5 py-0.5 uppercase tracking-wider font-heading shrink-0">
