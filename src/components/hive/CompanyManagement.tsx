@@ -483,15 +483,26 @@ const CompanyManagement = () => {
                                 Lv.{member.level} · {member.xp} XP
                               </p>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => removeMember.mutate(member.id)}
-                              disabled={removeMember.isPending}
-                              className="text-destructive hover:text-destructive h-6 px-2"
-                            >
-                              <UserMinus size={12} />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => navigate(`/the-hive/community/profile/${member.user_id}`)}
+                                className="text-gold hover:text-gold-light h-6 px-2"
+                                title="Ver Perfil"
+                              >
+                                <Eye size={12} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => removeMember.mutate(member.id)}
+                                disabled={removeMember.isPending}
+                                className="text-destructive hover:text-destructive h-6 px-2"
+                              >
+                                <UserMinus size={12} />
+                              </Button>
+                            </div>
                           </div>
                         ))}
                       </div>
