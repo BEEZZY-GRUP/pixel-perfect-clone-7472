@@ -463,7 +463,7 @@ const AdminPanel = () => {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
                           { label: "Nome", value: getDisplayName(profile) },
-                          { label: "CNPJ", value: profile.cnpj || "—" },
+                          { label: "CNPJ (Empresa)", value: getCompanyCnpj(profile.company_id) || profile.cnpj || "—" },
                           { label: "Empresa", value: linkedCompany || "Nenhuma" },
                           {
                             label: "Membro desde",
