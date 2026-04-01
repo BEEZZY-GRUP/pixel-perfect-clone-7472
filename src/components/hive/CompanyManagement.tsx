@@ -89,7 +89,8 @@ const CompanyManagement = () => {
   });
 
   const getDisplayName = (profile: Profile) => {
-    if (profile.name) return profile.name;
+    if (profile.name?.trim()) return profile.name.trim();
+    if (profile.company_name && profile.company_name !== "Empresa") return profile.company_name;
     const email = (userEmails as any[])?.find((e: any) => e.user_id === profile.user_id)?.email;
     return email || profile.company_name;
   };
