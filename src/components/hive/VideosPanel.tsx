@@ -134,8 +134,8 @@ const VideosPanel = () => {
                     </button>
                   )}
                   {/* Theater mode button */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setTheaterVideo(video); }}
+                   <button
+                    onClick={(e) => { e.stopPropagation(); setPlayingId(null); setTheaterVideo(video); }}
                     className="absolute top-2 right-2 bg-background/70 hover:bg-background/90 text-foreground p-1.5 rounded transition-all opacity-0 group-hover:opacity-100 z-10"
                     title="Modo Teatro"
                   >
@@ -150,8 +150,8 @@ const VideosPanel = () => {
                       {video.description && <p className="text-muted-foreground text-[.7rem] mt-1 line-clamp-2 leading-relaxed">{video.description}</p>}
                       <div className="flex items-center gap-3 mt-2">
                         <p className="text-muted-foreground/50 text-[.6rem]">{formatDistanceToNow(new Date(video.created_at), { addSuffix: true, locale: ptBR })}</p>
-                        <button
-                          onClick={() => setTheaterVideo(video)}
+                     <button
+                          onClick={() => { setPlayingId(null); setTheaterVideo(video); }}
                           className="flex items-center gap-1 text-muted-foreground/50 hover:text-gold text-[.6rem] transition-colors"
                         >
                           <MessageCircle size={10} /> Comentários
