@@ -72,7 +72,7 @@ const CompanyManagement = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, user_id, company_name, company_id, cnpj, level, xp")
+        .select("id, user_id, company_name, name, company_id, cnpj, level, xp")
         .order("company_name");
       return (data ?? []) as Profile[];
     },
