@@ -51,7 +51,7 @@ const HiveLogin = () => {
     }
     setRecovering(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/the-hive/reset-password`,
+      redirectTo: `https://beezzygroup.com/the-hive/reset-password`,
     });
     setRecovering(false);
     if (error) {
