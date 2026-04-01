@@ -123,7 +123,7 @@ const VideosPanel = () => {
             return (
               <div key={video.id} className="border border-border bg-card group hover:border-gold/20 transition-colors">
                 <div className="aspect-video bg-secondary relative overflow-hidden">
-                  {isPlaying ? (
+                  {isPlaying && !theaterVideo ? (
                     <iframe src={getEmbedUrl(video.video_url) + "?autoplay=1"} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
                   ) : (
                     <button onClick={() => setPlayingId(video.id)} className="w-full h-full relative">
