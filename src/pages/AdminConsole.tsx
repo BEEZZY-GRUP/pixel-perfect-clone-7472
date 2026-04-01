@@ -46,7 +46,7 @@ function ConsoleContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative console-white">
       <PageBackground />
 
       {/* Top bar */}
