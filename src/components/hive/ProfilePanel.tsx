@@ -219,7 +219,7 @@ const ProfilePanel = () => {
               <div className="flex items-end justify-between mb-4">
                 <div className="relative group" data-onboarding="avatar">
                   <div className="w-20 h-20 rounded-full border-4 border-background overflow-hidden bg-secondary">
-                    <UserAvatar avatarUrl={profile.avatar_url} name={(profile as any).name || profile.company_name} size="lg" className="w-full h-full text-lg" />
+                    <UserAvatar avatarUrl={profile.avatar_url} name={getDisplayName(profile)} size="lg" className="w-full h-full text-lg" />
                   </div>
                   <button
                     onClick={() => fileInputRef.current?.click()}
