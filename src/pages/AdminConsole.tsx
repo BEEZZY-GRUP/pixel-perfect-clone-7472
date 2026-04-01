@@ -72,7 +72,7 @@ function ConsoleContent() {
                 <button
                   key={t.key}
                   onClick={() => setTab(t.key)}
-                  className={`relative flex items-center gap-2 px-3 md:px-5 py-4 font-heading text-[9px] sm:text-[10px] tracking-[0.18em] transition-all duration-300 whitespace-nowrap font-semibold group ${
+                  className={`relative flex items-center gap-2 px-3 md:px-5 py-4 font-heading text-[10px] sm:text-[11px] tracking-[0.18em] transition-all duration-300 whitespace-nowrap font-semibold group ${
                     isActive
                       ? "text-gold"
                       : "text-muted-foreground/60 hover:text-foreground/80"
