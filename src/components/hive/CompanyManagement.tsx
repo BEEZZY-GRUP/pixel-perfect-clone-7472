@@ -43,6 +43,7 @@ interface Profile {
 const CompanyManagement = () => {
   const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [expandedCompany, setExpandedCompany] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
